@@ -2,8 +2,8 @@ import { getUser, isVip, fmt, say, esc, admins, activate, newPromo, stats, newTi
 
 export default async function handler(req, res) {
   if (!process.env.WEBHOOK_SECRET || req.headers['x-telegram-bot-api-secret-token'] !== process.env.WEBHOOK_SECRET) return res.status(401).end();
+  const m = req.body?.message;
   try {
-    const m = req.body?.message;
     if (m?.text) {
       const host = req.headers['x-forwarded-host'] || req.headers.host;
       const openBtn = { reply_markup: { inline_keyboard: [[{ text: '🌱 Открыть Садовест', web_app: { url: `https://${host}` } }]] } };
@@ -23,6 +23,6 @@ export default async function handler(req, res) {
         else if (adm && cmd === '/reply') { const [id, ...t] = rest; await replyTicket(id, t.join(' ')); await say(chat, '✅ Отправлено'); }
       } catch (e) { await say(chat, '⚠️ ' + esc(e.message)); }
     }
-  } catch (e) { console.error(e); }
+  } catch (e) { console.error(e); if (m?.chat?.id) await say(m.chat.id, '⚠️ Ошибка сервера: ' + esc(e.message)); }
   res.json({ ok: 1 });
 }
