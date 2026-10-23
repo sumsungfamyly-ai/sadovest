@@ -62,6 +62,15 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px soli
 .rays{position:absolute!important;inset:-50%;background:repeating-conic-gradient(#f6c74440 0 10deg,transparent 10deg 20deg);animation:rot 20s linear infinite}@keyframes rot{to{transform:rotate(360deg)}}
 .cele i{position:absolute;top:-30px;font-style:normal;animation:fall 3s linear infinite}@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important}}
+:root{--bg:#d4f7cf;--card:#fff;--ink:#17311f;--mute:#4f7a5a;--line:#b5e3b5;--goldbg:#fff0b8}
+html,body{background:linear-gradient(160deg,#b9f6ca 0%,#e8ffd6 45%,#fff3b0 100%) fixed;color:var(--ink)}h1{color:#14532d}nav{background:#fff}
+.btn{background:linear-gradient(#52d06a,#1f8f3a);border-bottom:6px solid #0f5a24;box-shadow:0 8px 14px rgba(20,83,45,.35),inset 0 2px 0 rgba(255,255,255,.45);text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.btn:active{transform:translateY(5px);border-bottom-width:1px;box-shadow:0 2px 4px rgba(20,83,45,.3)}
+.btn.gold{background:linear-gradient(#ffe27a,#e0a914);border-bottom-color:#9a6b00;text-shadow:none}
+.btn.ghost{background:#fff;border:2px solid var(--g1);border-bottom-width:5px;text-shadow:none;color:var(--g2)}.btn[disabled]{filter:grayscale(.7);opacity:.6}
+.tile,.les,.pl{border-bottom:5px solid #9fd6a4;box-shadow:0 6px 10px rgba(20,83,45,.15)}.tile.vip{border-bottom-color:#c99a14}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.chip{border:2px solid var(--g1);border-bottom-width:4px;background:#fff;color:var(--g2);border-radius:20px;padding:8px 14px;font:800 14px Nunito}.chip.on{background:var(--g1);color:#fff}
+.les.pick{background:#d9f2dc;border-color:var(--g1)}.card h2{margin-top:0}
 </style>
 </head>
 <body>
@@ -81,13 +90,13 @@ async function api(action,data={}){
 }
 function toast(t,err){const e=document.createElement('div');e.className='toast'+(err?' err':'');e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),2600)}
 const act=async(fn)=>{try{return await fn()}catch(e){toast(e.message,1)}};
-const head=(t,back=1)=>`<div class="top">${back?'<button class="back" aria-label="Назад" onclick="back()">‹</button>':''}<b>🌱 ${t}</b>${me?.vip?'<span style="font-size:26px">👑</span>':''}</div>`;
-const tabs=[['home','🏠','Главная'],['lessons','📖','Уроки'],['community','💬','Сообщество'],['profile','👤','Профиль']];
+const head=(t,back=1,x='')=>`<div class="top">${back?'<button class="back" aria-label="Назад" onclick="back()">‹</button>':''}<b>🌱 ${t}</b>${x}<button class="back" aria-label="Поиск" onclick="go('search','')">🔍</button>${me?.vip?'<span style="font-size:26px">👑</span>':''}</div>`;
+const tabs=[['home','🏠','Главная'],['lessons','📖','Уроки'],['plants','🌿','Растения'],['profile','👤','Профиль']];
 function go(v,a){stack.push([cur,curArg]);cur=v;curArg=a;draw()}
 let curArg;
 function back(){const p=stack.pop();if(p){cur=p[0];curArg=p[1];draw()}}
 function tab(v){stack=[];cur=v;curArg=null;draw()}
-const root=['home','lessons','community','profile'];
+const root=['home','lessons','plants','profile'];
 async function draw(){
   const nav=$('#nav');nav.hidden=!me||!root.includes(cur);
   nav.innerHTML=tabs.map(([v,i,t])=>`<button class="${v===cur?'on':''}" onclick="tab('${v}')"><i>${i}</i>${t}</button>`).join('');
@@ -152,7 +161,7 @@ const buy=()=>link(me.cfg.buy);
 const refresh=async()=>{me=await api('me')};
 const usePromo=()=>act(async()=>{const was=me.vip;const r=await api('promo',{code:$('#pc').value});await refresh();if(!was&&me.vip)celebrate('👑','Добро пожаловать в VIP!',r.msg);else toast('✅ '+r.msg);tab('profile')});
 const finish=id=>act(async()=>{const b=me.ach.length;await api('done',{id});await refresh();me.ach.length>b?celebrate('🏅','Новое достижение!',ACH[me.ach[me.ach.length-1]][1]):toast('Урок пройден! +2 🪙');back()});
-const sendT=()=>act(async()=>{await api('ticket_new',{text:$('#tx').value});toast('Отправлено');draw()});
+const sendT=()=>act(async()=>{await api('ticket_new',{text:$('#tx').value,photo:PH});PH='';toast('Отправлено');draw()});
 const addPlant=()=>act(async()=>{await api('plant_add',{name:$('#pn').value,every:$('#pe').value});await refresh();draw()});
 const plant=(a,id)=>act(async()=>{await api(a,{id});await refresh();draw()});
 const toggleN=()=>act(async()=>{await api('notify',{on:!me.notify});await refresh();draw()});
@@ -162,7 +171,7 @@ const grant=()=>act(async()=>{await api('admin_grant',{uid:$('#gu').value,days:$
 const reply=id=>adm('admin_reply',{id,text:$('#r'+id).value});
 async function init(){
   if(!tg?.initData){app.innerHTML=head('Садовест',0)+'<div class="card center"><div style="font-size:44px">📱</div>Откройте приложение через Telegram-бота «Садовест»</div>';return}
-  try{await refresh();draw()}catch(e){app.innerHTML=head('Садовест',0)+`<div class="card center">${esc(e.message)}<button class="btn" onclick="init()">Повторить</button></div>`}
+  try{await refresh();if(!me.profile)cur='onboard';draw();if(me.newReward)celebrateStreak(me.newReward)}catch(e){app.innerHTML=head('Садовест',0)+`<div class="card center">${esc(e.message)}<button class="btn" onclick="init()">Повторить</button></div>`}
 }
 // ---- v2: уроки, каталог, игры, эффекты ----
 function celebrate(icon,title,sub){const o=document.createElement('div');o.className='cele';
@@ -187,6 +196,73 @@ function quiz(){const z=QZ,el=$('#qz');if(!el)return;
 function ans(k){const z=QZ;if(z.lock)return;z.lock=1;const q=z.q[z.i],ok=q.o[k][1],b=$('#o'+k);b.classList.add(ok?'right':'wrong');
   if(ok){z.s++;burst(b)}else q.o.forEach(([,g],j)=>g&&$('#o'+j).classList.add('right'));setTimeout(()=>{z.i++;z.lock=0;quiz()},1200)}
 function reward(){act(async()=>{await api('quiz',{score:QZ.s});await refresh();QZ.s===QZ.q.length?celebrate('🏆','Идеально!','5 из 5 — вы настоящий садовод'):toast(`+${QZ.s} 🪙`);tab('home')})}
+// ---- v3 ----
+Object.assign(ACH,{s5:['🔥','5 дней подряд'],s30:['🔥','30 дней подряд'],s100:['🔥','100 дней подряд']});
+const chips=(k,o)=>`<div class="chips">${o.map(x=>`<button class="chip ${S2[k]===x?'on':''}" onclick="S2.${k}='${x}';draw()">${x}</button>`).join('')}</div>`;
+const S2={pt:'Растения',lv:'Все'};
+const bm=k=>`<button class="back" style="margin-left:auto" aria-label="Закладка" onclick="mark('${k}')">${me.bookmarks.includes(k)?'⭐':'☆'}</button>`;
+const mark=k=>act(async()=>{me.bookmarks=(await api('bookmark',{key:k})).bookmarks;draw()});
+const celebrateStreak=n=>celebrate('🔥',`${n} дней подряд!`,{5:'Награда: +10 🪙',30:'Награда: +50 🪙',100:'Награда: +200 🪙 и 7 дней VIP'}[n]);
+const tipsFor=()=>{const p=me.profile||{};return `${MON[new Date().getMonth()]} ${PLACE[p.place]||''} ${LEVELT[p.level]||''}`};
+// онбординг
+let OB={};
+const obq=(k,t,o)=>`<div class="card"><b>${t}</b><div class="chips">${o.map(x=>`<button class="chip ${OB[k]===x?'on':''}" onclick="OB.${k}='${x}';draw()">${x}</button>`).join('')}</div></div>`;
+V.onboard=()=>`<h1>Добро пожаловать! 🌱</h1><div class="mute">Три вопроса — и советы подстроятся под вас</div>${obq('place','1. Где вы выращиваете растения?',['Дача','Балкон','Теплица'])}${obq('level','2. Ваш опыт?',['Новичок','Любитель','Опытный'])}<div class="card"><b>3. Ваш город или регион</b><input value="${esc(OB.city||'')}" oninput="OB.city=this.value" placeholder="Например, Краснодар"></div><button class="btn" onclick="saveOB()">Начать</button>`;
+const saveOB=()=>act(async()=>{await api('onboard',OB);await refresh();tab('home')});
+// главная
+V.home=()=>`<h1>Привет, ${esc(me.name)}!</h1><input placeholder="🔍 Поиск по урокам, растениям, болезням…" onkeydown="if(event.key==='Enter')go('search',this.value)"><div class="card tipc" style="margin-top:12px">🌤 <b>Совет:</b> ${esc(tipsFor())}</div><div class="card row glow"><span>🔥 <b>${me.streak}</b> дн. подряд</span><span style="text-align:right">🪙 <b>${me.coins}</b></span></div><div class="grid">${[['lessons','📖','Уроки'],['garden','🪴','Мой огород'],['plants','🌿','Энциклопедия'],['weather','🌦️','Погода'],['games','🧩','Игры'],['board','🏆','Рейтинг'],['marks','🔖','Закладки'],['files','📄','Материалы'],['vip','👑','VIP-клуб','vip'],['support','🛟','Поддержка'],['calendar','🗓️','Календарь'],['shop','🧺','Магазин']].map(([v,i,t,c])=>`<button class="tile ${c||''}" onclick="${['lessons','plants'].includes(v)?'tab':'go'}('${v}')"><i>${i}</i>${t}</button>`).join('')}</div>${me.vip?'':`<button class="banner" onclick="go('vip')"><i>👑</i><span>VIP-доступ<small>100 уроков и поддержка экспертов</small></span></button>`}${me.admin?`<button class="btn ghost" onclick="go('admin')">⚙️ Панель администратора</button>`:''}`;
+// уроки по уровням
+V.lessons=async()=>{const {items}=await api('lessons'),L=['Начинающий','Любитель','Мастер'];
+  const row=l=>`<button class="les ${l.locked?'lock':''}" onclick="${l.locked?"go('vip')":`go('lesson',${l.id})`}"><span class="n">${l.locked?'🔒':l.done?'✅':l.id}</span><span>${esc(l.title)}</span><span class="tag ${l.free?'':'v'}">${l.free?'Бесплатно':'VIP'}</span></button>`;
+  return head('Уроки',0)+chips('lv',['Все',...L])+L.filter(l=>S2.lv==='Все'||S2.lv===l).map(l=>`<h2>${{Начинающий:'🌱',Любитель:'🌿',Мастер:'🌳'}[l]} ${l}</h2>`+items.filter(i=>i.level===l).map(row).join('')).join('')};
+// урок: слайды + 3 вопроса
+let LS=null;const ICO=['🌱','💧','☀️','🛡️','📌'];
+V.lesson=async id=>{if(!LS||LS.l.id!==id)LS={l:await api('lesson',{id}),i:0,a:[]};
+  const {l,i}=LS,sl=[...l.sections.map(([h,t],k)=>[ICO[k%5]+' '+h,t]),['🤯 Интересный факт',l.fact],['💡 Совет эксперта',l.tip]],n=sl.length,hd=head('Урок',1,bm('l:'+id));
+  if(i<n)return hd+`<div class="mute">${esc(l.title)} • слайд ${i+1} из ${n}</div><div class="bar"><div style="width:${(i+1)/n*100}%"></div></div><div class="card sec glow"><b style="font-size:19px">${sl[i][0]}</b><p style="font-size:17px">${esc(sl[i][1])}</p></div><div class="row">${i?'<button class="btn ghost" onclick="LS.i--;draw()">‹ Назад</button>':''}<button class="btn" onclick="LS.i++;draw()">${i===n-1?'К вопросам ›':'Далее ›'}</button></div>`;
+  return hd+`<h2>Проверка: 3 вопроса</h2><div class="mute">Нужно верно ответить минимум на 2</div>`+l.quiz.map((q,qi)=>`<div class="card"><b>${esc(q.q)}</b>${q.o.map((x,k)=>`<button class="les ${LS.a[qi]===x?'pick':''}" onclick="pickA(${qi},${k})">${esc(x)}</button>`).join('')}</div>`).join('')+`<button class="btn" onclick="submitL()">Завершить урок</button>`};
+const pickA=(qi,k)=>{LS.a[qi]=LS.l.quiz[qi].o[k];draw()};
+const submitL=()=>act(async()=>{if(LS.a.filter(Boolean).length<3)throw new Error('Ответьте на все три вопроса');try{await api('done',{id:LS.l.id,answers:LS.a})}catch(e){LS.a=[];throw e}LS=null;await refresh();celebrate('🌿','Урок пройден!',`+2 🪙 • пройдено ${me.done} из ${me.total}`);back()});
+// энциклопедия
+V.plants=()=>{const P=S2.pt==='Растения',src=P?PLANTS:PESTS;let last='';
+  return head('Энциклопедия',0)+chips('pt',['Растения','Болезни и вредители'])+src.map((x,i)=>[x,i]).sort((a,b)=>a[0].n.localeCompare(b[0].n,'ru')).map(([x,i])=>{const L=x.n[0].toUpperCase(),h=L!==last?(last=L,`<h2>${L}</h2>`):'';return h+`<button class="les" onclick="go('${P?'plantinfo':'pestinfo'}',${i})"><span class="n">${x.e}</span><span>${x.n}<div class="mute">${x.k}</div></span></button>`}).join('')};
+V.plantinfo=i=>{const p=PLANTS[i];return head(p.n,1,bm('p:'+i))+`<div class="card glow center"><div class="big">${p.e}</div><h2 style="margin:0">${p.n}</h2><div class="mute">${p.k} • ${p.s} • полив раз в ${p.w} дн.</div></div><div class="card"><b>О растении</b><p>${p.i}</p><b>Когда сажать</b><p>${p.t}</p><b>Советы</b>${p.c.map(x=>`<p>✅ ${x}</p>`).join('')}</div><button class="btn" onclick="addP(${i})">Добавить в мой огород</button>`};
+V.pestinfo=i=>{const p=PESTS[i];return head(p.n,1,bm('d:'+i))+`<div class="card glow center"><div class="big">${p.e}</div><h2 style="margin:0">${p.n}</h2><div class="mute">${p.k}</div></div><div class="card"><b>Признаки</b><p>${p.i}</p><b>Как бороться</b>${p.c.map(x=>`<p>✅ ${x}</p>`).join('')}</div>`};
+// закладки и поиск
+V.marks=async()=>{const L=(await api('lessons')).items;
+  const row=k=>{const [t,i]=k.split(':'),o=t==='l'?L.find(x=>x.id==i):t==='p'?PLANTS[i]:PESTS[i];if(!o)return'';return `<button class="les" onclick="go('${t==='l'?'lesson':t==='p'?'plantinfo':'pestinfo'}',${i})"><span class="n">${t==='l'?'📖':o.e}</span><span>${esc(o.title||o.n)}</span></button>`};
+  return head('Закладки')+(me.bookmarks.length?me.bookmarks.map(row).join(''):'<div class="card center">Нажмите ☆ на уроке, растении или болезни, чтобы сохранить</div>')};
+let SL=[];
+const results=q=>{q=(q||'').toLowerCase().trim();if(!q)return'<div class="mute center">Введите запрос</div>';const o=[];
+  SL.filter(x=>x.title.toLowerCase().includes(q)).forEach(x=>o.push([`📖 ${x.title}`,`go('lesson',${x.id})`]));
+  PLANTS.forEach((x,i)=>(x.n+x.i+x.c.join()).toLowerCase().includes(q)&&o.push([`${x.e} ${x.n}`,`go('plantinfo',${i})`]));
+  PESTS.forEach((x,i)=>(x.n+x.i+x.c.join()).toLowerCase().includes(q)&&o.push([`${x.e} ${x.n}`,`go('pestinfo',${i})`]));
+  return o.length?o.slice(0,30).map(([t,a])=>`<button class="les" onclick="${a}">${esc(t)}</button>`).join(''):'<div class="card center">Ничего не найдено</div>'};
+V.search=async q=>{SL=(await api('lessons')).items;return head('Поиск')+`<input value="${esc(q||'')}" oninput="$('#sr').innerHTML=results(this.value)" placeholder="Что ищем?"><div id="sr">${results(q)}</div>`};
+// погода
+V.weather=async()=>{const city=me.profile?.city||'Москва';
+  const g=await(await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=ru&name='+encodeURIComponent(city))).json();
+  if(!g.results)return head('Погода')+`<div class="card center">Город «${esc(city)}» не найден.</div>${cityBox()}`;
+  const {latitude:la,longitude:lo,name}=g.results[0],w=await(await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&forecast_days=7`)).json(),d=w.daily;
+  return head('Погода для огорода')+`<div class="mute">📍 ${esc(name)}</div>`+d.time.map((t,i)=>{const mx=d.temperature_2m_max[i],mn=d.temperature_2m_min[i],p=d.precipitation_sum[i],tip=mn<=1?'❄️ Заморозок: укройте рассаду и всходы':p>=3?'🌧 Дождь: полив не нужен':mx>=28?'🔥 Жара: поливайте вечером, притените':'✅ Хороший день для работ в саду';return `<div class="card"><div class="row"><b>${new Date(t).toLocaleDateString('ru-RU',{weekday:'short',day:'numeric',month:'short'})}</b><span style="text-align:right">${Math.round(mn)}…${Math.round(mx)} °C • ${p} мм</span></div><div class="mute">${tip}</div></div>`}).join('')+cityBox()};
+const cityBox=()=>`<div class="card"><b>Сменить город</b><input id="wc" placeholder="Город"><button class="btn" onclick="setCity()">Сохранить</button></div>`;
+const setCity=()=>act(async()=>{await api('onboard',{...me.profile,city:$('#wc').value});await refresh();draw()});
+// рейтинг
+V.board=async()=>{const {items,you}=await api('lb'),all=[...items,{nick:me.name+' (вы)',score:you,me:1}].sort((a,b)=>b.score-a.score);
+  return head('Рейтинг')+all.slice(0,30).map((x,i)=>`<div class="card row ${x.me?'glow':''}"><b>${['🥇','🥈','🥉'][i]||i+1}</b><span style="flex:3">${esc(x.nick)}</span><b style="text-align:right">${x.score} 🪙</b></div>`).join('')};
+const _adm=V.admin;V.admin=async()=>{const b=await _adm(),{items}=await api('lb');window.LBI=items;
+  return b+`<h2>Рейтинг (лидерборд)</h2>`+items.map((x,i)=>`<div class="card row"><span>${esc(x.nick)} — ${x.score}</span><button class="btn sm ghost" onclick="adm('admin_lb_del',{nick:LBI[${i}].nick})">Удалить</button></div>`).join('')+`<div class="card"><b>Добавить / изменить участника</b><input id="ln" maxlength="24" placeholder="Ник"><input id="ls" type="number" placeholder="Рейтинг"><button class="btn" onclick="adm('admin_lb_set',{nick:$('#ln').value,score:$('#ls').value})">Сохранить</button></div>`};
+// PDF
+const FILES=[['cal','📅','Календарь посадок',0],['water','💧','Чек-лист полива',0],['pests','🐛','Шпаргалка: болезни и вредители',1],['plan','🗓️','Годовой план садовода',1]];
+V.files=()=>head('Материалы')+'<div class="mute">PDF придёт вам в чат с ботом</div>'+FILES.map(([id,e,t,v])=>`<button class="les" onclick="${v&&!me.vip?"go('vip')":`getPdf('${id}')`}"><span class="n">${e}</span><span>${t}</span><span class="tag ${v?'v':''}">${v?(me.vip?'VIP':'🔒 VIP'):'Бесплатно'}</span></button>`).join('');
+const getPdf=id=>act(async()=>{await api('pdf',{id});toast('📄 Отправлено в чат с ботом')});
+// поддержка с фото
+let PH='';
+function pickPhoto(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);PH=c.toDataURL('image/jpeg',.8);$('#pv').src=PH;$('#pv').hidden=false};im.src=r.result};r.readAsDataURL(f)}
+V.support=async()=>{if(!me.vip)return head('VIP-эксперт')+`<div class="card center"><div style="font-size:44px">🔒</div><b>Поддержка доступна только VIP-пользователям</b><div class="mute">Ответ в течение 1–2 часов</div><button class="btn gold" onclick="go('vip')">Открыть VIP</button></div>`;
+  const {items}=await api('tickets');
+  return head('VIP-эксперт')+(items.length?items.slice().reverse().map(t=>`<div class="msg me">${esc(t.text)}${t.photo?'<div>📷 фото приложено</div>':''}<div class="mute">${fd(t.created)}</div></div>${t.reply?`<div class="msg ex"><b>Эксперт 👑</b><br>${esc(t.reply)}</div>`:'<div class="mute center">Ждём ответа эксперта…</div>'}`).join(''):'<div class="card center">Опишите проблему и приложите фото растения — эксперт ответит в течение 1–2 часов.</div>')+`<textarea id="tx" rows="3" maxlength="1000" placeholder="Напишите сообщение…"></textarea><img id="pv" hidden style="max-width:100%;border-radius:14px;margin-top:8px"><label class="btn ghost" style="display:block;text-align:center;box-sizing:border-box">📷 Прикрепить фото<input type="file" accept="image/*" hidden onchange="pickPhoto(this)"></label><button class="btn" onclick="sendT()">Отправить</button>`};
+const _pf=V.profile;V.profile=()=>_pf().replace('<h2>Достижения</h2>',`<div class="card glow center">🔥 <b>${me.streak} дн. подряд</b> (рекорд ${me.best})<div class="mute">5 дней — 10 🪙, 30 — 50 🪙, 100 — 200 🪙 и 7 дней VIP. Пропуск дня обнуляет серию.</div></div><h2>Достижения</h2>`);
 init();
 </script>
 </body>
