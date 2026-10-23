@@ -7,6 +7,7 @@ const needAdmin = a => { if (!a) deny(); };
 const H = {
   async me({ u, admin }) {
     return { id: u.id, name: u.name, vip: isVip(u), vip_until: u.vip_until, done: u.progress.length, total: LESSONS.length, coins: u.coins, days: u.days, ach: u.ach, notify: u.notify, admin,
+      quiz: (() => { const d = t => new Date(t).toISOString().slice(0, 10), log = u.quizLog || []; return { today: log.includes(d(Date.now())), days: [...Array(7)].map((_, i) => log.includes(d(Date.now() - (6 - i) * 864e5))) }; })(),
       cfg: { community: process.env.COMMUNITY_URL || '', buy: process.env.BUY_URL || '' } };
   },
   async lessons({ u }) {
@@ -15,7 +16,7 @@ const H = {
   async lesson({ u, b }) {
     const l = LESSONS.find(x => x.id === Number(b.id)); if (!l) deny('Урок не найден', 404);
     if (!l.free && !isVip(u)) deny('Урок доступен с VIP');
-    return { id: l.id, title: l.title, text: l.text, done: u.progress.includes(l.id) };
+    return { id: l.id, title: l.title, intro: l.intro, sections: l.sections, tip: l.tip, done: u.progress.includes(l.id) };
   },
   async done({ u, b }) {
     const l = LESSONS.find(x => x.id === Number(b.id)); if (!l) deny('Урок не найден', 404);
@@ -41,8 +42,9 @@ const H = {
   async notify({ u, b }) { u.notify = !!b.on; await save(u); return { notify: u.notify }; },
   async quiz({ u, b }) {
     const today = new Date().toISOString().slice(0, 10);
-    if (u.quizDay === today) deny('Награда за игру уже получена сегодня', 400);
-    u.quizDay = today; u.coins += Math.min(5, Math.max(0, Number(b.score) || 0)); await save(u); return { coins: u.coins };
+    u.quizLog = u.quizLog || [];
+    if (u.quizLog.includes(today)) deny('Сегодня вы уже играли', 400);
+    u.quizLog = [...u.quizLog, today].slice(-14); u.coins += Math.min(5, Math.max(0, Number(b.score) || 0)); await save(u); return { coins: u.coins };
   },
   async admin_stats({ admin }) { needAdmin(admin); return await stats(); },
   async admin_promos({ admin }) { needAdmin(admin); return { items: await listPromos() }; },

@@ -43,11 +43,31 @@ nav button{flex:1;border:0;background:none;color:var(--mute);font:800 11px Nunit
 .load{text-align:center;padding:50px;font-size:44px}
 button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 @media(prefers-reduced-motion:no-preference){.sprout{animation:sw 1.6s ease-in-out infinite}@keyframes sw{50%{transform:rotate(-8deg) scale(1.08)}}}
+.view{animation:in .4s ease both}@keyframes in{from{opacity:0;transform:translateY(14px)}}
+.tile,.btn,.les,.pl{transition:transform .15s,box-shadow .25s}.tile:active,.btn:active,.les:active,.pl:active{transform:scale(.95)}
+.tile:hover,.pl:hover{box-shadow:0 0 20px rgba(55,164,73,.5)}.glow{box-shadow:0 0 24px rgba(55,164,73,.35)}
+.tile.vip,.btn.gold,.banner{box-shadow:0 0 22px rgba(246,199,68,.6);animation:pulse 2.4s ease-in-out infinite}@keyframes pulse{50%{box-shadow:0 0 36px rgba(246,199,68,1)}}
+.grid .tile{animation:in .5s both}.tile:nth-child(odd){animation-delay:.05s}.tile:nth-child(even){animation-delay:.13s}
+.bar div{animation:fill 1.2s ease both}@keyframes fill{from{width:0}}
+.grid3{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.pl{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:10px 2px;font:800 12px Nunito;color:var(--ink);text-align:center}.pl i{display:block;font-style:normal;font-size:30px}
+.sec{border-left:4px solid var(--g1);animation:in .5s both;animation-delay:var(--d)}.sec p{margin:6px 0 0;line-height:1.55}.tipc{background:var(--goldbg);border-color:#e3b82f}
+.big{font-size:68px;animation:float 3s ease-in-out infinite}@keyframes float{50%{transform:translateY(-8px)}}
+.dots{display:flex;gap:6px;justify-content:center;margin:10px 0}.dot{width:34px;height:34px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-size:16px}.dot.on{background:var(--gold);box-shadow:0 0 14px var(--gold)}
+.opt{position:relative;overflow:visible}.opt.right{background:linear-gradient(135deg,#37a449,#14532d);color:#fff;border-color:#8fe3a0;animation:r3d .9s ease both;box-shadow:0 0 28px #37a449}
+@keyframes r3d{0%{transform:perspective(500px) rotateY(0)}50%{transform:perspective(500px) rotateY(180deg) translateZ(50px) scale(1.08)}100%{transform:perspective(500px) rotateY(360deg)}}
+.opt.wrong{background:#7a1f16;color:#fff;animation:shake .4s}@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.sp{position:absolute;left:50%;top:50%;font-style:normal;pointer-events:none;animation:spark .9s ease-out forwards}@keyframes spark{to{transform:translate(var(--x),var(--y)) scale(.3);opacity:0}}
+.cele{position:fixed;inset:0;z-index:20;background:radial-gradient(#5a4300,#000c);display:grid;place-content:center;text-align:center;color:#fff;padding:24px;overflow:hidden;animation:in .4s both}
+.cele>*{position:relative}.cele .crown{font-size:110px;animation:spin3d 3s ease-in-out infinite;filter:drop-shadow(0 0 30px gold)}@keyframes spin3d{to{transform:perspective(500px) rotateY(360deg)}}
+.rays{position:absolute!important;inset:-50%;background:repeating-conic-gradient(#f6c74440 0 10deg,transparent 10deg 20deg);animation:rot 20s linear infinite}@keyframes rot{to{transform:rotate(360deg)}}
+.cele i{position:absolute;top:-30px;font-style:normal;animation:fall 3s linear infinite}@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important}}
 </style>
 </head>
 <body>
 <div id="app"><div class="load"><span class="sprout" style="display:inline-block">🌱</span></div></div>
 <nav id="nav" hidden></nav>
+<script src="/data.js"></script>
 <script>
 const tg=window.Telegram?.WebApp;tg?.ready();tg?.expand();
 const $=s=>document.querySelector(s),app=$('#app');
@@ -73,7 +93,7 @@ async function draw(){
   nav.innerHTML=tabs.map(([v,i,t])=>`<button class="${v===cur?'on':''}" onclick="tab('${v}')"><i>${i}</i>${t}</button>`).join('');
   window.scrollTo(0,0);
   if(tg){tg.BackButton[stack.length?'show':'hide']();}
-  try{app.innerHTML=await V[cur](curArg)}catch(e){app.innerHTML=head('Садовест',0)+`<div class="card center">${esc(e.message)}<button class="btn" onclick="init()">Повторить</button></div>`}
+  try{app.innerHTML='<div class="view">'+await V[cur](curArg)+'</div>'}catch(e){app.innerHTML=head('Садовест',0)+`<div class="card center">${esc(e.message)}<button class="btn" onclick="init()">Повторить</button></div>`}
 }
 tg?.BackButton.onClick(back);
 const V={
@@ -130,8 +150,8 @@ const promoBox=()=>`<div class="card"><b>Промокод</b><input id="pc" maxl
 function link(u){if(!u)return toast('Ссылка пока не настроена',1);u.startsWith('https://t.me')&&tg?tg.openTelegramLink(u):tg?tg.openLink(u):open(u)}
 const buy=()=>link(me.cfg.buy);
 const refresh=async()=>{me=await api('me')};
-const usePromo=()=>act(async()=>{const r=await api('promo',{code:$('#pc').value});toast('✅ '+r.msg);await refresh();tab('profile')});
-const finish=id=>act(async()=>{await api('done',{id});await refresh();toast('Урок пройден! +2 🪙');back()});
+const usePromo=()=>act(async()=>{const was=me.vip;const r=await api('promo',{code:$('#pc').value});await refresh();if(!was&&me.vip)celebrate('👑','Добро пожаловать в VIP!',r.msg);else toast('✅ '+r.msg);tab('profile')});
+const finish=id=>act(async()=>{const b=me.ach.length;await api('done',{id});await refresh();me.ach.length>b?celebrate('🏅','Новое достижение!',ACH[me.ach[me.ach.length-1]][1]):toast('Урок пройден! +2 🪙');back()});
 const sendT=()=>act(async()=>{await api('ticket_new',{text:$('#tx').value});toast('Отправлено');draw()});
 const addPlant=()=>act(async()=>{await api('plant_add',{name:$('#pn').value,every:$('#pe').value});await refresh();draw()});
 const plant=(a,id)=>act(async()=>{await api(a,{id});await refresh();draw()});
@@ -140,15 +160,33 @@ const adm=(a,d)=>act(async()=>{await api(a,d);draw()});
 const newPromo=()=>adm('admin_promo_new',{code:$('#ac').value,type:$('#at').value,value:$('#av').value,limit:$('#al').value,days:$('#ad').value});
 const grant=()=>act(async()=>{await api('admin_grant',{uid:$('#gu').value,days:$('#gd').value});toast('VIP выдан')});
 const reply=id=>adm('admin_reply',{id,text:$('#r'+id).value});
-function quiz(){const z=QZ,el=$('#qz');if(!el)return;
-  if(z.i>=z.q.length){el.innerHTML=`<div class="card center"><div style="font-size:48px">🏆</div><b>Верно: ${z.s} из ${z.q.length}</b><button class="btn" onclick="reward()">Забрать монеты</button></div>`;return}
-  const [t,o]=z.q[z.i];el.innerHTML=`<div class="card"><b>${t}</b></div>`+o.map((x,k)=>`<button class="les" onclick="ans(${k})">${x}</button>`).join('')}
-function ans(k){if(k===QZ.q[QZ.i][2])QZ.s++;QZ.i++;quiz()}
-const reward=()=>act(async()=>{await api('quiz',{score:QZ.s});await refresh();toast(`+${QZ.s} 🪙`);tab('home')});
 async function init(){
   if(!tg?.initData){app.innerHTML=head('Садовест',0)+'<div class="card center"><div style="font-size:44px">📱</div>Откройте приложение через Telegram-бота «Садовест»</div>';return}
   try{await refresh();draw()}catch(e){app.innerHTML=head('Садовест',0)+`<div class="card center">${esc(e.message)}<button class="btn" onclick="init()">Повторить</button></div>`}
 }
+// ---- v2: уроки, каталог, игры, эффекты ----
+function celebrate(icon,title,sub){const o=document.createElement('div');o.className='cele';
+  o.innerHTML=`<div class="rays"></div><div class="crown">${icon}</div><h1 style="color:#ffe58a">${esc(title)}</h1><p>${esc(sub)}</p><button class="btn gold" onclick="this.parentNode.remove()">Отлично!</button>`;
+  for(let i=0;i<40;i++){const p=document.createElement('i');p.textContent=['✨','⭐','🌿','👑','🪙'][i%5];p.style.cssText=`left:${Math.random()*100}%;animation-delay:${Math.random()*2}s;font-size:${14+Math.random()*18}px`;o.append(p)}
+  document.body.append(o)}
+function burst(el){for(let i=0;i<10;i++){const s=document.createElement('i');s.className='sp';s.textContent=['✨','⭐','🌿'][i%3];const a=i/10*6.28;s.style.setProperty('--x',Math.cos(a)*70+'px');s.style.setProperty('--y',Math.sin(a)*50+'px');el.append(s)}}
+V.lesson=async id=>{const l=await api('lesson',{id});
+  return head('Урок')+`<div class="card glow"><h2 style="margin:0 0 6px">${esc(l.title)}</h2><div class="mute">${esc(l.intro)}</div></div>`+l.sections.map(([h,t],i)=>`<div class="card sec" style="--d:${i*.1}s"><b>${['🌱','💧','☀️','🛡️','📌'][i%5]} ${esc(h)}</b><p>${esc(t)}</p></div>`).join('')+`<div class="card tipc">💡 <b>Совет эксперта:</b> ${esc(l.tip)}</div><button class="btn" ${l.done?'disabled':''} onclick="finish(${l.id})">${l.done?'✅ Пройден':'Отметить пройденным'}</button>`};
+const plIdx=name=>PLANTS.findIndex(p=>name.includes(p.n));
+V.garden=async()=>{const {items}=await api('plants');
+  return head('Мой огород')+`<h2>Каталог растений</h2><div class="grid3">${PLANTS.map((p,i)=>`<button class="pl" onclick="go('plantinfo',${i})"><i>${p.e}</i>${p.n}</button>`).join('')}</div><h2>Мои растения</h2>`+(items.length?items.map(p=>{const k=plIdx(p.name);return `<div class="card"><div class="row"><b>${esc(p.name)}</b><span class="mute" style="text-align:right">полив раз в ${p.every} дн.</span></div><div class="mute">Последний полив: ${fd(p.last)}</div><div class="row" style="margin-top:8px"><button class="btn sm" onclick="plant('plant_water',${p.id})">💧 Полил(а)</button>${k>=0?`<button class="btn sm ghost" onclick="go('plantinfo',${k})">Советы</button>`:''}<button class="btn sm ghost" onclick="plant('plant_del',${p.id})">Удалить</button></div></div>`}).join(''):'<div class="card center">Выберите растение в каталоге выше</div>')+`<div class="card"><b>Своё растение</b><input id="pn" maxlength="40" placeholder="Название"><input id="pe" type="number" min="1" max="60" value="3" aria-label="Полив раз в N дней"><div class="mute">Поливать раз в N дней</div><button class="btn" onclick="addPlant()">Добавить</button></div>`};
+V.plantinfo=i=>{const p=PLANTS[i];return head(p.n)+`<div class="card glow center"><div class="big">${p.e}</div><h2 style="margin:0">${p.n}</h2><div class="mute">${p.k} • ${p.s} • полив раз в ${p.w} дн.</div></div><div class="card"><b>О растении</b><p>${p.i}</p><b>Когда сажать</b><p>${p.t}</p><b>Советы</b>${p.c.map(x=>`<p>✅ ${x}</p>`).join('')}</div><button class="btn" onclick="addP(${i})">Добавить в мой огород</button>`};
+const addP=i=>act(async()=>{const p=PLANTS[i];await api('plant_add',{name:p.e+' '+p.n,every:p.w});await refresh();toast('Добавлено в огород 🌿');back()});
+V.games=()=>{const q=me.quiz,days=q.days.map(d=>`<span class="dot ${d?'on':''}">${d?'⭐':''}</span>`).join('');
+  if(q.today)return head('Игры')+`<div class="card center glow"><div class="big">🏆</div><b>Сегодня вы уже играли</b><div class="mute">Новый тест — завтра. Играть можно раз в день, 7 раз в неделю.</div><div class="dots">${days}</div></div>`;
+  const d=Math.floor(Date.now()/864e5),qs=[...Array(5)].map((_,i)=>QUIZ[(d*5+i)%QUIZ.length]).map(([t,o])=>({t,o:o.map((x,k)=>[x,k===0]).sort(()=>Math.random()-.5)}));
+  window.QZ={q:qs,i:0,s:0,lock:0};setTimeout(quiz,0);return head('Игры')+`<div class="mute center">Тест дня • дни недели</div><div class="dots">${days}</div><div id="qz"></div>`};
+function quiz(){const z=QZ,el=$('#qz');if(!el)return;
+  if(z.i>=z.q.length){el.innerHTML=`<div class="card center glow"><div class="big">🏆</div><b>Верно: ${z.s} из ${z.q.length}</b><button class="btn" onclick="reward()">Забрать монеты</button></div>`;return}
+  const q=z.q[z.i];el.innerHTML=`<div class="mute">Вопрос ${z.i+1} из ${z.q.length}</div><div class="card glow"><b>${q.t}</b></div>`+q.o.map(([x],k)=>`<button class="les opt" id="o${k}" onclick="ans(${k})">${x}</button>`).join('')}
+function ans(k){const z=QZ;if(z.lock)return;z.lock=1;const q=z.q[z.i],ok=q.o[k][1],b=$('#o'+k);b.classList.add(ok?'right':'wrong');
+  if(ok){z.s++;burst(b)}else q.o.forEach(([,g],j)=>g&&$('#o'+j).classList.add('right'));setTimeout(()=>{z.i++;z.lock=0;quiz()},1200)}
+function reward(){act(async()=>{await api('quiz',{score:QZ.s});await refresh();QZ.s===QZ.q.length?celebrate('🏆','Идеально!','5 из 5 — вы настоящий садовод'):toast(`+${QZ.s} 🪙`);tab('home')})}
 init();
 </script>
 </body>
