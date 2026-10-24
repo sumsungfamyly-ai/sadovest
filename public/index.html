@@ -71,6 +71,12 @@ html,body{background:linear-gradient(160deg,#b9f6ca 0%,#e8ffd6 45%,#fff3b0 100%)
 .tile,.les,.pl{border-bottom:5px solid #9fd6a4;box-shadow:0 6px 10px rgba(20,83,45,.15)}.tile.vip{border-bottom-color:#c99a14}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.chip{border:2px solid var(--g1);border-bottom-width:4px;background:#fff;color:var(--g2);border-radius:20px;padding:8px 14px;font:800 14px Nunito}.chip.on{background:var(--g1);color:#fff}
 .les.pick{background:#d9f2dc;border-color:var(--g1)}.card h2{margin-top:0}
+.cele{position:fixed;inset:0;z-index:20;background:rgba(10,40,20,.45);display:grid;place-items:center;padding:24px;animation:in .25s both}
+.cbox{background:#fff;border-radius:24px;padding:28px 24px;text-align:center;max-width:340px;box-shadow:0 20px 50px rgba(0,0,0,.25);animation:pop .3s ease both}@keyframes pop{from{transform:scale(.92);opacity:0}}
+.ci{font-size:52px}.cbox h2{margin:8px 0}.cbox p{color:var(--mute);margin:0 0 8px}
+.tile.vip,.btn.gold,.banner,.big{animation:none}.glow{box-shadow:0 4px 14px rgba(20,83,45,.12)}.grid .tile{animation:none}
+.opt.right{animation:none;box-shadow:none}.opt.wrong{animation:none}.sp{display:none}
+details summary{cursor:pointer}details p{margin:8px 0 0}
 </style>
 </head>
 <body>
@@ -98,6 +104,7 @@ function back(){const p=stack.pop();if(p){cur=p[0];curArg=p[1];draw()}}
 function tab(v){stack=[];cur=v;curArg=null;draw()}
 const root=['home','lessons','plants','profile'];
 async function draw(){
+  if(me&&!me.profile)cur='onboard';
   const nav=$('#nav');nav.hidden=!me||!root.includes(cur);
   nav.innerHTML=tabs.map(([v,i,t])=>`<button class="${v===cur?'on':''}" onclick="tab('${v}')"><i>${i}</i>${t}</button>`).join('');
   window.scrollTo(0,0);
@@ -121,7 +128,7 @@ async lesson(id){const l=await api('lesson',{id});
   return head('Урок')+`<div class="card"><h2 style="margin-top:0">${esc(l.title)}</h2><p>${esc(l.text)}</p></div><button class="btn" ${l.done?'disabled':''} onclick="finish(${l.id})">${l.done?'✅ Пройден':'Отметить пройденным'}</button>`},
 
 vip:()=>`${head('VIP-клуб')}<div class="card" style="background:linear-gradient(135deg,#fff3c9,#ffe28a);color:#4a3600;border-color:#e3b82f"><div class="center" style="font-size:56px">👑</div><h1 class="center" style="color:#4a3600;margin:0">VIP-клуб</h1><p class="center" style="margin:2px 0 14px">Больше знаний — больше возможностей</p>
-${['📚 100 уроков','🛟 Профессиональная поддержка','⭐ Эксклюзивные материалы','🏅 Золотой значок'].map(t=>`<p style="margin:8px 0;font-weight:800">${t}</p>`).join('')}
+${['📚 200 уроков','🛟 Профессиональная поддержка','⭐ Эксклюзивные материалы','🏅 Золотой значок'].map(t=>`<p style="margin:8px 0;font-weight:800">${t}</p>`).join('')}
 ${me.vip?`<p class="center" style="font-weight:800">VIP активен до ${fd(me.vip_until)}</p>`:''}
 <button class="btn gold" onclick="buy()">${me.vip?'Продлить VIP':'Купить VIP'}</button></div>${promoBox()}`,
 
@@ -174,11 +181,6 @@ async function init(){
   try{await refresh();if(!me.profile)cur='onboard';draw();if(me.newReward)celebrateStreak(me.newReward)}catch(e){app.innerHTML=head('Садовест',0)+`<div class="card center">${esc(e.message)}<button class="btn" onclick="init()">Повторить</button></div>`}
 }
 // ---- v2: уроки, каталог, игры, эффекты ----
-function celebrate(icon,title,sub){const o=document.createElement('div');o.className='cele';
-  o.innerHTML=`<div class="rays"></div><div class="crown">${icon}</div><h1 style="color:#ffe58a">${esc(title)}</h1><p>${esc(sub)}</p><button class="btn gold" onclick="this.parentNode.remove()">Отлично!</button>`;
-  for(let i=0;i<40;i++){const p=document.createElement('i');p.textContent=['✨','⭐','🌿','👑','🪙'][i%5];p.style.cssText=`left:${Math.random()*100}%;animation-delay:${Math.random()*2}s;font-size:${14+Math.random()*18}px`;o.append(p)}
-  document.body.append(o)}
-function burst(el){for(let i=0;i<10;i++){const s=document.createElement('i');s.className='sp';s.textContent=['✨','⭐','🌿'][i%3];const a=i/10*6.28;s.style.setProperty('--x',Math.cos(a)*70+'px');s.style.setProperty('--y',Math.sin(a)*50+'px');el.append(s)}}
 V.lesson=async id=>{const l=await api('lesson',{id});
   return head('Урок')+`<div class="card glow"><h2 style="margin:0 0 6px">${esc(l.title)}</h2><div class="mute">${esc(l.intro)}</div></div>`+l.sections.map(([h,t],i)=>`<div class="card sec" style="--d:${i*.1}s"><b>${['🌱','💧','☀️','🛡️','📌'][i%5]} ${esc(h)}</b><p>${esc(t)}</p></div>`).join('')+`<div class="card tipc">💡 <b>Совет эксперта:</b> ${esc(l.tip)}</div><button class="btn" ${l.done?'disabled':''} onclick="finish(${l.id})">${l.done?'✅ Пройден':'Отметить пройденным'}</button>`};
 const plIdx=name=>PLANTS.findIndex(p=>name.includes(p.n));
@@ -203,14 +205,8 @@ const S2={pt:'Растения',lv:'Все'};
 const bm=k=>`<button class="back" style="margin-left:auto" aria-label="Закладка" onclick="mark('${k}')">${me.bookmarks.includes(k)?'⭐':'☆'}</button>`;
 const mark=k=>act(async()=>{me.bookmarks=(await api('bookmark',{key:k})).bookmarks;draw()});
 const celebrateStreak=n=>celebrate('🔥',`${n} дней подряд!`,{5:'Награда: +10 🪙',30:'Награда: +50 🪙',100:'Награда: +200 🪙 и 7 дней VIP'}[n]);
-const tipsFor=()=>{const p=me.profile||{};return `${MON[new Date().getMonth()]} ${PLACE[p.place]||''} ${LEVELT[p.level]||''}`};
 // онбординг
-let OB={};
-const obq=(k,t,o)=>`<div class="card"><b>${t}</b><div class="chips">${o.map(x=>`<button class="chip ${OB[k]===x?'on':''}" onclick="OB.${k}='${x}';draw()">${x}</button>`).join('')}</div></div>`;
-V.onboard=()=>`<h1>Добро пожаловать! 🌱</h1><div class="mute">Три вопроса — и советы подстроятся под вас</div>${obq('place','1. Где вы выращиваете растения?',['Дача','Балкон','Теплица'])}${obq('level','2. Ваш опыт?',['Новичок','Любитель','Опытный'])}<div class="card"><b>3. Ваш город или регион</b><input value="${esc(OB.city||'')}" oninput="OB.city=this.value" placeholder="Например, Краснодар"></div><button class="btn" onclick="saveOB()">Начать</button>`;
-const saveOB=()=>act(async()=>{await api('onboard',OB);await refresh();tab('home')});
 // главная
-V.home=()=>`<h1>Привет, ${esc(me.name)}!</h1><input placeholder="🔍 Поиск по урокам, растениям, болезням…" onkeydown="if(event.key==='Enter')go('search',this.value)"><div class="card tipc" style="margin-top:12px">🌤 <b>Совет:</b> ${esc(tipsFor())}</div><div class="card row glow"><span>🔥 <b>${me.streak}</b> дн. подряд</span><span style="text-align:right">🪙 <b>${me.coins}</b></span></div><div class="grid">${[['lessons','📖','Уроки'],['garden','🪴','Мой огород'],['plants','🌿','Энциклопедия'],['weather','🌦️','Погода'],['games','🧩','Игры'],['board','🏆','Рейтинг'],['marks','🔖','Закладки'],['files','📄','Материалы'],['vip','👑','VIP-клуб','vip'],['support','🛟','Поддержка'],['calendar','🗓️','Календарь'],['shop','🧺','Магазин']].map(([v,i,t,c])=>`<button class="tile ${c||''}" onclick="${['lessons','plants'].includes(v)?'tab':'go'}('${v}')"><i>${i}</i>${t}</button>`).join('')}</div>${me.vip?'':`<button class="banner" onclick="go('vip')"><i>👑</i><span>VIP-доступ<small>100 уроков и поддержка экспертов</small></span></button>`}${me.admin?`<button class="btn ghost" onclick="go('admin')">⚙️ Панель администратора</button>`:''}`;
 // уроки по уровням
 V.lessons=async()=>{const {items}=await api('lessons'),L=['Начинающий','Любитель','Мастер'];
   const row=l=>`<button class="les ${l.locked?'lock':''}" onclick="${l.locked?"go('vip')":`go('lesson',${l.id})`}"><span class="n">${l.locked?'🔒':l.done?'✅':l.id}</span><span>${esc(l.title)}</span><span class="tag ${l.free?'':'v'}">${l.free?'Бесплатно':'VIP'}</span></button>`;
@@ -221,8 +217,6 @@ V.lesson=async id=>{if(!LS||LS.l.id!==id)LS={l:await api('lesson',{id}),i:0,a:[]
   const {l,i}=LS,sl=[...l.sections.map(([h,t],k)=>[ICO[k%5]+' '+h,t]),['🤯 Интересный факт',l.fact],['💡 Совет эксперта',l.tip]],n=sl.length,hd=head('Урок',1,bm('l:'+id));
   if(i<n)return hd+`<div class="mute">${esc(l.title)} • слайд ${i+1} из ${n}</div><div class="bar"><div style="width:${(i+1)/n*100}%"></div></div><div class="card sec glow"><b style="font-size:19px">${sl[i][0]}</b><p style="font-size:17px">${esc(sl[i][1])}</p></div><div class="row">${i?'<button class="btn ghost" onclick="LS.i--;draw()">‹ Назад</button>':''}<button class="btn" onclick="LS.i++;draw()">${i===n-1?'К вопросам ›':'Далее ›'}</button></div>`;
   return hd+`<h2>Проверка: 3 вопроса</h2><div class="mute">Нужно верно ответить минимум на 2</div>`+l.quiz.map((q,qi)=>`<div class="card"><b>${esc(q.q)}</b>${q.o.map((x,k)=>`<button class="les ${LS.a[qi]===x?'pick':''}" onclick="pickA(${qi},${k})">${esc(x)}</button>`).join('')}</div>`).join('')+`<button class="btn" onclick="submitL()">Завершить урок</button>`};
-const pickA=(qi,k)=>{LS.a[qi]=LS.l.quiz[qi].o[k];draw()};
-const submitL=()=>act(async()=>{if(LS.a.filter(Boolean).length<3)throw new Error('Ответьте на все три вопроса');try{await api('done',{id:LS.l.id,answers:LS.a})}catch(e){LS.a=[];throw e}LS=null;await refresh();celebrate('🌿','Урок пройден!',`+2 🪙 • пройдено ${me.done} из ${me.total}`);back()});
 // энциклопедия
 V.plants=()=>{const P=S2.pt==='Растения',src=P?PLANTS:PESTS;let last='';
   return head('Энциклопедия',0)+chips('pt',['Растения','Болезни и вредители'])+src.map((x,i)=>[x,i]).sort((a,b)=>a[0].n.localeCompare(b[0].n,'ru')).map(([x,i])=>{const L=x.n[0].toUpperCase(),h=L!==last?(last=L,`<h2>${L}</h2>`):'';return h+`<button class="les" onclick="go('${P?'plantinfo':'pestinfo'}',${i})"><span class="n">${x.e}</span><span>${x.n}<div class="mute">${x.k}</div></span></button>`}).join('')};
@@ -263,6 +257,36 @@ V.support=async()=>{if(!me.vip)return head('VIP-эксперт')+`<div class="ca
   const {items}=await api('tickets');
   return head('VIP-эксперт')+(items.length?items.slice().reverse().map(t=>`<div class="msg me">${esc(t.text)}${t.photo?'<div>📷 фото приложено</div>':''}<div class="mute">${fd(t.created)}</div></div>${t.reply?`<div class="msg ex"><b>Эксперт 👑</b><br>${esc(t.reply)}</div>`:'<div class="mute center">Ждём ответа эксперта…</div>'}`).join(''):'<div class="card center">Опишите проблему и приложите фото растения — эксперт ответит в течение 1–2 часов.</div>')+`<textarea id="tx" rows="3" maxlength="1000" placeholder="Напишите сообщение…"></textarea><img id="pv" hidden style="max-width:100%;border-radius:14px;margin-top:8px"><label class="btn ghost" style="display:block;text-align:center;box-sizing:border-box">📷 Прикрепить фото<input type="file" accept="image/*" hidden onchange="pickPhoto(this)"></label><button class="btn" onclick="sendT()">Отправить</button>`};
 const _pf=V.profile;V.profile=()=>_pf().replace('<h2>Достижения</h2>',`<div class="card glow center">🔥 <b>${me.streak} дн. подряд</b> (рекорд ${me.best})<div class="mute">5 дней — 10 🪙, 30 — 50 🪙, 100 — 200 🪙 и 7 дней VIP. Пропуск дня обнуляет серию.</div></div><h2>Достижения</h2>`);
+// ---- v4 ----
+function celebrate(icon,title,sub){const o=document.createElement('div');o.className='cele';o.innerHTML=`<div class="cbox"><div class="ci">${icon}</div><h2>${esc(title)}</h2><p>${esc(sub)}</p><button class="btn" onclick="this.closest('.cele').remove()">Отлично</button></div>`;document.body.append(o)}
+function burst(){}
+let OB={place:[]};const PL=['Дача','Теплица','Балкон','Огород во дворе','Подоконник'];
+const tipsFor=()=>{const p=me.profile||{};return `${MON[new Date().getMonth()]} ${[].concat(p.place||[]).map(x=>PLACE[x]||'').join(' ')} ${LEVELT[p.level]||''}`};
+const obq=(k,t,o)=>`<div class="card"><b>${t}</b><div class="chips">${o.map(x=>`<button class="chip ${OB[k]===x?'on':''}" onclick="OB.${k}='${x}';draw()">${x}</button>`).join('')}</div></div>`;
+const togPl=i=>{const x=PL[i];OB.place=OB.place.includes(x)?OB.place.filter(y=>y!==x):[...OB.place,x];draw()};
+V.onboard=()=>`<h1>Добро пожаловать! 🌱</h1><div class="mute">Ответьте на три вопроса — без них приложение не откроется</div><div class="card"><b>1. Где вы выращиваете растения? (можно несколько)</b><div class="chips">${PL.map((x,i)=>`<button class="chip ${OB.place.includes(x)?'on':''}" onclick="togPl(${i})">${x}</button>`).join('')}</div></div>${obq('level','2. Ваш опыт?',['Новичок','Любитель','Опытный'])}<div class="card"><b>3. Ваш город или регион</b><input value="${esc(OB.city||'')}" oninput="OB.city=this.value" placeholder="Например, Краснодар"></div><button class="btn" onclick="saveOB()">Начать</button>`;
+const saveOB=()=>act(async()=>{if(!OB.place.length||!OB.level||!(OB.city||'').trim())throw new Error('Ответьте на все три вопроса');await api('onboard',OB);await refresh();tab('home')});
+V.home=()=>`<h1>Привет, ${esc(me.name)}!</h1><input placeholder="🔍 Поиск по урокам, растениям, болезням…" onkeydown="if(event.key==='Enter')go('search',this.value)"><div class="card tipc" style="margin-top:12px">🌤 <b>Совет:</b> ${esc(tipsFor())}</div><div class="card row"><span>🔥 <b>${me.streak}</b> дн. подряд</span><span style="text-align:right">🪙 <b>${me.coins}</b></span></div><div class="mute center">Продлить серию: пройдите урок или тест</div><div class="grid" style="margin-top:10px">${[['lessons','📖','Уроки'],['tests','📝','Тесты'],['garden','🪴','Мой огород'],['plants','🌿','Энциклопедия'],['weather','🌦️','Погода'],['games','🧩','Игра дня'],['board','🏆','Рейтинг'],['marks','🔖','Закладки'],['files','📄','Материалы'],['vip','👑','VIP-клуб','vip'],['support','🛟','Поддержка'],['calendar','🗓️','Календарь']].map(([v,i,t,c])=>`<button class="tile ${c||''}" onclick="${['lessons','plants'].includes(v)?'tab':'go'}('${v}')"><i>${i}</i>${t}</button>`).join('')}</div><button class="btn ghost" onclick="go('faq')">❓ Вопросы и ответы</button>${me.vip?'':`<button class="banner" onclick="go('vip')"><i>👑</i><span>VIP-доступ<small>200 уроков и поддержка экспертов</small></span></button>`}${me.admin?`<button class="btn ghost" onclick="go('admin')">⚙️ Панель администратора</button>`:''}`;
+// исправление: ответы в уроке сбрасывались, а на экране оставались выбранными
+const pickA=(qi,k)=>{LS.a[qi]=LS.l.quiz[qi].o[k];const y=window.scrollY;draw().then(()=>window.scrollTo(0,y))};
+const submitL=()=>act(async()=>{if(![0,1,2].every(i=>LS.a[i]))throw new Error('Ответьте на все три вопроса');
+  try{await api('done',{id:LS.l.id,answers:LS.a})}catch(e){if(e.message.startsWith('Нужно'))LS.a=[];await draw();throw e}
+  LS=null;await refresh();me.newReward?celebrateStreak(me.newReward):celebrate('🌿','Урок пройден',`+2 🪙 • пройдено ${me.done} из ${me.total}`);back()});
+// тесты
+let TS=null;
+V.tests=async()=>{const {items}=await api('tests');
+  const row=t=>`<button class="les" onclick="startTest(${t.id})"><span class="n">${t.id>10?'⭐':t.id}</span><span>${esc(t.title)}<div class="mute">${t.section} • ${t.n} вопросов${t.best!=null?' • лучший: '+t.best+'/'+t.n:''}</div></span></button>`;
+  return head('Тесты')+'<div class="mute">Пройдите тест — серия дней продлится. За улучшение результата начисляются монеты.</div>'+[['Начинающий','🌱'],['Любитель','🌿'],['Мастер','🌳']].map(([l,e])=>`<h2>${e} ${l}</h2>`+items.filter(t=>t.level===l).map(row).join('')).join('')};
+const startTest=id=>act(async()=>{TS={t:await api('test',{id}),i:0,a:[],res:null,busy:0};go('testrun')});
+V.testrun=()=>{const {t,i}=TS;
+  if(TS.res){const r=TS.res;return head(t.title)+`<div class="card center"><div class="big">${r.score>=r.total*.8?'🏆':r.score>=r.total/2?'👍':'📚'}</div><h2>${r.score} из ${r.total}</h2><div class="mute">${r.coins?`+${r.coins} 🪙`:'Попробуйте улучшить результат'}</div></div>`+(r.review.length?'<h2>Разбор ошибок</h2>'+r.review.map(x=>`<div class="card"><b>${esc(x.q)}</b><p>Ваш ответ: ${esc(x.mine||'—')}</p><p>✅ Верно: ${esc(x.right)}</p></div>`).join(''):'<div class="card center">Без ошибок! 🎉</div>')+'<button class="btn" onclick="back()">К тестам</button>'}
+  const q=t.questions[i];return head(t.title)+`<div class="mute">Вопрос ${i+1} из ${t.questions.length}</div><div class="bar"><div style="width:${i/t.questions.length*100}%"></div></div><div class="card"><b style="font-size:18px">${esc(q.q)}</b></div>`+q.o.map((x,k)=>`<button class="les" onclick="ansT(${k})">${esc(x)}</button>`).join('')};
+const ansT=k=>act(async()=>{if(TS.busy)return;TS.busy=1;TS.a[TS.i]=TS.t.questions[TS.i].o[k];TS.i++;
+  if(TS.i>=TS.t.questions.length){TS.res=await api('test_done',{answers:TS.a});await refresh();if(me.newReward)celebrateStreak(me.newReward)}
+  TS.busy=0;draw()});
+// вопросы и ответы
+const FAQ=[['Как пройти урок?','Откройте «Уроки», выберите урок и листайте слайды кнопкой «Далее». В конце ответьте верно минимум на 2 из 3 вопросов — тогда урок засчитается.'],['Как продлить серию дней?','Пройдите хотя бы один урок или тест в течение дня. Награды: 5, 30 и 100 дней подряд. Если пропустить день, серия обнулится.'],['Как получить VIP?','«VIP-клуб» → «Купить VIP» или введите промокод в «Профиль» → «Ввести промокод».'],['Что даёт VIP?','200 уроков, поддержку экспертов с фото, эксклюзивные PDF и золотой значок.'],['Как активировать промокод?','Профиль → «Ввести промокод» или команда /promo КОД в боте. Каждый код можно использовать один раз.'],['Как работают тесты?','Раздел «Тесты»: 10 тематических и 3 общих (лёгкий, средний, сложный). После теста вы увидите разбор ошибок.'],['Как задать вопрос эксперту?','Раздел «Поддержка» (только VIP). К сообщению можно приложить фото растения.'],['Как добавить растение в огород?','«Энциклопедия» → растение → «Добавить в мой огород». Мы напомним о поливе.'],['Как работает поиск?','Нажмите 🔍 вверху любого экрана и введите название урока, растения или болезни.'],['Что такое закладки?','Нажмите ☆ на уроке, растении или болезни — они сохранятся в разделе «Закладки».']];
+V.faq=()=>head('Вопросы и ответы')+FAQ.map(([q,a])=>`<details class="card"><summary><b>${q}</b></summary><p>${a}</p></details>`).join('');
 init();
 </script>
 </body>

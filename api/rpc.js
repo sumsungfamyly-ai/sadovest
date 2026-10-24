@@ -1,7 +1,8 @@
 import { r, getJ, setJ } from '../lib/db.js';
 import fs from 'fs';
 import path from 'path';
-import { sendFile, verify, getUser, save, isVip, activate, achieve, LESSONS, admins, newPromo, listPromos, stats, newTicket, replyTicket, grantVip } from '../lib/core.js';
+import { TESTS, pickQs, testSize, shuffle } from '../lib/tests.js';
+import { bump, sendFile, verify, getUser, save, isVip, activate, achieve, LESSONS, admins, newPromo, listPromos, stats, newTicket, replyTicket, grantVip } from '../lib/core.js';
 
 const deny = (m = 'Нет доступа', code = 403) => { const e = new Error(m); e.code = code; throw e; };
 const needAdmin = a => { if (!a) deny(); };
@@ -10,7 +11,7 @@ const PDFS = { cal: ['Календарь посадок', 0], water: ['Чек-л
 const board = async () => { const a = (await r('HGETALL', 'lb')) || [], o = []; for (let i = 0; i < a.length; i += 2) o.push({ nick: a[i], score: Number(a[i + 1]) }); return o.sort((x, y) => y.score - x.score).slice(0, 50); };
 const H = {
   async me({ u, admin }) {
-    return { id: u.id, name: u.name, vip: isVip(u), streak: u.streak, best: u.best, bookmarks: u.bookmarks, profile: u.profile, newReward: await (async () => { const n = u.newReward; if (n) { u.newReward = 0; await save(u); } return n || 0; })(), vip_until: u.vip_until, done: u.progress.length, total: LESSONS.length, coins: u.coins, days: u.days, ach: u.ach, notify: u.notify, admin,
+    return { id: u.id, name: u.name, vip: isVip(u), streak: (u.lastAct === new Date().toISOString().slice(0, 10) || u.lastAct === new Date(Date.now() - 864e5).toISOString().slice(0, 10)) ? u.streak : 0, best: u.best, bookmarks: u.bookmarks, profile: u.profile, newReward: await (async () => { const n = u.newReward; if (n) { u.newReward = 0; await save(u); } return n || 0; })(), vip_until: u.vip_until, done: u.progress.length, total: LESSONS.length, coins: u.coins, days: u.days, ach: u.ach, notify: u.notify, admin,
       quiz: (() => { const d = t => new Date(t).toISOString().slice(0, 10), log = u.quizLog || []; return { today: log.includes(d(Date.now())), days: [...Array(7)].map((_, i) => log.includes(d(Date.now() - (6 - i) * 864e5))) }; })(),
       cfg: { community: process.env.COMMUNITY_URL || '', buy: process.env.BUY_URL || '' } };
   },
@@ -27,11 +28,13 @@ const H = {
   async done({ u, b }) {
     const l = LESSONS.find(x => x.id === Number(b.id)); if (!l) deny('Урок не найден', 404);
     if (!l.free && !isVip(u)) deny('Урок доступен с VIP');
-    if (!u.reading || u.reading.id !== l.id || Date.now() - u.reading.at < (l.sections.length + 2) * 4000) deny('Внимательно изучите все слайды урока', 400);
+    if (!u.reading || u.reading.id !== l.id) deny('Откройте урок заново', 400);
+    const wait = Math.ceil(((l.sections.length + 2) * 3000 - (Date.now() - u.reading.at)) / 1000);
+    if (wait > 0) deny(`Изучите слайды внимательнее: подождите ещё ${wait} сек.`, 400);
     const a = Array.isArray(b.answers) ? b.answers : [];
     if (l.quiz.filter(([, right], i) => a[i] === right).length < 2) deny('Нужно верно ответить минимум на 2 из 3 вопросов. Попробуйте ещё раз!', 400);
     if (!u.progress.includes(l.id)) { u.progress.push(l.id); u.coins += 2; }
-    achieve(u); await save(u); return { done: u.progress.length };
+    await bump(u); achieve(u); await save(u); return { done: u.progress.length };
   },
   async promo({ u, b }) { return { msg: await activate(u, b.code) }; },
   async tickets({ u }) {
@@ -53,16 +56,30 @@ const H = {
     const today = new Date().toISOString().slice(0, 10);
     u.quizLog = u.quizLog || [];
     if (u.quizLog.includes(today)) deny('Сегодня вы уже играли', 400);
-    u.quizLog = [...u.quizLog, today].slice(-14); u.coins += Math.min(5, Math.max(0, Number(b.score) || 0)); await save(u); return { coins: u.coins };
+    u.quizLog = [...u.quizLog, today].slice(-14); u.coins += Math.min(5, Math.max(0, Number(b.score) || 0)); await bump(u); await save(u); return { coins: u.coins };
   },
   async bookmark({ u, b }) {
     const k = String(b.key || '').slice(0, 10); if (!/^[lpd]:\d+$/.test(k)) deny('Ошибка', 400);
     u.bookmarks = u.bookmarks.includes(k) ? u.bookmarks.filter(x => x !== k) : [...u.bookmarks, k].slice(-100); await save(u); return { bookmarks: u.bookmarks };
   },
   async onboard({ u, b }) {
-    const city = String(b.city || '').trim().slice(0, 40);
-    if (!['Дача', 'Балкон', 'Теплица'].includes(b.place) || !['Новичок', 'Любитель', 'Опытный'].includes(b.level) || !city) deny('Ответьте на все вопросы', 400);
-    u.profile = { place: b.place, level: b.level, city }; await save(u); return { ok: 1 };
+    const city = String(b.city || '').trim().slice(0, 40), place = (Array.isArray(b.place) ? b.place : []).filter(x => ['Дача', 'Теплица', 'Балкон', 'Огород во дворе', 'Подоконник'].includes(x));
+    if (!place.length || !['Новичок', 'Любитель', 'Опытный'].includes(b.level) || !city) deny('Ответьте на все три вопроса', 400);
+    u.profile = { place, level: b.level, city }; await save(u); return { ok: 1 };
+  },
+  async tests({ u }) { return { items: TESTS.map(t => ({ id: t.id, title: t.title, level: t.level, section: t.section, n: testSize(t), best: (u.tests || {})[t.id] ?? null })) }; },
+  async test({ u, b }) {
+    const t = TESTS.find(x => x.id === Number(b.id)); if (!t) deny('Тест не найден', 404);
+    const qs = pickQs(t); u.run = { id: t.id, keys: qs.map(([q, r]) => [q, r]) }; await save(u);
+    return { id: t.id, title: t.title, questions: qs.map(([q, ...o]) => ({ q, o: shuffle(o) })) };
+  },
+  async test_done({ u, b }) {
+    if (!u.run) deny('Начните тест заново', 400);
+    const a = Array.isArray(b.answers) ? b.answers : [], keys = u.run.keys, id = u.run.id;
+    const review = keys.map(([q, right], i) => ({ q, right, mine: a[i] })).filter(x => x.mine !== x.right), score = keys.length - review.length;
+    u.tests = u.tests || {}; const old = u.tests[id] || 0, coins = Math.floor(Math.max(0, score - old) / 3);
+    if (score > old) u.tests[id] = score; u.coins += coins; u.run = null; await bump(u); await save(u);
+    return { score, total: keys.length, review, coins };
   },
   async lb({ u }) { return { items: await board(), you: u.coins }; },
   async pdf({ u, b }) {
@@ -97,6 +114,7 @@ export default async function handler(req, res) {
     const tu = verify(req.headers['x-init'] || '');
     if (!tu) return res.status(401).json({ error: 'Откройте приложение через Telegram' });
     const u = await getUser(tu);
+    if (!u.profile && !['me', 'onboard'].includes((req.body || {}).action)) deny('Сначала ответьте на вопросы', 400);
     const b = req.body || {};
     const fn = H[b.action]; if (!fn) deny('Неизвестное действие', 400);
     res.json(await fn({ u, b, admin: admins().includes(String(u.id)) }));
