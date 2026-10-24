@@ -56,7 +56,7 @@ const H = {
   async plant_del({ u, b }) { u.plants = u.plants.filter(x => x.id !== Number(b.id)); await save(u); return { items: u.plants }; },
   async notify({ u, b }) { u.notify = !!b.on; await save(u); return { notify: u.notify }; },
   async bookmark({ u, b }) {
-    const k = String(b.key || '').slice(0, 10); if (!/^[lpd]:\d+$/.test(k)) deny('Ошибка', 400);
+    const k = String(b.key || '').slice(0, 10); if (!/^[lpdh]:\d+$/.test(k)) deny('Ошибка', 400);
     u.bookmarks = u.bookmarks.includes(k) ? u.bookmarks.filter(x => x !== k) : [...u.bookmarks, k].slice(-100); await save(u); return { bookmarks: u.bookmarks };
   },
   async onboard({ u, b }) {

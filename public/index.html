@@ -94,12 +94,24 @@ html,body{background:linear-gradient(180deg,#eaf6e4 0%,#fbfdf7 60%) fixed}
 .sh{display:flex;justify-content:space-between;align-items:center;margin:16px 0 6px}.sh h2{margin:0;font-size:21px;color:#14532d}.lnk{border:0;background:none;font:800 14px Nunito;color:#14532d}
 .tk{display:flex;align-items:center;gap:12px;background:#eaf5e6;border-radius:16px;padding:12px 14px;margin:6px 0}.tk b{display:block}.chk{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid #7a8f7d;background:#fff}
 .wcard{display:flex;align-items:center;gap:12px;width:100%;border:0;border-radius:20px;padding:14px;margin:12px 0;background:linear-gradient(180deg,#d6ecfb,#eaf7e1);font:600 14px Nunito;color:#17311f;text-align:left}.wcard .wi{font-size:40px}.wcard .wt{font-size:32px;font-weight:800}.wcard .adv{flex:1;border-left:1px solid #b6d3c0;padding-left:12px;font-size:13px}
+html[data-theme=dark]{--bg:#0f1f14;--card:#16301e;--ink:#e8f5ea;--mute:#9bb8a2;--line:#24472f;--goldbg:#3a3213;color-scheme:dark}
+html[data-theme=dark],html[data-theme=dark] body{background:#0f1f14}
+html[data-theme=dark] :is(h1,.brand,.sh h2,.lnk,h2){color:#8fe3a0}
+html[data-theme=dark] :is(.chip,.ib,.stat2,.hr,nav,.cbox,.chk,.ans,.btn.ghost,.pl,.les,.card,input,textarea,select,.msg.ex,details){background:var(--card);color:var(--ink)}
+html[data-theme=dark] :is(.tk,.qt button,.les .n){background:#1d3b27;color:var(--ink)}html[data-theme=dark] .wcard{background:#1a3a2a;color:var(--ink)}
+html[data-theme=dark] .badc{background:#3a1a17}html[data-theme=dark] .tag{background:#24472f;color:#cfeedd}
+.nomo *{animation:none!important;transition:none!important}
+body.fs-s #app{zoom:.92}body.fs-l #app{zoom:1.12}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:10px}.tg{flex:none;width:52px;height:30px;border-radius:20px;border:0;background:#c9d6cb;position:relative;transition:background .2s}.tg i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}.tg.on{background:#4caf50}.tg.on i{left:25px}
+.mchips{padding-bottom:8px;margin-bottom:6px}.mchips .chip{flex:none}
+.hk small{display:inline-block;background:#d9f2dc;color:#14532d;border-radius:8px;padding:2px 8px;font-weight:800;font-size:11px;margin-bottom:6px}
 </style>
 </head>
 <body>
 <div id="app"><div class="load"><span class="sprout" style="display:inline-block">🌱</span></div></div>
 <nav id="nav" hidden></nav>
 <script src="/data.js"></script>
+<script src="/data2.js"></script>
 <script>
 const tg=window.Telegram?.WebApp;tg?.ready();tg?.expand();
 const $=s=>document.querySelector(s),app=$('#app');
@@ -192,7 +204,7 @@ const adm=(a,d)=>act(async()=>{await api(a,d);draw()});
 const newPromo=()=>adm('admin_promo_new',{code:$('#ac').value,type:$('#at').value,value:$('#av').value,limit:$('#al').value,days:$('#ad').value});
 const grant=()=>act(async()=>{await api('admin_grant',{uid:$('#gu').value,days:$('#gd').value});toast('VIP выдан')});
 const reply=id=>adm('admin_reply',{id,text:$('#r'+id).value});
-async function init(){
+async function init(){applySet();
   if(!tg?.initData){app.innerHTML=head('Садовест',0)+'<div class="card center"><div style="font-size:44px">📱</div>Откройте приложение через Telegram-бота «Садовест»</div>';return}
   try{await refresh();if(!me.profile)cur='onboard';draw();if(me.newReward)celebrateStreak(me.newReward)}catch(e){app.innerHTML=head('Садовест',0)+`<div class="card center">${esc(e.message)}<button class="btn" onclick="init()">Повторить</button></div>`}
 }
@@ -237,6 +249,7 @@ const results=q=>{q=(q||'').toLowerCase().trim();if(!q)return'<div class="mute c
   SL.filter(x=>x.title.toLowerCase().includes(q)).forEach(x=>o.push([`📖 ${x.title}`,`go('lesson',${x.id})`]));
   PLANTS.forEach((x,i)=>(x.n+x.i+x.c.join()).toLowerCase().includes(q)&&o.push([`${x.e} ${x.n}`,`go('plantinfo',${i})`]));
   PESTS.forEach((x,i)=>(x.n+x.i+x.c.join()).toLowerCase().includes(q)&&o.push([`${x.e} ${x.n}`,`go('pestinfo',${i})`]));
+  HACKS.forEach((x,i)=>(x[1]+x[2]).toLowerCase().includes(q)&&o.push([`💡 ${x[1]}`,"go('hacks')"]));DICT.forEach(x=>(x[0]+x[1]).toLowerCase().includes(q)&&o.push([`📖 ${x[0]}: ${x[1].slice(0,40)}…`,"go('dict')"]));
   return o.length?o.slice(0,30).map(([t,a])=>`<button class="les" onclick="${a}">${esc(t)}</button>`).join(''):'<div class="card center">Ничего не найдено</div>'};
 V.search=async q=>{SL=(await api('lessons')).items;return head('Поиск')+`<input value="${esc(q||'')}" oninput="$('#sr').innerHTML=results(this.value)" placeholder="Что ищем?"><div id="sr">${results(q)}</div>`};
 // погода
@@ -264,7 +277,7 @@ V.support=async()=>{if(!me.vip)return head('VIP-эксперт')+`<div class="ca
   return head('VIP-эксперт')+(items.length?items.slice().reverse().map(t=>`<div class="msg me">${esc(t.text)}${t.photo?'<div>📷 фото приложено</div>':''}<div class="mute">${fd(t.created)}</div></div>${t.reply?`<div class="msg ex"><b>Эксперт 👑</b><br>${esc(t.reply)}</div>`:'<div class="mute center">Ждём ответа эксперта…</div>'}`).join(''):'<div class="card center">Опишите проблему и приложите фото растения — эксперт ответит в течение 1–2 часов.</div>')+`<textarea id="tx" rows="3" maxlength="1000" placeholder="Напишите сообщение…"></textarea><img id="pv" hidden style="max-width:100%;border-radius:14px;margin-top:8px"><label class="btn ghost" style="display:block;text-align:center;box-sizing:border-box">📷 Прикрепить фото<input type="file" accept="image/*" hidden onchange="pickPhoto(this)"></label><button class="btn" onclick="sendT()">Отправить</button>`};
 const _pf=V.profile;V.profile=()=>_pf().replace('<h2>Достижения</h2>',`<div class="card glow center">🔥 <b>${me.streak} дн. подряд</b> (рекорд ${me.best})<div class="mute">5 дней — 10 🪙, 30 — 50 🪙, 100 — 200 🪙 и 7 дней VIP. Пропуск дня обнуляет серию.</div></div><h2>Достижения</h2>`);
 // ---- v4 ----
-function celebrate(icon,title,sub){const o=document.createElement('div');o.className='cele';o.innerHTML=`<div class="cbox"><div class="ci">${icon}</div><h2>${esc(title)}</h2><p>${esc(sub)}</p><button class="btn" onclick="this.closest('.cele').remove()">Отлично</button></div>`;document.body.append(o)}
+function celebrate(icon,title,sub){SND.reward();const o=document.createElement('div');o.className='cele';o.innerHTML=`<div class="cbox"><div class="ci">${icon}</div><h2>${esc(title)}</h2><p>${esc(sub)}</p><button class="btn" onclick="this.closest('.cele').remove()">Отлично</button></div>`;document.body.append(o)}
 function burst(){}
 let OB={place:[]};const PL=['Дача','Теплица','Балкон','Огород во дворе','Подоконник'];
 const tipsFor=()=>{const p=me.profile||{};return `${MON[new Date().getMonth()]} ${[].concat(p.place||[]).map(x=>PLACE[x]||'').join(' ')} ${LEVELT[p.level]||''}`};
@@ -285,7 +298,7 @@ V.testrun=()=>{const {t,i}=TS;
   if(TS.res){const r=TS.res;return head(t.title)+`<div class="card center"><div class="big">${r.score>=r.total*.8?'🏆':r.score>=r.total/2?'👍':'📚'}</div><h2>${r.score} из ${r.total}</h2><div class="mute">${r.coins?`+${r.coins} 🪙`:'Попробуйте улучшить результат'}</div></div>`+(r.review.length?'<h2>Разбор ошибок</h2>'+r.review.map(x=>`<div class="card"><b>${esc(x.q)}</b><p>Ваш ответ: ${esc(x.mine||'—')}</p><p>✅ Верно: ${esc(x.right)}</p></div>`).join(''):'<div class="card center">Без ошибок! 🎉</div>')+'<button class="btn" onclick="back()">К тестам</button>'}
   const q=t.questions[i];return head(t.title)+`<div class="mute">Вопрос ${i+1} из ${t.questions.length}</div><div class="bar"><div style="width:${i/t.questions.length*100}%"></div></div><div class="card"><b style="font-size:18px">${esc(q.q)}</b></div>`+q.o.map((x,k)=>`<button class="les" onclick="ansT(${k})">${esc(x)}</button>`).join('')};
 const ansT=k=>act(async()=>{if(TS.busy)return;TS.busy=1;TS.a[TS.i]=TS.t.questions[TS.i].o[k];TS.i++;
-  if(TS.i>=TS.t.questions.length){TS.res=await api('test_done',{answers:TS.a});await refresh();if(me.newReward)celebrateStreak(me.newReward)}
+  if(TS.i>=TS.t.questions.length){TS.res=await api('test_done',{answers:TS.a});SND[TS.res.score>=TS.res.total/2?'ok':'bad']();await refresh();if(me.newReward)celebrateStreak(me.newReward)}
   TS.busy=0;draw()});
 // вопросы и ответы
 const FAQ=[['Как пройти урок?','Откройте «Уроки», выберите урок и листайте слайды кнопкой «Далее». В конце ответьте верно минимум на 2 из 3 вопросов — тогда урок засчитается.'],['Как продлить серию дней?','Пройдите новый урок или тест, которых вы ещё не проходили. Повторное прохождение серию не продлевает и монеты не даёт. Награды: 5, 30 и 100 дней подряд. Если пропустить день, серия обнулится.'],['Как получить VIP?','«VIP-клуб» → «Купить VIP» или введите промокод в «Профиль» → «Ввести промокод».'],['Что даёт VIP?','200 уроков, поддержку экспертов с фото, эксклюзивные PDF и золотой значок.'],['Как активировать промокод?','Профиль → «Ввести промокод» или команда /promo КОД в боте. Каждый код можно использовать один раз.'],['Как работают тесты?','Раздел «Тесты»: 10 тематических и 3 общих (лёгкий, средний, сложный). После теста вы увидите разбор ошибок.'],['Как задать вопрос эксперту?','Раздел «Поддержка» (только VIP). К сообщению можно приложить фото растения.'],['Как добавить растение в огород?','«Энциклопедия» → растение → «Добавить в мой огород». Мы напомним о поливе.'],['Как работает поиск?','Нажмите 🔍 вверху любого экрана и введите название урока, растения или болезни.'],['Что такое закладки?','Нажмите ☆ на уроке, растении или болезни — они сохранятся в разделе «Закладки».']];
@@ -299,7 +312,7 @@ V.lesson=async id=>{if(!LS||LS.l.id!==id)LS={l:await api('lesson',{id}),i:0,a:[]
   return hd+`<h2>Проверка: 3 вопроса</h2><div class="mute">Нужно верно ответить минимум на 2 из 3. Иначе урок не засчитывается и его нужно пройти заново.</div>`+l.quiz.map((q,qi)=>`<div class="qbox"><small>ВОПРОС ${qi+1}</small>${esc(q.q)}</div>`+q.o.map((x,k)=>`<button class="les ans ${LS.a[qi]===x?'pick':''}" onclick="pickA(${qi},${k})"><span class="n">${ABV[k]}</span><span>${esc(x)}</span></button>`).join('')).join('')+`<button class="btn" onclick="submitL()">Завершить урок</button>`};
 const lessonRes=()=>{const r=LS.res;return head('Результат урока')+`<div class="card center ${r.passed?'glow':''}"><div class="big">${r.passed?'✅':'❌'}</div><h2>${r.passed?'Урок засчитан':'Урок не засчитан'}</h2>${r.repeat?'<p class="mute">Вы уже проходили этот урок: серия дней и монеты за повторное прохождение не начисляются.</p>':''}<div class="mute">Верно ${r.score} из ${r.total}. Нужно минимум 2.${r.gain?` Награда: +${r.gain} 🪙`:''}</div>${r.passed?'':'<p><b>Перечитайте слайды и пройдите урок заново.</b></p>'}</div><h2>Разбор ответов</h2>`+rv(r)+(r.passed?'<button class="btn" onclick="LS=null;back()">К урокам</button>':'<button class="btn" onclick="LS=null;draw()">🔁 Перепройти урок</button>')};
 const submitL=()=>act(async()=>{if(![0,1,2].every(i=>LS.a[i]))throw new Error('Ответьте на все три вопроса');
-  LS.res=await api('done',{id:LS.l.id,answers:LS.a});await refresh();if(LS.res.passed&&me.newReward)celebrateStreak(me.newReward);draw()});
+  LS.res=await api('done',{id:LS.l.id,answers:LS.a});SND[LS.res.passed?'ok':'bad']();await refresh();if(LS.res.passed&&me.newReward)celebrateStreak(me.newReward);draw()});
 V.testrun=()=>{const {t,i}=TS;
   if(TS.res){const r=TS.res;return head(t.title)+`<div class="card center"><div class="big">${r.score>=r.total*.8?'🏆':r.score>=r.total/2?'👍':'📚'}</div><h2>${r.score} из ${r.total}</h2><div class="mute">${r.coins?`+${r.coins} 🪙`:'Попробуйте улучшить результат'}</div></div><h2>Разбор ответов</h2>`+rv(r)+'<button class="btn" onclick="back()">К тестам</button>'}
   const q=t.questions[i];return head(t.title)+`<div class="mute">Вопрос ${i+1} из ${t.questions.length}</div><div class="bar"><div style="width:${i/t.questions.length*100}%"></div></div><div class="qbox"><small>ВОПРОС ${i+1}</small>${esc(q.q)}</div>`+q.o.map((x,k)=>`<button class="les ans" onclick="ansT(${k})"><span class="n">${ABV[k]}</span><span>${esc(x)}</span></button>`).join('')};
@@ -344,6 +357,46 @@ V.more=()=>head('Ещё',0)+[['tests','📝','Тесты'],['plants','🌿','Э�
 V.lessons=async()=>{const {items,soon}=await api('lessons'),L=['Начинающий','Любитель','Мастер'];
   const row=l=>`<button class="les ${l.locked?'lock':''}" onclick="${l.locked?"go('vip')":`go('lesson',${l.id})`}"><span class="n">${l.locked?'🔒':l.done?'✅':l.id}</span><span>${esc(l.title)}</span><span class="tag ${l.free?'':'v'}">${l.free?'Бесплатно':'VIP'}</span></button>`;
   return head('Уроки',0)+chips('lv',['Все',...L])+L.filter(l=>S2.lv==='Все'||S2.lv===l).map(l=>{const a=items.filter(i=>i.level===l);return a.length?`<h2>${{Начинающий:'🌱',Любитель:'🌿',Мастер:'🌳'}[l]} ${l}</h2>`+a.map(row).join(''):''}).join('')+(soon?`<div class="card center">🕓 Ещё ${soon} VIP-уроков готовятся и будут появляться здесь по мере выхода</div>`:'')};
+// ---- v7: настройки, звук, тема, календарь, лайфхаки, словарь ----
+const SET={sound:true,vibe:true,theme:'auto',fs:'m',motion:true};
+try{Object.assign(SET,JSON.parse(localStorage.getItem('sv_set')||'{}'))}catch{}
+const saveSet=()=>{try{localStorage.setItem('sv_set',JSON.stringify(SET))}catch{}};
+function applySet(){const dark=SET.theme==='dark'||(SET.theme==='auto'&&(tg?.colorScheme==='dark'||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)));
+  document.documentElement.dataset.theme=dark?'dark':'light';document.body.classList.toggle('nomo',!SET.motion);document.body.classList.remove('fs-s','fs-l');if(SET.fs!=='m')document.body.classList.add('fs-'+SET.fs)}
+let AC=null;
+function beep(f=520,d=.07,type='sine',v=.07){if(!SET.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch{}}
+const SND={tap:()=>beep(520),nav:()=>beep(700,.06,'triangle'),pick:()=>beep(430,.05,'square',.035),ok:()=>{beep(660,.09);setTimeout(()=>beep(880,.14),90)},bad:()=>beep(170,.22,'sawtooth',.05),reward:()=>[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.16),i*110)),
+  key:k=>k==='Enter'?beep(880,.08,'triangle'):k==='Backspace'?beep(300,.05,'sawtooth',.04):k===' '?beep(400,.04,'triangle',.04):beep(480+(k.charCodeAt(0)%12)*18,.03,'square',.03)};
+document.addEventListener('click',e=>{const b=e.target.closest('button,summary');if(!b)return;const c=b.className||'';SND[b.closest('nav')?'nav':/chip|ans|les/.test(c)?'pick':'tap']();if(SET.vibe)try{tg?.HapticFeedback?.impactOccurred('light')}catch{}},true);
+document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA/.test(e.target.tagName)&&e.key.length>0)SND.key(e.key)},true);
+// календарь огородника
+let CM=new Date().getMonth();
+V.calendar=async()=>{const {items}=await api('plants');
+  return head('Календарь огородника')+`<div class="hrs mchips">${MN.map((m,i)=>`<button class="chip ${i===CM?'on':''}" onclick="CM=${i};draw()">${m}</button>`).join('')}</div>`
+  +(items.length?`<div class="card glow"><b>💧 Мои растения: когда полить</b>${items.map(p=>{const nx=p.last+p.every*864e5;return `<div class="row" style="margin-top:6px"><span>${esc(p.name)}</span><span style="text-align:right;color:${nx<Date.now()?'var(--red)':'inherit'}">${nx<Date.now()?'Пора!':fd(nx)}</span></div>`}).join('')}</div>`:'')
+  +CATS.map(([e,t,d],k)=>`<div class="card sec" style="--d:${k*.04}s"><b>${e} ${t}</b><div class="mute">${d}</div><p>${esc(CAL[CM][k])}</p></div>`).join('')};
+// лайфхаки
+V.hacks=()=>head('Лайфхаки')+chips('hc',['Все',...HCATS])+HACKS.map((h,i)=>[h,i]).filter(([h])=>S2.hc==='Все'||h[0]===S2.hc).map(([h,i])=>`<div class="card hk"><small>${h[0]}</small><div class="row"><b style="flex:5">💡 ${esc(h[1])}</b>${bm('h:'+i)}</div><p style="margin:6px 0 0">${esc(h[2])}</p></div>`).join('');
+S2.hc='Все';
+// словарь огородника
+V.dict=()=>head('Словарь огородника')+'<div class="mute">Термины простыми словами</div><input placeholder="Найти термин…" oninput="$(\'#dl\').innerHTML=dictList(this.value)"><div id="dl">'+dictList('')+'</div>';
+const dictList=q=>{q=(q||'').toLowerCase();let last='';return [...DICT].sort((a,b)=>a[0].localeCompare(b[0],'ru')).filter(([t,d])=>!q||(t+d).toLowerCase().includes(q)).map(([t,d])=>{const L=t[0].toUpperCase(),h=L!==last?(last=L,`<h2>${L}</h2>`):'';return h+`<details class="card"><summary><b>${esc(t)}</b></summary><p>${esc(d)}</p></details>`}).join('')||'<div class="card center">Ничего не найдено</div>'};
+// настройки
+const tog=(k,on)=>`<button class="tg ${on?'on':''}" role="switch" aria-checked="${on}" onclick="setS('${k}',${!on})"><i></i></button>`;
+const setS=(k,v)=>{SET[k]=v;saveSet();applySet();draw()};
+const setN=on=>act(async()=>{await api('notify',{on});await refresh();draw()});
+V.settings=()=>head('Настройки')+`<div class="card"><div class="sw"><span>🔊 Звуки нажатий</span>${tog('sound',SET.sound)}</div></div><div class="card"><div class="sw"><span>📳 Вибрация</span>${tog('vibe',SET.vibe)}</div></div>
+<div class="card"><b>🌗 Тема</b><div class="chips">${[['auto','Авто'],['light','Светлая'],['dark','Тёмная']].map(([v,t])=>`<button class="chip ${SET.theme===v?'on':''}" onclick="setS('theme','${v}')">${t}</button>`).join('')}</div></div>
+<div class="card"><b>🔠 Размер текста</b><div class="chips">${[['s','Мелкий'],['m','Обычный'],['l','Крупный']].map(([v,t])=>`<button class="chip ${SET.fs===v?'on':''}" onclick="setS('fs','${v}')">${t}</button>`).join('')}</div></div>
+<div class="card"><div class="sw"><span>✨ Анимации</span>${tog('motion',SET.motion)}</div></div><div class="card"><div class="sw"><span>🔔 Уведомления в Telegram</span><button class="tg ${me.notify?'on':''}" role="switch" aria-checked="${me.notify}" onclick="setN(${!me.notify})"><i></i></button></div><div class="mute">Напоминания о поливе и об окончании VIP</div></div>
+<div class="card"><b>📍 Город: ${esc(me.profile?.city||'не указан')}</b><input id="wc" placeholder="Новый город"><button class="btn sm" style="margin-top:8px" onclick="setCity()">Сохранить город</button></div>
+<button class="btn ghost" onclick="Object.assign(SET,{sound:true,vibe:true,theme:'auto',fs:'m',motion:true});saveSet();applySet();draw()">Сбросить настройки</button><div class="mute center" style="margin-top:12px">СадоВест • настройки хранятся на этом устройстве</div>`;
+// «Ещё»
+V.more=()=>head('Ещё',0)+[['tests','📝','Тесты'],['hacks','💡','Лайфхаки'],['dict','📖','Словарь огородника'],['plants','🌿','Энциклопедия: растения, болезни, вредители'],['weather','🌦️','Погода для огорода'],['board','🏆','Рейтинг'],['marks','🔖','Закладки'],['files','📄','Материалы (PDF)'],['vip','👑','VIP-клуб'],['support','🛟','Поддержка'],['profile','👤','Профиль'],['settings','⚙️','Настройки'],['faq','❓','Вопросы и ответы'],...(me.admin?[['admin','🛠','Панель администратора']]:[])].map(([v,e,t])=>`<button class="les" onclick="go('${v}')"><span class="n">${e}</span><span>${t}</span><span style="margin-left:auto">›</span></button>`).join('');
+// закладки (уроки, растения, болезни, лайфхаки)
+V.marks=async()=>{const L=(await api('lessons')).items;
+  const row=k=>{const [t,i]=k.split(':'),o=t==='l'?L.find(x=>x.id==i):t==='p'?PLANTS[i]:t==='d'?PESTS[i]:HACKS[i];if(!o)return'';const go_=t==='l'?`go('lesson',${i})`:t==='p'?`go('plantinfo',${i})`:t==='d'?`go('pestinfo',${i})`:"go('hacks')";return `<button class="les" onclick="${go_}"><span class="n">${t==='l'?'📖':t==='h'?'💡':o.e}</span><span>${esc(t==='l'?o.title:t==='h'?o[1]:o.n)}</span></button>`};
+  return head('Закладки')+(me.bookmarks.length?me.bookmarks.map(row).join(''):'<div class="card center">Нажмите ☆ на уроке, растении, болезни или лайфхаке, чтобы сохранить</div>')};
 init();
 </script>
 </body>
