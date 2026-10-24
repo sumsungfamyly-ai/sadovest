@@ -1,22 +1,22 @@
 import { r, getJ, setJ } from '../lib/db.js';
 import fs from 'fs';
 import path from 'path';
+import { SOON } from '../lib/lessons.js';
 import { TESTS, pickQs, testSize, shuffle } from '../lib/tests.js';
 import { bump, sendFile, verify, getUser, save, isVip, activate, achieve, LESSONS, admins, newPromo, listPromos, stats, newTicket, replyTicket, grantVip } from '../lib/core.js';
 
 const deny = (m = 'Нет доступа', code = 403) => { const e = new Error(m); e.code = code; throw e; };
 const needAdmin = a => { if (!a) deny(); };
 
-const PDFS = { cal: ['Календарь посадок', 0], water: ['Чек-лист полива', 0], pests: ['Шпаргалка: болезни и вредители', 1], plan: ['Годовой план садовода', 1] };
+const pdfs = () => JSON.parse(fs.readFileSync(path.join(process.cwd(), 'lib', 'pdf', 'index.json'), 'utf8'));
 const board = async () => { const a = (await r('HGETALL', 'lb')) || [], o = []; for (let i = 0; i < a.length; i += 2) o.push({ nick: a[i], score: Number(a[i + 1]) }); return o.sort((x, y) => y.score - x.score).slice(0, 50); };
 const H = {
   async me({ u, admin }) {
     return { id: u.id, name: u.name, vip: isVip(u), streak: (u.lastAct === new Date().toISOString().slice(0, 10) || u.lastAct === new Date(Date.now() - 864e5).toISOString().slice(0, 10)) ? u.streak : 0, best: u.best, bookmarks: u.bookmarks, profile: u.profile, newReward: await (async () => { const n = u.newReward; if (n) { u.newReward = 0; await save(u); } return n || 0; })(), vip_until: u.vip_until, done: u.progress.length, total: LESSONS.length, coins: u.coins, days: u.days, ach: u.ach, notify: u.notify, admin,
-      quiz: (() => { const d = t => new Date(t).toISOString().slice(0, 10), log = u.quizLog || []; return { today: log.includes(d(Date.now())), days: [...Array(7)].map((_, i) => log.includes(d(Date.now() - (6 - i) * 864e5))) }; })(),
       cfg: { community: process.env.COMMUNITY_URL || '', buy: process.env.BUY_URL || '' } };
   },
   async lessons({ u }) {
-    return { items: LESSONS.map(l => ({ id: l.id, title: l.title, free: l.free, level: l.level, done: u.progress.includes(l.id), locked: !l.free && !isVip(u) })) };
+    return { items: LESSONS.map(l => ({ id: l.id, title: l.title, free: l.free, level: l.level, done: u.progress.includes(l.id), locked: !l.free && !isVip(u) })), soon: SOON };
   },
   async lesson({ u, b }) {
     const l = LESSONS.find(x => x.id === Number(b.id)); if (!l) deny('Урок не найден', 404);
@@ -32,9 +32,12 @@ const H = {
     const wait = Math.ceil(((l.sections.length + 2) * 3000 - (Date.now() - u.reading.at)) / 1000);
     if (wait > 0) deny(`Изучите слайды внимательнее: подождите ещё ${wait} сек.`, 400);
     const a = Array.isArray(b.answers) ? b.answers : [];
-    if (l.quiz.filter(([, right], i) => a[i] === right).length < 2) deny('Нужно верно ответить минимум на 2 из 3 вопросов. Попробуйте ещё раз!', 400);
-    if (!u.progress.includes(l.id)) { u.progress.push(l.id); u.coins += 2; }
-    await bump(u); achieve(u); await save(u); return { done: u.progress.length };
+    const review = l.quiz.map(([q, right], i) => ({ q, right, mine: a[i], ok: a[i] === right })), score = review.filter(x => x.ok).length;
+    u.reading = null;
+    if (score < 2) { await save(u); return { passed: false, score, total: review.length, review }; }
+    const first = !u.progress.includes(l.id); if (first) { u.progress.push(l.id); u.coins += 2; }
+    if (first) await bump(u);
+    achieve(u); await save(u); return { passed: true, score, total: review.length, review, gain: first ? 2 : 0, repeat: !first };
   },
   async promo({ u, b }) { return { msg: await activate(u, b.code) }; },
   async tickets({ u }) {
@@ -52,12 +55,6 @@ const H = {
   async plant_water({ u, b }) { const p = u.plants.find(x => x.id === Number(b.id)); if (p) p.last = Date.now(); await save(u); return { items: u.plants }; },
   async plant_del({ u, b }) { u.plants = u.plants.filter(x => x.id !== Number(b.id)); await save(u); return { items: u.plants }; },
   async notify({ u, b }) { u.notify = !!b.on; await save(u); return { notify: u.notify }; },
-  async quiz({ u, b }) {
-    const today = new Date().toISOString().slice(0, 10);
-    u.quizLog = u.quizLog || [];
-    if (u.quizLog.includes(today)) deny('Сегодня вы уже играли', 400);
-    u.quizLog = [...u.quizLog, today].slice(-14); u.coins += Math.min(5, Math.max(0, Number(b.score) || 0)); await bump(u); await save(u); return { coins: u.coins };
-  },
   async bookmark({ u, b }) {
     const k = String(b.key || '').slice(0, 10); if (!/^[lpd]:\d+$/.test(k)) deny('Ошибка', 400);
     u.bookmarks = u.bookmarks.includes(k) ? u.bookmarks.filter(x => x !== k) : [...u.bookmarks, k].slice(-100); await save(u); return { bookmarks: u.bookmarks };
@@ -76,17 +73,20 @@ const H = {
   async test_done({ u, b }) {
     if (!u.run) deny('Начните тест заново', 400);
     const a = Array.isArray(b.answers) ? b.answers : [], keys = u.run.keys, id = u.run.id;
-    const review = keys.map(([q, right], i) => ({ q, right, mine: a[i] })).filter(x => x.mine !== x.right), score = keys.length - review.length;
+    const review = keys.map(([q, right], i) => ({ q, right, mine: a[i], ok: a[i] === right })), score = review.filter(x => x.ok).length;
     u.tests = u.tests || {}; const old = u.tests[id] || 0, coins = Math.floor(Math.max(0, score - old) / 3);
-    if (score > old) u.tests[id] = score; u.coins += coins; u.run = null; await bump(u); await save(u);
+    const need = Math.ceil(keys.length / 2);
+    if (score >= need && old < need) await bump(u);
+    if (score > old) u.tests[id] = score; u.coins += coins; u.run = null; await save(u);
     return { score, total: keys.length, review, coins };
   },
   async lb({ u }) { return { items: await board(), you: u.coins }; },
+  async files() { return { items: pdfs() }; },
   async pdf({ u, b }) {
-    const f = PDFS[b.id]; if (!f) deny('Файл не найден', 404);
-    if (f[1] && !isVip(u)) deny('Материал только для VIP');
-    const buf = fs.readFileSync(path.join(process.cwd(), 'lib', 'pdf', b.id + '.pdf'));
-    await sendFile('sendDocument', u.id, 'document', buf, f[0] + '.pdf', 'application/pdf', '📄 ' + f[0]); return { ok: 1 };
+    const f = pdfs().find(x => x.id === b.id); if (!f) deny('Файл не найден', 404);
+    if (f.vip && !isVip(u)) deny('Материал только для VIP');
+    const buf = fs.readFileSync(path.join(process.cwd(), 'lib', 'pdf', f.id + '.pdf'));
+    await sendFile('sendDocument', u.id, 'document', buf, f.title + '.pdf', 'application/pdf', '📄 ' + f.title); return { ok: 1 };
   },
   async admin_lb_set({ admin, b }) {
     needAdmin(admin); const n = String(b.nick || '').trim().slice(0, 24), sc = Number(b.score);
