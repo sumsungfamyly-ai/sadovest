@@ -23,7 +23,7 @@ const H = {
     if (!l.free && !isVip(u)) deny('Урок доступен с VIP');
     u.reading = { id: l.id, at: Date.now() }; await save(u);
     const mix = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(x => x[1]);
-    return { id: l.id, title: l.title, intro: l.intro, sections: l.sections, tip: l.tip, fact: l.fact, done: u.progress.includes(l.id), quiz: l.quiz.map(([q, ...o]) => ({ q, o: mix(o) })) };
+    return { id: l.id, title: l.title, intro: l.intro, sections: l.sections, tip: l.tip, fact: l.fact, words: l.words || [], done: u.progress.includes(l.id), quiz: l.quiz.map(([q, ...o]) => ({ q, o: mix(o) })) };
   },
   async done({ u, b }) {
     const l = LESSONS.find(x => x.id === Number(b.id)); if (!l) deny('Урок не найден', 404);

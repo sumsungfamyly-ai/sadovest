@@ -105,13 +105,24 @@ body.fs-s #app{zoom:.92}body.fs-l #app{zoom:1.12}
 .sw{display:flex;align-items:center;justify-content:space-between;gap:10px}.tg{flex:none;width:52px;height:30px;border-radius:20px;border:0;background:#c9d6cb;position:relative;transition:background .2s}.tg i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}.tg.on{background:#4caf50}.tg.on i{left:25px}
 .mchips{padding-bottom:8px;margin-bottom:6px}.mchips .chip{flex:none}
 .hk small{display:inline-block;background:#d9f2dc;color:#14532d;border-radius:8px;padding:2px 8px;font-weight:800;font-size:11px;margin-bottom:6px}
+#splash{position:fixed;inset:0;z-index:60;display:grid;place-content:center;justify-items:center;background:radial-gradient(circle at 50% 35%,#f4ffe9,#cdeebd 60%,#a8e0a0);transition:opacity .5s}#splash.hide{opacity:0;pointer-events:none}
+#splash svg{width:150px;height:170px}.stem{stroke:#2e7d32;stroke-width:6;fill:none;stroke-linecap:round;stroke-dasharray:70;stroke-dashoffset:70;animation:grow 1s .2s ease-out forwards}@keyframes grow{to{stroke-dashoffset:0}}
+.lf{transform-box:fill-box;transform:scale(0);animation:leaf .7s ease-out forwards}.l1{transform-origin:right bottom;animation-delay:.9s}.l2{transform-origin:left bottom;animation-delay:1.1s}@keyframes leaf{to{transform:scale(1)}}
+.sp-t{font:800 40px Nunito,system-ui;color:#14532d;margin-top:6px;opacity:0;animation:fade .6s 1.2s forwards}.sp-s{color:#3b6e44;font-weight:600;opacity:0;animation:fade .6s 1.4s forwards}@keyframes fade{to{opacity:1}}
+.sp-bar{width:150px;height:6px;border-radius:4px;background:#bfe3bd;margin-top:22px;overflow:hidden}.sp-bar i{display:block;height:100%;width:0;background:#43a047;animation:bar 1.9s ease-out forwards}@keyframes bar{to{width:100%}}
+.mg{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:8px 0}.mg b{text-align:center;font-size:12px;color:var(--mute)}.md{border:2px solid transparent;border-radius:12px;background:var(--card);padding:4px 0;text-align:center;font:700 12px Nunito;color:var(--ink);min-height:48px}.md i{display:block;font-style:normal;font-size:20px;line-height:1.1}
+.md.g{border-color:#7bc47f}.md.r{border-color:#e08a80;background:#fff3f1}.md.t{box-shadow:0 0 0 2px #14532d}.md.sel{background:#d9f2dc;color:#14532d}html[data-theme=dark] .md.r{background:#3a1a17}
+details.lh summary{cursor:pointer;list-style:none}details.lh summary::-webkit-details-marker{display:none}.lh .mute{font-weight:700}.wd{background:var(--goldbg);border-radius:12px;padding:10px 12px;margin:8px 0}.wd b{color:#14532d}html[data-theme=dark] .wd b{color:#f6c744}
+.lk{opacity:.7}
 </style>
 </head>
 <body>
+<div id="splash"><svg viewBox="0 0 120 130" aria-hidden="true"><ellipse cx="60" cy="114" rx="36" ry="9" fill="#7a5532"/><path class="stem" d="M60 112 C60 92 60 72 60 52"/><g class="lf l1"><path d="M60 64 C40 62 27 48 25 32 C44 32 58 43 60 64Z" fill="#43a047"/></g><g class="lf l2"><path d="M60 52 C80 50 93 36 95 20 C76 20 62 31 60 52Z" fill="#66bb6a"/></g></svg><div class="sp-t">Садовест</div><div class="sp-s">Ваш помощник в мире растений</div><div class="sp-bar"><i></i></div></div>
 <div id="app"><div class="load"><span class="sprout" style="display:inline-block">🌱</span></div></div>
 <nav id="nav" hidden></nav>
 <script src="/data.js"></script>
 <script src="/data2.js"></script>
+<script src="/data3.js"></script>
 <script>
 const tg=window.Telegram?.WebApp;tg?.ready();tg?.expand();
 const $=s=>document.querySelector(s),app=$('#app');
@@ -373,7 +384,7 @@ document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA/.test(e.target.tagNam
 let CM=new Date().getMonth();
 V.calendar=async()=>{const {items}=await api('plants');
   return head('Календарь огородника')+`<div class="hrs mchips">${MN.map((m,i)=>`<button class="chip ${i===CM?'on':''}" onclick="CM=${i};draw()">${m}</button>`).join('')}</div>`
-  +(items.length?`<div class="card glow"><b>💧 Мои растения: когда полить</b>${items.map(p=>{const nx=p.last+p.every*864e5;return `<div class="row" style="margin-top:6px"><span>${esc(p.name)}</span><span style="text-align:right;color:${nx<Date.now()?'var(--red)':'inherit'}">${nx<Date.now()?'Пора!':fd(nx)}</span></div>`}).join('')}</div>`:'')
+  +`<button class="btn" onclick="go('moon')">🌙 Лунный календарь</button>`+(items.length?`<div class="card glow"><b>💧 Мои растения: когда полить</b>${items.map(p=>{const nx=p.last+p.every*864e5;return `<div class="row" style="margin-top:6px"><span>${esc(p.name)}</span><span style="text-align:right;color:${nx<Date.now()?'var(--red)':'inherit'}">${nx<Date.now()?'Пора!':fd(nx)}</span></div>`}).join('')}</div>`:'')
   +CATS.map(([e,t,d],k)=>`<div class="card sec" style="--d:${k*.04}s"><b>${e} ${t}</b><div class="mute">${d}</div><p>${esc(CAL[CM][k])}</p></div>`).join('')};
 // лайфхаки
 V.hacks=()=>head('Лайфхаки')+chips('hc',['Все',...HCATS])+HACKS.map((h,i)=>[h,i]).filter(([h])=>S2.hc==='Все'||h[0]===S2.hc).map(([h,i])=>`<div class="card hk"><small>${h[0]}</small><div class="row"><b style="flex:5">💡 ${esc(h[1])}</b>${bm('h:'+i)}</div><p style="margin:6px 0 0">${esc(h[2])}</p></div>`).join('');
@@ -392,12 +403,43 @@ V.settings=()=>head('Настройки')+`<div class="card"><div class="sw"><sp
 <div class="card"><b>📍 Город: ${esc(me.profile?.city||'не указан')}</b><input id="wc" placeholder="Новый город"><button class="btn sm" style="margin-top:8px" onclick="setCity()">Сохранить город</button></div>
 <button class="btn ghost" onclick="Object.assign(SET,{sound:true,vibe:true,theme:'auto',fs:'m',motion:true});saveSet();applySet();draw()">Сбросить настройки</button><div class="mute center" style="margin-top:12px">СадоВест • настройки хранятся на этом устройстве</div>`;
 // «Ещё»
-V.more=()=>head('Ещё',0)+[['tests','📝','Тесты'],['hacks','💡','Лайфхаки'],['dict','📖','Словарь огородника'],['plants','🌿','Энциклопедия: растения, болезни, вредители'],['weather','🌦️','Погода для огорода'],['board','🏆','Рейтинг'],['marks','🔖','Закладки'],['files','📄','Материалы (PDF)'],['vip','👑','VIP-клуб'],['support','🛟','Поддержка'],['profile','👤','Профиль'],['settings','⚙️','Настройки'],['faq','❓','Вопросы и ответы'],...(me.admin?[['admin','🛠','Панель администратора']]:[])].map(([v,e,t])=>`<button class="les" onclick="go('${v}')"><span class="n">${e}</span><span>${t}</span><span style="margin-left:auto">›</span></button>`).join('');
+V.more=()=>head('Ещё',0)+[['tests','📝','Тесты'],['moon','🌙','Лунный календарь'],['hacks','💡','Лайфхаки'],['dict','📖','Словарь огородника'],['plants','🌿','Энциклопедия: растения, болезни, вредители'],['weather','🌦️','Погода для огорода'],['board','🏆','Рейтинг'],['marks','🔖','Закладки'],['files','📄','Материалы (PDF)'],['vip','👑','VIP-клуб'],['support','🛟','Поддержка'],['profile','👤','Профиль'],['settings','⚙️','Настройки'],['faq','❓','Вопросы и ответы'],...(me.admin?[['admin','🛠','Панель администратора']]:[])].map(([v,e,t])=>`<button class="les" onclick="go('${v}')"><span class="n">${e}</span><span>${t}</span><span style="margin-left:auto">›</span></button>`).join('');
 // закладки (уроки, растения, болезни, лайфхаки)
 V.marks=async()=>{const L=(await api('lessons')).items;
   const row=k=>{const [t,i]=k.split(':'),o=t==='l'?L.find(x=>x.id==i):t==='p'?PLANTS[i]:t==='d'?PESTS[i]:HACKS[i];if(!o)return'';const go_=t==='l'?`go('lesson',${i})`:t==='p'?`go('plantinfo',${i})`:t==='d'?`go('pestinfo',${i})`:"go('hacks')";return `<button class="les" onclick="${go_}"><span class="n">${t==='l'?'📖':t==='h'?'💡':o.e}</span><span>${esc(t==='l'?o.title:t==='h'?o[1]:o.n)}</span></button>`};
   return head('Закладки')+(me.bookmarks.length?me.bookmarks.map(row).join(''):'<div class="card center">Нажмите ☆ на уроке, растении, болезни или лайфхаке, чтобы сохранить</div>')};
-init();
+// ---- v8: бесплатные/VIP записи энциклопедии, лайфхаки подробно, лунный календарь, новые слова ----
+const FREE_ENC=(()=>{const s=new Set(),c={};PLANTS.forEach((x,i)=>{if(i<10)s.add('p'+i)});PESTS.forEach((x,i)=>{c[x.k]=(c[x.k]||0)+1;if(c[x.k]<=10)s.add('d'+i)});return s})();
+const encOk=k=>me.vip||FREE_ENC.has(k);
+V.plants=()=>{const P=S2.pt==='Растения',src=(P?PLANTS:PESTS).map((x,i)=>[x,i]).filter(([x])=>P||(S2.pt==='Болезни'?x.k==='Болезнь':x.k==='Вредитель')),pre=P?'p':'d',free=src.filter(([x,i])=>FREE_ENC.has(pre+i)).length;let last='';
+  return head('Энциклопедия')+chips('pt',['Растения','Болезни','Вредители'])+`<div class="mute">Всего: ${src.length}${me.vip?'':` • бесплатно доступно ${free}, остальные — с VIP`}</div>`+src.sort((a,b)=>a[0].n.localeCompare(b[0].n,'ru')).map(([x,i])=>{const L=x.n[0].toUpperCase(),h=L!==last?(last=L,`<h2>${L}</h2>`):'',ok=encOk(pre+i);return h+`<button class="les ${ok?'':'lk'}" onclick="${ok?`go('${P?'plantinfo':'pestinfo'}',${i})`:"go('vip')"}"><span class="n">${ok?x.e:'🔒'}</span><span>${esc(x.n)}<div class="mute">${x.k}</div></span><span class="tag ${ok?'':'v'}">${ok?(me.vip?'':'Бесплатно'):'VIP'}</span></button>`}).join('')};
+const _pi=V.plantinfo,_di=V.pestinfo;
+V.plantinfo=i=>encOk('p'+i)?_pi(i):V.vip();
+V.pestinfo=i=>encOk('d'+i)?_di(i):V.vip();
+// лайфхаки: нажмите на карточку, чтобы раскрыть подробности
+V.hacks=()=>head('Лайфхаки')+'<div class="mute">Нажмите на лайфхак, чтобы прочитать подробно</div>'+chips('hc',['Все',...HCATS])+HACKS.map((h,i)=>[h,i]).filter(([h])=>S2.hc==='Все'||h[0]===S2.hc).map(([h,i])=>`<details class="card hk lh"><summary><small>${h[0]}</small><div><b>💡 ${esc(h[1])}</b></div><div class="mute">${esc(h[2])}</div></summary><div class="wd"><b>Подробно:</b><p style="margin:6px 0 0">${esc(h[3]||'')}</p></div>${bm('h:'+i)}</details>`).join('');
+// слайд «Новые слова» в уроке
+V.lesson=async id=>{if(!LS||LS.l.id!==id)LS={l:await api('lesson',{id}),i:0,a:[],res:null};if(LS.res)return lessonRes();
+  const {l,i}=LS,W=(l.words||[]).map(w=>[w,(DICT.find(d=>d[0]===w)||[])[1]]).filter(x=>x[1]),
+  sl=[...l.sections.map(([h,t],k)=>[ICO[k%5]+' '+h,esc(t)]),['🤯 Интересный факт',esc(l.fact)],['💡 Совет эксперта',esc(l.tip)],...(W.length?[['📚 Новые слова из урока',W.map(([w,d])=>`<div class="wd"><b>${esc(w)}</b> — ${esc(d)}</div>`).join('')]]:[])],n=sl.length,hd=head('Урок',1,bm('l:'+id));
+  if(i<n)return hd+(l.done?'<div class="card tipc">✅ Урок уже пройден. Повторное прохождение не продлевает серию и не даёт монет.</div>':'')+`<div class="mute">${esc(l.title)} • слайд ${i+1} из ${n}</div><div class="bar"><div style="width:${(i+1)/n*100}%"></div></div><div class="card sec glow"><b style="font-size:19px">${sl[i][0]}</b><div style="font-size:17px;margin-top:6px">${sl[i][1]}</div></div><div class="row">${i?'<button class="btn ghost" onclick="LS.i--;draw()">‹ Назад</button>':''}<button class="btn" onclick="LS.i++;draw()">${i===n-1?'К вопросам ›':'Далее ›'}</button></div>`;
+  return hd+`<h2>Проверка: 3 вопроса</h2><div class="mute">Нужно верно ответить минимум на 2 из 3. Иначе урок не засчитывается и его нужно пройти заново.</div>`+l.quiz.map((q,qi)=>`<div class="qbox"><small>ВОПРОС ${qi+1}</small>${esc(q.q)}</div>`+q.o.map((x,k)=>`<button class="les ans ${LS.a[qi]===x?'pick':''}" onclick="pickA(${qi},${k})"><span class="n">${ABV[k]}</span><span>${esc(x)}</span></button>`).join('')).join('')+`<button class="btn" onclick="submitL()">Завершить урок</button>`};
+// лунный календарь
+const SYN=29.530588853,NEW0=Date.UTC(2000,0,6,18,14),SIGNS=['Овен','Телец','Близнецы','Рак','Лев','Дева','Весы','Скорпион','Стрелец','Козерог','Водолей','Рыбы'],MOONS=['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'];
+const mAge=ms=>{const t=((ms-NEW0)/864e5)%SYN;return t<0?t+SYN:t};
+const mSign=ms=>SIGNS[Math.floor((((218.316+13.176396*((ms-Date.UTC(2000,0,1,12))/864e5))%360)+360)%360/30)];
+const mInfo=d=>{const ms=Date.UTC(d.getFullYear(),d.getMonth(),d.getDate(),12),a=mAge(ms),sg=mSign(ms),edge=a<1||a>SYN-1||Math.abs(a-SYN/2)<1,fert=['Рак','Скорпион','Рыбы'].includes(sg),mid=['Телец','Весы','Козерог'].includes(sg);
+  return {a,sg,edge,emoji:MOONS[Math.floor(a/SYN*8+.5)%8],ph:edge?(a<2||a>SYN-2?'Новолуние':'Полнолуние'):a<SYN/2?'Растущая Луна':'Убывающая Луна',cls:edge?'r':(fert?'g':''),
+  adv:edge?'Неблагоприятный день: не сеять и не пересаживать. Подходит для планирования, прополки и ухода за инструментом.':a<SYN/2?'Растущая Луна: сейте и сажайте культуры, плодоносящие над землёй (томаты, огурцы, капуста, зелень), хорошо поливать и подкармливать.':'Убывающая Луна: сейте и сажайте корнеплоды и луковичные (морковь, свёкла, лук, чеснок), обрезайте, пересаживайте, боритесь с вредителями.',
+  sgn:fert?'Знак плодородный: хороший день для посева и посадки.':mid?'Знак со средней плодородностью: допустимо сеять и сажать.':'Знак малоплодородный: лучше полоть, рыхлить и обрабатывать от вредителей.'}};
+let MY=new Date().getFullYear(),MM=new Date().getMonth(),MD=new Date().getDate();
+const moonNav=d=>{MM+=d;if(MM<0){MM=11;MY--}if(MM>11){MM=0;MY++}MD=1;draw()};
+V.moon=()=>{const first=(new Date(MY,MM,1).getDay()+6)%7,days=new Date(MY,MM+1,0).getDate(),now=new Date(),sel=mInfo(new Date(MY,MM,Math.min(MD,days)));
+  let nxt='';for(let k=0;k<45&&!nxt;k++){const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+k),a=mAge(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate(),12));if(k&&(a<1||Math.abs(a-SYN/2)<.5)&&!nxt)nxt=`${a<1?'🌑 Новолуние':'🌕 Полнолуние'}: ${d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'})}`}
+  return head('Лунный календарь')+`<div class="row"><button class="btn sm ghost" onclick="moonNav(-1)">‹</button><b style="text-align:center;flex:3">${MN[MM]} ${MY}</b><button class="btn sm ghost" onclick="moonNav(1)">›</button></div><div class="mg">${['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<b>${x}</b>`).join('')}${[...Array(first)].map(()=>'<span></span>').join('')}${[...Array(days)].map((_,k)=>{const d=k+1,m=mInfo(new Date(MY,MM,d));return `<button class="md ${m.cls} ${d===MD?'sel':''} ${(d===now.getDate()&&MM===now.getMonth()&&MY===now.getFullYear())?'t':''}" onclick="MD=${d};draw()">${d}<i>${m.emoji}</i></button>`}).join('')}</div>
+<div class="card glow center"><div class="big">${sel.emoji}</div><h2 style="margin:0">${MD} ${MN[MM].toLowerCase()}: ${sel.ph}</h2><div class="mute">Возраст Луны ${sel.a.toFixed(1)} сут. • Луна в знаке: ${sel.sg}</div></div><div class="card"><b>🌱 Рекомендация</b><p>${sel.adv}</p><p>${sel.sgn}</p></div>${nxt?`<div class="card tipc">Ближайшее: ${nxt}</div>`:''}<div class="mute center">🟩 благоприятные дни, 🟥 неблагоприятные (новолуние и полнолуние). Расчёт приблизительный: календарь — ориентир, а не закон.</div>`};
+const _sp=document.getElementById&&document.getElementById('splash');
+Promise.all([init(),new Promise(r=>setTimeout(r,SET.motion?2100:300))]).finally(()=>{if(_sp){_sp.classList.add('hide');setTimeout(()=>_sp.remove(),600)}});
 </script>
 </body>
 </html>
