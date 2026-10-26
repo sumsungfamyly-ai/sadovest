@@ -1,7 +1,8 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
 <meta charset="utf-8">
+<meta name="color-scheme" content="light">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Садовест</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
@@ -10,12 +11,10 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 :root{--bg:#eef8ee;--card:#fff;--ink:#17311f;--mute:#5d7a66;--g1:#2e8b3d;--g2:#14532d;--line:#d5ead7;--gold:#f6c744;--gold2:#b8860b;--goldbg:#fff3c9;--red:#c0392b}
-@media(prefers-color-scheme:dark){:root{--bg:#0f1f14;--card:#16301e;--ink:#e8f5ea;--mute:#9bb8a2;--line:#24472f;--goldbg:#3a3213}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:600 16px/1.4 Nunito,system-ui,sans-serif}
 #app{max-width:520px;margin:0 auto;padding:12px 14px calc(88px + env(safe-area-inset-bottom))}
-h1{font-size:24px;font-weight:800;margin:6px 0 12px;color:var(--g2)}@media(prefers-color-scheme:dark){h1{color:#8fe3a0}}
-h2{font-size:18px;font-weight:800;margin:18px 0 8px}
+h1{font-size:24px;font-weight:800;margin:6px 0 12px;color:var(--g2)}h2{font-size:18px;font-weight:800;margin:18px 0 8px}
 .top{display:flex;align-items:center;gap:8px}.top b{font-size:19px;font-weight:800;flex:1}
 .back{border:0;background:var(--card);border-radius:12px;width:38px;height:38px;font-size:20px;color:var(--ink)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -114,6 +113,33 @@ body.fs-s #app{zoom:.92}body.fs-l #app{zoom:1.12}
 .md.g{border-color:#7bc47f}.md.r{border-color:#e08a80;background:#fff3f1}.md.t{box-shadow:0 0 0 2px #14532d}.md.sel{background:#d9f2dc;color:#14532d}html[data-theme=dark] .md.r{background:#3a1a17}
 details.lh summary{cursor:pointer;list-style:none}details.lh summary::-webkit-details-marker{display:none}.lh .mute{font-weight:700}.wd{background:var(--goldbg);border-radius:12px;padding:10px 12px;margin:8px 0}.wd b{color:#14532d}html[data-theme=dark] .wd b{color:#f6c744}
 .lk{opacity:.7}
+.n{overflow:hidden}.n img{width:100%;height:100%;object-fit:cover;border-radius:10px;display:block}
+.pbig{width:150px;height:150px;border-radius:22px;object-fit:cover;box-shadow:0 6px 16px rgba(20,83,45,.2);background:#fff}
+.pl i img{width:44px;height:44px;border-radius:10px;object-fit:cover;display:block;margin:0 auto 2px}
+.vid{width:100%;border-radius:16px;margin:10px 0;background:#000;max-height:260px}
+#tour{position:fixed;inset:0;z-index:70}
+#tour .spot{position:fixed;border-radius:18px;box-shadow:0 0 0 9999px rgba(8,30,15,.64),0 0 0 3px #ffd54f;transition:all .3s;pointer-events:none}
+#tour .dim{position:fixed;inset:0;background:rgba(8,30,15,.64)}
+#tour .tb{position:fixed;left:12px;right:12px;max-width:500px;margin:0 auto;display:flex;gap:10px;align-items:flex-end;animation:in .3s both}
+#tour .mole{width:92px;height:92px;flex:none;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.4);animation:bob 1.4s ease-in-out infinite;background:#fff}
+#tour .bub{flex:1;background:#fff;color:#17311f;border-radius:18px;padding:12px 14px;box-shadow:0 8px 22px rgba(0,0,0,.35);font-weight:700;line-height:1.35}
+#tour .tr{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}#tour .tr .mute{color:#5d7a66}
+@keyframes bob{50%{transform:translateY(-5px)}}
+/* мягкая светло-зелёная тема по умолчанию */
+:root{--bg:#e8f5e1;--card:#fff;--ink:#1f3a26;--mute:#5f7f66;--line:#d3ebcc;--g1:#4caf50;--g2:#2e7d32;--goldbg:#fff6d6}
+html,body{background:linear-gradient(180deg,#e0f2d8 0%,#eff9ea 50%,#fafef6 100%) fixed;color:var(--ink)}
+h1,.brand,.sh h2,.lnk{color:#2e6b34}
+.btn{background:linear-gradient(#86cf8a,#56b05d);border-bottom:6px solid #3e8e47;box-shadow:0 6px 12px rgba(62,142,71,.28),inset 0 2px 0 rgba(255,255,255,.5)}
+.btn.ghost{background:#fff;color:#2e7d32;border:2px solid #7cc47f;border-bottom-width:5px}
+.chip{border-color:#7cc47f;color:#2e7d32}.chip.on{background:#6dbb72;color:#fff}
+.tile,.les,.pl,.card{border-color:#d3ebcc}.tile,.les,.pl{border-bottom-color:#b9dfb2;box-shadow:0 4px 8px rgba(62,142,71,.1)}
+.hero{background:linear-gradient(90deg,#3d8f48 0%,#3d8f48d9 45%,#3d8f4833 100%),url(/img/hero.jpg) center/cover,linear-gradient(135deg,#4caf50,#81c784)}
+.qbox{background:linear-gradient(135deg,#43a047,#7bc67f)}.hbtn{background:#8bc34a;border-bottom-color:#689f38}
+.tk{background:#e4f3dd}.qt button{background:#e3f3dc;border-bottom-color:#cbe6c3}.qt .r{background:#fde9e9;border-bottom-color:#f5cfcf}.qt .y{background:#fff3d1;border-bottom-color:#f0deaa}
+nav{background:#fbfef8;border-top-color:#d3ebcc}nav button.on{color:#3d8f48}
+.bar div{background:linear-gradient(90deg,#66bb6a,#a5d6a7)}.ans{background:#f4fbf1}.les.pick{background:#dff2d9}.sec{border-left-color:#6dbb72}
+.ava{background:linear-gradient(#6dbb72,#3d8f48)}.stat div{background:linear-gradient(135deg,#66bb6a,#43a047)}.wcard{background:linear-gradient(180deg,#e1f1fb,#eaf7e1)}
+.tag{background:#dff2d9;color:#2e6b34}.md.sel{background:#dff2d9}.tg.on{background:#66bb6a}
 </style>
 </head>
 <body>
@@ -224,7 +250,7 @@ V.lesson=async id=>{const l=await api('lesson',{id});
   return head('Урок')+`<div class="card glow"><h2 style="margin:0 0 6px">${esc(l.title)}</h2><div class="mute">${esc(l.intro)}</div></div>`+l.sections.map(([h,t],i)=>`<div class="card sec" style="--d:${i*.1}s"><b>${['🌱','💧','☀️','🛡️','📌'][i%5]} ${esc(h)}</b><p>${esc(t)}</p></div>`).join('')+`<div class="card tipc">💡 <b>Совет эксперта:</b> ${esc(l.tip)}</div><button class="btn" ${l.done?'disabled':''} onclick="finish(${l.id})">${l.done?'✅ Пройден':'Отметить пройденным'}</button>`};
 const plIdx=name=>PLANTS.findIndex(p=>name.includes(p.n));
 V.garden=async()=>{const {items}=await api('plants');
-  return head('Мой огород')+`<h2>Каталог растений</h2><div class="grid3">${PLANTS.map((p,i)=>`<button class="pl" onclick="go('plantinfo',${i})"><i>${p.e}</i>${p.n}</button>`).join('')}</div><h2>Мои растения</h2>`+(items.length?items.map(p=>{const k=plIdx(p.name);return `<div class="card"><div class="row"><b>${esc(p.name)}</b><span class="mute" style="text-align:right">полив раз в ${p.every} дн.</span></div><div class="mute">Последний полив: ${fd(p.last)}</div><div class="row" style="margin-top:8px"><button class="btn sm" onclick="plant('plant_water',${p.id})">💧 Полил(а)</button>${k>=0?`<button class="btn sm ghost" onclick="go('plantinfo',${k})">Советы</button>`:''}<button class="btn sm ghost" onclick="plant('plant_del',${p.id})">Удалить</button></div></div>`}).join(''):'<div class="card center">Выберите растение в каталоге выше</div>')+`<div class="card"><b>Своё растение</b><input id="pn" maxlength="40" placeholder="Название"><input id="pe" type="number" min="1" max="60" value="3" aria-label="Полив раз в N дней"><div class="mute">Поливать раз в N дней</div><button class="btn" onclick="addPlant()">Добавить</button></div>`};
+  return head('Мой огород')+`<details class="card"><summary><b>➕ Добавить из каталога (${PLANTS.length})</b></summary><div class="grid3" style="margin-top:8px">${PLANTS.map((p,i)=>`<button class="pl ${encOk('p'+i)?'':'lk'}" onclick="go('plantinfo',${i})"><i>${encOk('p'+i)?(pimg(p.n)||p.e):'🔒'}</i>${p.n}</button>`).join('')}</div></details><h2>Мои растения</h2>`+(items.length?items.map(p=>{const k=plIdx(p.name);return `<div class="card"><div class="row"><b>${esc(p.name)}</b><span class="mute" style="text-align:right">полив раз в ${p.every} дн.</span></div><div class="mute">Последний полив: ${fd(p.last)}</div><div class="row" style="margin-top:8px"><button class="btn sm" onclick="plant('plant_water',${p.id})">💧 Полил(а)</button>${k>=0?`<button class="btn sm ghost" onclick="go('plantinfo',${k})">Советы</button>`:''}<button class="btn sm ghost" onclick="plant('plant_del',${p.id})">Удалить</button></div></div>`}).join(''):'<div class="card center">Выберите растение в каталоге выше</div>')+`<div class="card"><b>Своё растение</b><input id="pn" maxlength="40" placeholder="Название"><input id="pe" type="number" min="1" max="60" value="3" aria-label="Полив раз в N дней"><div class="mute">Поливать раз в N дней</div><button class="btn" onclick="addPlant()">Добавить</button></div>`};
 V.plantinfo=i=>{const p=PLANTS[i];return head(p.n)+`<div class="card glow center"><div class="big">${p.e}</div><h2 style="margin:0">${p.n}</h2><div class="mute">${p.k} • ${p.s} • полив раз в ${p.w} дн.</div></div><div class="card"><b>О растении</b><p>${p.i}</p><b>Когда сажать</b><p>${p.t}</p><b>Советы</b>${p.c.map(x=>`<p>✅ ${x}</p>`).join('')}</div><button class="btn" onclick="addP(${i})">Добавить в мой огород</button>`};
 const addP=i=>act(async()=>{const p=PLANTS[i];await api('plant_add',{name:p.e+' '+p.n,every:p.w});await refresh();toast('Добавлено в огород 🌿');back()});
 // ---- v3 ----
@@ -295,7 +321,7 @@ const tipsFor=()=>{const p=me.profile||{};return `${MON[new Date().getMonth()]} 
 const obq=(k,t,o)=>`<div class="card"><b>${t}</b><div class="chips">${o.map(x=>`<button class="chip ${OB[k]===x?'on':''}" onclick="OB.${k}='${x}';draw()">${x}</button>`).join('')}</div></div>`;
 const togPl=i=>{const x=PL[i];OB.place=OB.place.includes(x)?OB.place.filter(y=>y!==x):[...OB.place,x];draw()};
 V.onboard=()=>`<h1>Добро пожаловать! 🌱</h1><div class="mute">Ответьте на три вопроса — без них приложение не откроется</div><div class="card"><b>1. Где вы выращиваете растения? (можно несколько)</b><div class="chips">${PL.map((x,i)=>`<button class="chip ${OB.place.includes(x)?'on':''}" onclick="togPl(${i})">${x}</button>`).join('')}</div></div>${obq('level','2. Ваш опыт?',['Новичок','Любитель','Опытный'])}<div class="card"><b>3. Ваш город или регион</b><input value="${esc(OB.city||'')}" oninput="OB.city=this.value" placeholder="Например, Краснодар"></div><button class="btn" onclick="saveOB()">Начать</button>`;
-const saveOB=()=>act(async()=>{if(!OB.place.length||!OB.level||!(OB.city||'').trim())throw new Error('Ответьте на все три вопроса');await api('onboard',OB);await refresh();tab('home')});
+const saveOB=()=>act(async()=>{if(!OB.place.length||!OB.level||!(OB.city||'').trim())throw new Error('Ответьте на все три вопроса');await api('onboard',OB);await refresh();tab('home');setTimeout(maybeTour,900)});
 V.home=()=>`<h1>Привет, ${esc(me.name)}!</h1><input placeholder="🔍 Поиск по урокам, растениям, болезням…" onkeydown="if(event.key==='Enter')go('search',this.value)"><div class="card tipc" style="margin-top:12px">🌤 <b>Совет:</b> ${esc(tipsFor())}</div><div class="card row"><span>🔥 <b>${me.streak}</b> дн. подряд</span><span style="text-align:right">🪙 <b>${me.coins}</b></span></div><div class="mute center">Продлить серию: пройдите урок или тест</div><div class="grid" style="margin-top:10px">${[['lessons','📖','Уроки'],['tests','📝','Тесты'],['garden','🪴','Мой огород'],['plants','🌿','Энциклопедия'],['weather','🌦️','Погода'],['faq','❓','Вопросы и ответы'],['board','🏆','Рейтинг'],['marks','🔖','Закладки'],['files','📄','Материалы'],['vip','👑','VIP-клуб','vip'],['support','🛟','Поддержка'],['calendar','🗓️','Календарь']].map(([v,i,t,c])=>`<button class="tile ${c||''}" onclick="${['lessons','plants'].includes(v)?'tab':'go'}('${v}')"><i>${i}</i>${t}</button>`).join('')}</div>${me.vip?'':`<button class="banner" onclick="go('vip')"><i>👑</i><span>VIP-доступ<small>200 уроков и поддержка экспертов</small></span></button>`}${me.admin?`<button class="btn ghost" onclick="go('admin')">⚙️ Панель администратора</button>`:''}`;
 // исправление: ответы в уроке сбрасывались, а на экране оставались выбранными
 const pickA=(qi,k)=>{LS.a[qi]=LS.l.quiz[qi].o[k];const y=window.scrollY;draw().then(()=>window.scrollTo(0,y))};
@@ -313,7 +339,7 @@ const ansT=k=>act(async()=>{if(TS.busy)return;TS.busy=1;TS.a[TS.i]=TS.t.question
   TS.busy=0;draw()});
 // вопросы и ответы
 const FAQ=[['Как пройти урок?','Откройте «Уроки», выберите урок и листайте слайды кнопкой «Далее». В конце ответьте верно минимум на 2 из 3 вопросов — тогда урок засчитается.'],['Как продлить серию дней?','Пройдите новый урок или тест, которых вы ещё не проходили. Повторное прохождение серию не продлевает и монеты не даёт. Награды: 5, 30 и 100 дней подряд. Если пропустить день, серия обнулится.'],['Как получить VIP?','«VIP-клуб» → «Купить VIP» или введите промокод в «Профиль» → «Ввести промокод».'],['Что даёт VIP?','200 уроков, поддержку экспертов с фото, эксклюзивные PDF и золотой значок.'],['Как активировать промокод?','Профиль → «Ввести промокод» или команда /promo КОД в боте. Каждый код можно использовать один раз.'],['Как работают тесты?','Раздел «Тесты»: 10 тематических и 3 общих (лёгкий, средний, сложный). После теста вы увидите разбор ошибок.'],['Как задать вопрос эксперту?','Раздел «Поддержка» (только VIP). К сообщению можно приложить фото растения.'],['Как добавить растение в огород?','«Энциклопедия» → растение → «Добавить в мой огород». Мы напомним о поливе.'],['Как работает поиск?','Нажмите 🔍 вверху любого экрана и введите название урока, растения или болезни.'],['Что такое закладки?','Нажмите ☆ на уроке, растении или болезни — они сохранятся в разделе «Закладки».']];
-V.faq=()=>head('Вопросы и ответы')+FAQ.map(([q,a])=>`<details class="card"><summary><b>${q}</b></summary><p>${a}</p></details>`).join('');
+V.faq=()=>head('Вопросы и ответы')+`<button class="btn" onclick="tab('home');setTimeout(startTour,700)">🐹 Экскурсия с землеройкой</button><video class="vid" controls playsinline preload="none" poster="/img/mole.jpg" src="/img/tour.mp4" onerror="this.remove()"></video>`+FAQ.map(([q,a])=>`<details class="card"><summary><b>${q}</b></summary><p>${a}</p></details>`).join('');
 // ---- v5 ----
 const rv=r=>r.review.map((x,i)=>`<div class="card ${x.ok?'okc':'badc'}"><b>${i+1}. ${esc(x.q)}</b><p>${x.ok?'✅ Верно':'❌ Ваш ответ'}: ${esc(x.mine||'—')}</p>${x.ok?'':`<p>✅ Правильный ответ: ${esc(x.right)}</p>`}</div>`).join('');
 const ABV='АБВГ';
@@ -369,11 +395,11 @@ V.lessons=async()=>{const {items,soon}=await api('lessons'),L=['Начинающ
   const row=l=>`<button class="les ${l.locked?'lock':''}" onclick="${l.locked?"go('vip')":`go('lesson',${l.id})`}"><span class="n">${l.locked?'🔒':l.done?'✅':l.id}</span><span>${esc(l.title)}</span><span class="tag ${l.free?'':'v'}">${l.free?'Бесплатно':'VIP'}</span></button>`;
   return head('Уроки',0)+chips('lv',['Все',...L])+L.filter(l=>S2.lv==='Все'||S2.lv===l).map(l=>{const a=items.filter(i=>i.level===l);return a.length?`<h2>${{Начинающий:'🌱',Любитель:'🌿',Мастер:'🌳'}[l]} ${l}</h2>`+a.map(row).join(''):''}).join('')+(soon?`<div class="card center">🕓 Ещё ${soon} VIP-уроков готовятся и будут появляться здесь по мере выхода</div>`:'')};
 // ---- v7: настройки, звук, тема, календарь, лайфхаки, словарь ----
-const SET={sound:true,vibe:true,theme:'auto',fs:'m',motion:true};
-try{Object.assign(SET,JSON.parse(localStorage.getItem('sv_set')||'{}'))}catch{}
-const saveSet=()=>{try{localStorage.setItem('sv_set',JSON.stringify(SET))}catch{}};
+const SET={sound:true,vibe:true,theme:'light',fs:'m',motion:true,toured:false};
+try{Object.assign(SET,JSON.parse(localStorage.getItem('sv_set2')||'{}'))}catch{}
+const saveSet=()=>{try{localStorage.setItem('sv_set2',JSON.stringify(SET))}catch{}};
 function applySet(){const dark=SET.theme==='dark'||(SET.theme==='auto'&&(tg?.colorScheme==='dark'||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)));
-  document.documentElement.dataset.theme=dark?'dark':'light';document.body.classList.toggle('nomo',!SET.motion);document.body.classList.remove('fs-s','fs-l');if(SET.fs!=='m')document.body.classList.add('fs-'+SET.fs)}
+  document.documentElement.dataset.theme=dark?'dark':'light';document.body.classList.toggle('nomo',!SET.motion);document.body.classList.remove('fs-s','fs-l');if(SET.fs!=='m')document.body.classList.add('fs-'+SET.fs);try{tg?.setHeaderColor?.(dark?'#0f1f14':'#e3f3dc');tg?.setBackgroundColor?.(dark?'#0f1f14':'#e8f5e1')}catch{}}
 let AC=null;
 function beep(f=520,d=.07,type='sine',v=.07){if(!SET.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch{}}
 const SND={tap:()=>beep(520),nav:()=>beep(700,.06,'triangle'),pick:()=>beep(430,.05,'square',.035),ok:()=>{beep(660,.09);setTimeout(()=>beep(880,.14),90)},bad:()=>beep(170,.22,'sawtooth',.05),reward:()=>[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.16),i*110)),
@@ -401,7 +427,7 @@ V.settings=()=>head('Настройки')+`<div class="card"><div class="sw"><sp
 <div class="card"><b>🔠 Размер текста</b><div class="chips">${[['s','Мелкий'],['m','Обычный'],['l','Крупный']].map(([v,t])=>`<button class="chip ${SET.fs===v?'on':''}" onclick="setS('fs','${v}')">${t}</button>`).join('')}</div></div>
 <div class="card"><div class="sw"><span>✨ Анимации</span>${tog('motion',SET.motion)}</div></div><div class="card"><div class="sw"><span>🔔 Уведомления в Telegram</span><button class="tg ${me.notify?'on':''}" role="switch" aria-checked="${me.notify}" onclick="setN(${!me.notify})"><i></i></button></div><div class="mute">Напоминания о поливе и об окончании VIP</div></div>
 <div class="card"><b>📍 Город: ${esc(me.profile?.city||'не указан')}</b><input id="wc" placeholder="Новый город"><button class="btn sm" style="margin-top:8px" onclick="setCity()">Сохранить город</button></div>
-<button class="btn ghost" onclick="Object.assign(SET,{sound:true,vibe:true,theme:'auto',fs:'m',motion:true});saveSet();applySet();draw()">Сбросить настройки</button><div class="mute center" style="margin-top:12px">СадоВест • настройки хранятся на этом устройстве</div>`;
+<button class="btn" onclick="tab('home');setTimeout(startTour,700)">🐹 Экскурсия с землеройкой</button><button class="btn ghost" onclick="Object.assign(SET,{sound:true,vibe:true,theme:'light',fs:'m',motion:true});saveSet();applySet();draw()">Сбросить настройки</button><div class="mute center" style="margin-top:12px">СадоВест • настройки хранятся на этом устройстве</div>`;
 // «Ещё»
 V.more=()=>head('Ещё',0)+[['tests','📝','Тесты'],['moon','🌙','Лунный календарь'],['hacks','💡','Лайфхаки'],['dict','📖','Словарь огородника'],['plants','🌿','Энциклопедия: растения, болезни, вредители'],['weather','🌦️','Погода для огорода'],['board','🏆','Рейтинг'],['marks','🔖','Закладки'],['files','📄','Материалы (PDF)'],['vip','👑','VIP-клуб'],['support','🛟','Поддержка'],['profile','👤','Профиль'],['settings','⚙️','Настройки'],['faq','❓','Вопросы и ответы'],...(me.admin?[['admin','🛠','Панель администратора']]:[])].map(([v,e,t])=>`<button class="les" onclick="go('${v}')"><span class="n">${e}</span><span>${t}</span><span style="margin-left:auto">›</span></button>`).join('');
 // закладки (уроки, растения, болезни, лайфхаки)
@@ -438,8 +464,33 @@ V.moon=()=>{const first=(new Date(MY,MM,1).getDay()+6)%7,days=new Date(MY,MM+1,0
   let nxt='';for(let k=0;k<45&&!nxt;k++){const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+k),a=mAge(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate(),12));if(k&&(a<1||Math.abs(a-SYN/2)<.5)&&!nxt)nxt=`${a<1?'🌑 Новолуние':'🌕 Полнолуние'}: ${d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'})}`}
   return head('Лунный календарь')+`<div class="row"><button class="btn sm ghost" onclick="moonNav(-1)">‹</button><b style="text-align:center;flex:3">${MN[MM]} ${MY}</b><button class="btn sm ghost" onclick="moonNav(1)">›</button></div><div class="mg">${['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<b>${x}</b>`).join('')}${[...Array(first)].map(()=>'<span></span>').join('')}${[...Array(days)].map((_,k)=>{const d=k+1,m=mInfo(new Date(MY,MM,d));return `<button class="md ${m.cls} ${d===MD?'sel':''} ${(d===now.getDate()&&MM===now.getMonth()&&MY===now.getFullYear())?'t':''}" onclick="MD=${d};draw()">${d}<i>${m.emoji}</i></button>`}).join('')}</div>
 <div class="card glow center"><div class="big">${sel.emoji}</div><h2 style="margin:0">${MD} ${MN[MM].toLowerCase()}: ${sel.ph}</h2><div class="mute">Возраст Луны ${sel.a.toFixed(1)} сут. • Луна в знаке: ${sel.sg}</div></div><div class="card"><b>🌱 Рекомендация</b><p>${sel.adv}</p><p>${sel.sgn}</p></div>${nxt?`<div class="card tipc">Ближайшее: ${nxt}</div>`:''}<div class="mute center">🟩 благоприятные дни, 🟥 неблагоприятные (новолуние и полнолуние). Расчёт приблизительный: календарь — ориентир, а не закон.</div>`};
+// ---- v9: фото растений, экскурсия землеройки ----
+const PIMG={'Томат':'tomato','Огурец':'cucumber','Картофель':'potato','Морковь':'carrot','Капуста':'cabbage','Лук':'onion','Чеснок':'garlic','Перец':'pepper','Баклажан':'eggplant','Свёкла':'beet','Кабачок':'zucchini','Редис':'radish','Тыква':'pumpkin','Яблоня':'apple','Колоновидная яблоня':'apple','Груша':'pear','Виноград':'grape','Дыня':'melon','Вишня':'cherry','Слива':'plum','Абрикос':'apricot','Персик':'peach','Клубника':'strawberry','Земляника садовая':'strawberry','Малина':'raspberry','Ежевика':'blackberry','Голубика':'blueberry','Смородина':'currant','Красная смородина':'currant','Крыжовник':'gooseberry','Облепиха':'seabuckthorn','Кукуруза':'corn','Горох':'pea','Брокколи':'broccoli','Шпинат':'spinach','Салат':'lettuce','Петрушка':'parsley','Базилик':'basil','Мята':'mint','Укроп':'dill','Лук-батун':'scallion','Руккола':'arugula','Кинза':'cilantro','Тимьян':'thyme'};
+const pimg=(n,c='')=>PIMG[n]?`<img class="${c}" src="/img/plants/${PIMG[n]}.jpg" alt="${esc(n)}" loading="lazy">`:'';
+V.plants=()=>{const P=S2.pt==='Растения',src=(P?PLANTS:PESTS).map((x,i)=>[x,i]).filter(([x])=>P||(S2.pt==='Болезни'?x.k==='Болезнь':x.k==='Вредитель')),pre=P?'p':'d',free=src.filter(([x,i])=>FREE_ENC.has(pre+i)).length;let last='';
+  return head('Энциклопедия')+chips('pt',['Растения','Болезни','Вредители'])+`<div class="mute">Всего: ${src.length}${me.vip?'':` • бесплатно доступно ${free}, остальные — с VIP`}${P?` • с фото: ${src.filter(([x])=>PIMG[x.n]).length}`:''}</div>`+src.sort((a,b)=>a[0].n.localeCompare(b[0].n,'ru')).map(([x,i])=>{const L=x.n[0].toUpperCase(),h=L!==last?(last=L,`<h2>${L}</h2>`):'',ok=encOk(pre+i);return h+`<button class="les ${ok?'':'lk'}" onclick="${ok?`go('${P?'plantinfo':'pestinfo'}',${i})`:"go('vip')"}"><span class="n">${ok?(P&&pimg(x.n)||x.e):'🔒'}</span><span>${esc(x.n)}<div class="mute">${x.k}</div></span><span class="tag ${ok?'':'v'}">${ok?(me.vip?'':'Бесплатно'):'VIP'}</span></button>`}).join('')};
+V.plantinfo=i=>{if(!encOk('p'+i))return V.vip();const p=PLANTS[i],im=pimg(p.n,'pbig')||`<div class="big">${p.e}</div>`;
+  return head(p.n,1,bm('p:'+i))+`<div class="card glow center">${im}<h2 style="margin:6px 0 0">${p.n}</h2><div class="mute">${p.k} • ${p.s} • полив раз в ${p.w} дн.</div></div><div class="card"><b>О растении</b><p>${p.i}</p><b>Когда сажать</b><p>${p.t}</p><b>Советы</b>${p.c.map(x=>`<p>✅ ${x}</p>`).join('')}</div><button class="btn" onclick="addP(${i})">Добавить в мой огород</button>`};
+// экскурсия с землеройкой
+const TOUR=[
+ {x:'Привет! Я землеройка-садовод. Покажу, где что находится в СадоВесте — это займёт меньше минуты.'},
+ {s:'.hbtn',x:'Вот тут твои грядки: добавляй растения, и я напомню, когда их поливать.'},
+ {s:'nav button:nth-child(4)',x:'Здесь ты будешь проходить уроки. Первые 10 бесплатные, после каждого — небольшой тест.'},
+ {s:'.banner',opt:1,x:'А здесь покупается VIP-доступ: все уроки, вся энциклопедия, PDF-шпаргалки и помощь экспертов.'},
+ {s:'nav button:nth-child(3)',x:'Календарь огородника: что и когда сеять, поливать и подкармливать. Там же лунный календарь.'},
+ {s:'nav button:nth-child(5)',x:'В «Ещё» спрятано много полезного: тесты, лайфхаки, словарь, энциклопедия, погода, VIP и настройки.'},
+ {s:'.ib[aria-label="Поиск"]',x:'А это поиск: он найдёт урок, растение, болезнь или лайфхак.'},
+ {x:'Вот и всё! Начни с первого бесплатного урока. Экскурсию можно повторить в «Ещё» → Настройки.'}];
+let TI=0,TSL=[];
+function startTour(){TSL=TOUR.filter(s=>!s.opt||document.querySelector(s.s));TI=0;let o=document.getElementById('tour');if(!o){o=document.createElement('div');o.id='tour';document.body.append(o)}tourShow()}
+function tourShow(){const o=document.getElementById('tour'),s=TSL[TI];if(!o)return;if(!s)return tourEnd();
+  const el=s.s&&document.querySelector(s.s),r=el?el.getBoundingClientRect():null,up=r&&r.top>innerHeight/2;
+  o.innerHTML=(r?`<div class="spot" style="left:${r.left-6}px;top:${r.top-6}px;width:${r.width+12}px;height:${r.height+12}px"></div>`:'<div class="dim"></div>')+`<div class="tb" style="${r?(up?`bottom:${innerHeight-r.top+16}px`:`top:${r.bottom+16}px`):'top:28%'}"><img class="mole" src="/img/mole.jpg" alt="Землеройка"><div class="bub"><div>${s.x}</div><div class="tr"><button class="btn sm ghost" onclick="tourEnd()">Пропустить</button><span class="mute">${TI+1}/${TSL.length}</span><button class="btn sm" onclick="TI++;tourShow()">${TI===TSL.length-1?'Готово':'Дальше'}</button></div></div></div>`}
+function tourEnd(){const o=document.getElementById('tour');if(o)o.remove();SET.toured=true;saveSet()}
+function maybeTour(){if(SET.toured||!me||!me.profile||cur!=='home'||document.getElementById('tour'))return;startTour()}
+V.more=()=>head('Ещё',0)+[['tests','📝','Тесты'],['moon','🌙','Лунный календарь'],['hacks','💡','Лайфхаки'],['dict','📖','Словарь огородника'],['plants','🌿','Энциклопедия: растения, болезни, вредители'],['weather','🌦️','Погода для огорода'],['board','🏆','Рейтинг'],['marks','🔖','Закладки'],['files','📄','Материалы (PDF)'],['vip','👑','VIP-клуб'],['support','🛟','Поддержка'],['profile','👤','Профиль'],['settings','⚙️','Настройки'],['faq','❓','Вопросы и ответы'],['tour','🐹','Экскурсия с землеройкой'],...(me.admin?[['admin','🛠','Панель администратора']]:[])].map(([v,e,t])=>`<button class="les" onclick="${v==='tour'?"tab('home');setTimeout(startTour,700)":`go('${v}')`}"><span class="n">${e}</span><span>${t}</span><span style="margin-left:auto">›</span></button>`).join('');
 const _sp=document.getElementById&&document.getElementById('splash');
-Promise.all([init(),new Promise(r=>setTimeout(r,SET.motion?2100:300))]).finally(()=>{if(_sp){_sp.classList.add('hide');setTimeout(()=>_sp.remove(),600)}});
+Promise.all([init(),new Promise(r=>setTimeout(r,SET.motion?2100:300))]).finally(()=>{if(_sp){_sp.classList.add('hide');setTimeout(()=>_sp.remove(),600)};setTimeout(maybeTour,700)});
 </script>
 </body>
 </html>
