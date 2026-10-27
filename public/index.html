@@ -145,6 +145,41 @@ nav{background:#fbfef8;border-top-color:#d3ebcc}nav button.on{color:#3d8f48}
 .hero .hdr{margin-bottom:26px}.hero .hdr .logo{font-size:32px;filter:drop-shadow(0 1px 3px rgba(0,0,0,.35))}.hero .hdr .sub{color:#fff;font-weight:800;font-size:14px;text-shadow:0 1px 5px rgba(0,0,0,.45)}
 .hero .ib{background:rgba(255,255,255,.92);color:#1f3a26}.hero h1,.hero p{text-shadow:0 2px 8px rgba(0,0,0,.45)}.hero p{max-width:58%}
 #tour .x{position:fixed;top:12px;right:12px;z-index:72;border:0;border-radius:18px;padding:8px 14px;font:800 14px Nunito;color:#1f3a26;background:#fff;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+/* быстрые кнопки с иллюстрациями */
+.qt{gap:8px}.qt button{padding:0;border:0;background:none;border-radius:20px;box-shadow:0 6px 12px rgba(31,90,45,.16);transition:transform .15s,box-shadow .2s}
+.qt button:active{transform:scale(.95)}.qt img{width:100%;display:block;border-radius:20px}
+/* плавная смена темы: градиенты фона переключаются через прозрачность */
+html{background-color:var(--bg);transition:background-color .45s ease}
+body{background:transparent!important}
+body::before,body::after{content:"";position:fixed;inset:0;z-index:-1;transition:opacity .5s ease;pointer-events:none}
+body::before{background:linear-gradient(180deg,#e0f2d8 0%,#eff9ea 50%,#fafef6 100%);opacity:1}
+body::after{background:linear-gradient(180deg,#1b2d22 0%,#142219 55%,#101b14 100%);opacity:0}
+html[data-theme=dark] body::before{opacity:0}html[data-theme=dark] body::after{opacity:1}
+.card,.les,.tile,.pl,.chip,.btn,input,textarea,select,nav,.stat2,.hr,.tk,.wcard,.banner,.ib,.qbox,.ans,.md,details,.msg{transition:background-color .4s ease,color .4s ease,border-color .4s ease,box-shadow .4s ease,transform .15s ease}
+/* тёмная тема: мягкая, приглушённая, без резких контрастов */
+html[data-theme=dark]{--bg:#15251b;--card:#1d3126;--ink:#e3efe5;--mute:#9db7a4;--line:#2d4a39;--goldbg:#3a3418;color-scheme:dark;background-color:#15251b}
+html[data-theme=dark] :is(h1,h2,.brand,.sh h2,.lnk){color:#a9e7b6}
+html[data-theme=dark] :is(.card,.les,.pl,.tile){border-color:#2d4a39;box-shadow:0 4px 14px rgba(0,0,0,.22)}
+html[data-theme=dark] :is(.les,.pl,.tile){border-bottom-color:#274233}
+html[data-theme=dark] .btn{background:linear-gradient(#63c277,#43a059);border-bottom-color:#2f7d43;box-shadow:0 6px 14px rgba(0,0,0,.28),inset 0 2px 0 rgba(255,255,255,.22);text-shadow:0 1px 2px rgba(0,0,0,.3)}
+html[data-theme=dark] .btn.gold{background:linear-gradient(#f3d067,#d3a523);color:#3d2d00;border-bottom-color:#9a6b00}
+html[data-theme=dark] .btn.ghost{background:transparent;color:#a9e7b6;border:2px solid #3f7a52;border-bottom-width:5px;text-shadow:none}
+html[data-theme=dark] .chip{background:#1d3126;color:#c4ebcd;border-color:#3d6b4d}html[data-theme=dark] .chip.on{background:#43a059;color:#fff;border-color:#43a059}
+html[data-theme=dark] nav{background:#172a20;border-top-color:#25402f}html[data-theme=dark] nav button{color:#8fa898}html[data-theme=dark] nav button.on{color:#93e4a5}
+html[data-theme=dark] :is(input,textarea,select){background:#172a20;border-color:#2d4a39;color:#e3efe5}
+html[data-theme=dark] .hero{background:linear-gradient(90deg,rgba(8,34,18,.9) 0%,rgba(8,34,18,.6) 48%,rgba(8,34,18,.08) 100%),url(/img/hero.jpg) center 35%/cover,linear-gradient(135deg,#1f5a2d,#2f7d3a)}
+html[data-theme=dark] .qt button{background:none;box-shadow:0 6px 14px rgba(0,0,0,.35)}html[data-theme=dark] .qt img{filter:brightness(.9) saturate(.92)}
+html[data-theme=dark] .qbox{background:linear-gradient(135deg,#2b7a42,#3b9552);box-shadow:0 6px 14px rgba(0,0,0,.3)}
+html[data-theme=dark] .ans{background:#1b2e23;border-color:#3d6b4d}html[data-theme=dark] .les.pick{background:#244a33;border-color:#4caf50}
+html[data-theme=dark] .okc{border-left-color:#4caf50}html[data-theme=dark] .badc{background:#3a2220;border-left-color:#e57368}
+html[data-theme=dark] :is(.tk,.les .n){background:#24402f;color:#e3efe5}
+html[data-theme=dark] .wcard{background:linear-gradient(180deg,#1f3a4d,#1f3a2b);color:#e3efe5}html[data-theme=dark] .wcard .adv{border-left-color:#3f6a52}
+html[data-theme=dark] .tag{background:#27432f;color:#c4ebcd}html[data-theme=dark] .tag.v{background:#e0b83a;color:#3d2d00}
+html[data-theme=dark] .card.tipc{border-color:#6a5a22}html[data-theme=dark] .bar{background:#2a4636}html[data-theme=dark] .bar div{background:linear-gradient(90deg,#4caf50,#8fd99b)}
+html[data-theme=dark] .md.sel{background:#2a5238}html[data-theme=dark] .md.r{background:#3a2220}
+html[data-theme=dark] .tg{background:#3b5547}html[data-theme=dark] .tg.on{background:#4caf50}
+html[data-theme=dark] .cbox{background:var(--card);color:var(--ink)}html[data-theme=dark] .ib{background:rgba(29,49,38,.92);color:#e3efe5}
+html[data-theme=dark] .banner{box-shadow:0 4px 14px rgba(0,0,0,.3)}
 </style>
 </head>
 <body>
@@ -388,7 +423,7 @@ V.home=async()=>{const [{items},cur]=await Promise.all([api('plants'),loadCur().
   const tasks=items.map(p=>({p,nx:p.last+p.every*864e5})).filter(x=>x.nx<=end+864e5).sort((a,b)=>a.nx-b.nx).slice(0,3);
   const adv=cur?(cur.temperature_2m<=1?'Заморозок: укройте рассаду':cur.temperature_2m>=28?'Жарко: поливайте вечером':cur.wind_speed_10m>=10?'Сильный ветер: подвяжите растения':'Отличные условия для работ в огороде'):'';
   return `<div class="hero"><div class="hdr"><div class="logo">🌿</div><div><div class="sub">Ваш помощник в мире огорода</div></div><button class="ib" aria-label="Поиск" onclick="go('search','')">🔍</button><button class="ib" aria-label="Профиль" onclick="go('profile')">👤</button></div><div class="hbody"><h1>СадоВест</h1><p>Больше, чем просто огород. Это забота о будущем урожае!</p><button class="hbtn" onclick="tab('garden')">Мои грядки →</button></div></div>
-<div class="qt"><button onclick="tab('garden')"><i>🌱</i>Мои культуры</button><button onclick="tab('calendar')"><i>🗓️</i>Календарь работ</button><button class="r" onclick="S2.pt='Болезни';go('plants')"><i>🐞</i>Болезни и вредители</button><button class="y" onclick="tab('lessons')"><i>💡</i>Уроки и советы</button></div>
+<div class="qt"><button aria-label="Мои культуры" onclick="tab('garden')"><img src="/img/tiles/garden.webp" alt="Мои культуры"></button><button aria-label="Календарь работ" onclick="tab('calendar')"><img src="/img/tiles/calendar.webp" alt="Календарь работ"></button><button aria-label="Болезни и вредители" onclick="S2.pt='Болезни';go('plants')"><img src="/img/tiles/pests.webp" alt="Болезни и вредители"></button><button aria-label="Уроки и советы" onclick="tab('lessons')"><img src="/img/tiles/lessons.webp" alt="Уроки и советы"></button></div>
 ${me.vip?'':`<button class="banner" onclick="go('vip')"><i>👑</i><span>VIP-доступ<small>Расширенные уроки и поддержка экспертов</small></span></button>`}<div class="sh"><h2>Сегодня в огороде</h2><button class="lnk" onclick="tab('calendar')">Все задачи →</button></div>
 ${tasks.length?tasks.map(({p,nx})=>`<div class="tk"><button class="chk" aria-label="Отметить" onclick="plant('plant_water',${p.id})"></button><div><b>Полить: ${esc(p.name)}</b><span class="mute">${nx<=end?'Сегодня':'Завтра'} · каждые ${p.every} дн.</span></div></div>`).join(''):'<div class="card center mute">Добавьте растения в «Мои грядки», и задачи по поливу появятся здесь</div>'}
 <div class="card row"><span>🔥 <b>${me.streak}</b> дн. подряд</span><span style="text-align:right">🪙 <b>${me.coins}</b></span></div><div class="mute center">Серия продлевается новым уроком или тестом</div>
