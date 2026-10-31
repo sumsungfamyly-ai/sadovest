@@ -1,1 +1,1 @@
-{"crons":[{"path":"/api/cron","schedule":"0 6 * * *"}],"functions":{"api/rpc.js":{"includeFiles":"lib/pdf/**"}}}
+{"crons":[{"path":"/api/cron","schedule":"0 6 * * *"}],"functions":{"api/rpc.js":{"includeFiles":"lib/pdf/**","maxDuration":60}}}

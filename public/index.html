@@ -180,6 +180,51 @@ html[data-theme=dark] .md.sel{background:#2a5238}html[data-theme=dark] .md.r{bac
 html[data-theme=dark] .tg{background:#3b5547}html[data-theme=dark] .tg.on{background:#4caf50}
 html[data-theme=dark] .cbox{background:var(--card);color:var(--ink)}html[data-theme=dark] .ib{background:rgba(29,49,38,.92);color:#e3efe5}
 html[data-theme=dark] .banner{box-shadow:0 4px 14px rgba(0,0,0,.3)}
+/* солидный, сдержанный стиль */
+:root{--g1:#2f7d4f;--g2:#1f5a38;--sh:0 1px 2px rgba(23,49,31,.06),0 6px 16px rgba(23,49,31,.07)}
+body{font-weight:600;-webkit-font-smoothing:antialiased}
+h1{font-size:26px;letter-spacing:-.02em;color:#1f5a38}h2{font-size:17px;letter-spacing:-.01em;margin:22px 0 8px;color:#1f5a38}.sh h2{font-size:19px}
+.top b{font-size:18px;font-weight:800}.back,.ib{box-shadow:0 1px 3px rgba(23,49,31,.14)}
+.card{border-radius:16px;border:1px solid #d5e6da;box-shadow:var(--sh);padding:16px}
+.les{border-radius:14px;border:1px solid #d5e6da;border-bottom:1px solid #d5e6da;box-shadow:var(--sh);padding:13px 14px}
+.les .n{border-radius:10px;background:#eaf4ee;color:#1f5a38}
+.tile,.pl{border-radius:16px;border:1px solid #d5e6da;border-bottom:1px solid #d5e6da;box-shadow:var(--sh)}
+.btn{border-radius:14px;padding:14px;font-size:16px;font-weight:700;letter-spacing:.01em;text-shadow:none;background:linear-gradient(180deg,#3b9160,#2f7d4f);border-bottom:3px solid #1f5a38;box-shadow:0 3px 8px rgba(31,90,56,.22)}
+.btn:active{transform:translateY(2px);border-bottom-width:1px;box-shadow:0 1px 3px rgba(31,90,56,.2)}
+.btn.ghost{background:#fff;color:#2f7d4f;border:1.5px solid #9cc9ae;border-bottom-width:1.5px;box-shadow:none}
+.btn.gold{background:linear-gradient(180deg,#ebc85e,#d3a82f);color:#3a2b00;border-bottom:3px solid #a67d12;box-shadow:0 3px 8px rgba(166,125,18,.25);animation:none}
+.btn.sm{padding:9px 14px;font-size:14px;border-radius:12px}
+.hbtn{background:#fff;color:#1f5a38;border:0;border-bottom:3px solid #cfe3d6;border-radius:14px;padding:11px 22px;font-weight:800;box-shadow:0 3px 8px rgba(0,0,0,.18)}
+.chip{border-radius:999px;border:1px solid #b2d5be;background:#fff;color:#2f7d4f;font-weight:700;padding:7px 14px}.chip.on{background:#2f7d4f;border-color:#2f7d4f;color:#fff}
+.tag{border-radius:8px;font-weight:800;font-size:11px;background:#e4f1e8;color:#1f5a38}.tag.v{background:#e8c860;color:#3a2b00}
+nav{box-shadow:0 -6px 20px rgba(23,49,31,.08);border-top:1px solid #d5e6da;padding-top:8px}
+nav button{position:relative;font-weight:700;font-size:11px;color:#7d9a8a}nav button.on{color:#2f7d4f}
+nav button i{height:26px}nav button i svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;margin:0 auto 2px}
+nav button.on::before{content:"";position:absolute;top:-8px;left:32%;right:32%;height:3px;border-radius:0 0 3px 3px;background:#2f7d4f}
+input,textarea,select{border-radius:12px;border:1px solid #bdd8c7;font-weight:600}
+.bar{height:8px;background:#dcebe1;border-radius:6px}.bar div{background:linear-gradient(90deg,#3b9160,#7cc79a)}
+.qbox{border-radius:16px;background:linear-gradient(135deg,#2f7d4f,#3b9160);font-weight:700}
+.ans{border-radius:14px;background:#f6fbf8;border:1.5px solid #c8e0d0;font-weight:600}.les.pick{background:#e0f1e6;border-color:#2f7d4f}
+.tk{border-radius:14px;background:#fff;border:1px solid #d5e6da;box-shadow:var(--sh)}.chk{border-color:#8fb09d}
+.banner{border-radius:16px;box-shadow:var(--sh)}.wcard{border-radius:16px;border:1px solid #cfe4ea;box-shadow:var(--sh)}
+.stat div{border-radius:14px;background:linear-gradient(135deg,#3b9160,#2f7d4f)}
+.hero{border-radius:0 0 24px 24px;box-shadow:0 8px 20px rgba(23,49,31,.18)}.qt button{border-radius:18px;box-shadow:var(--sh)}
+.toast{border-radius:12px;font-weight:700}.cbox{border-radius:20px}
+html[data-theme=dark]{--sh:0 1px 2px rgba(0,0,0,.3),0 6px 16px rgba(0,0,0,.25)}
+html[data-theme=dark] :is(h1,h2){color:#a9e7b6}
+html[data-theme=dark] .btn{border-bottom:3px solid #2a6f40;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+html[data-theme=dark] .btn.ghost{border:1.5px solid #3f7a52;color:#a9e7b6;background:transparent}
+html[data-theme=dark] .btn.gold{border-bottom:3px solid #9a6b00}
+html[data-theme=dark] .hbtn{background:#e8f3ea;color:#1f5a38}
+html[data-theme=dark] nav{border-top-color:#25402f;box-shadow:0 -6px 20px rgba(0,0,0,.3)}
+html[data-theme=dark] nav button.on{color:#93e4a5}html[data-theme=dark] nav button.on::before{background:#93e4a5}
+html[data-theme=dark] :is(.tk,.les .n){background:#1d3126;border-color:#2d4a39;color:#e3efe5}
+html[data-theme=dark] .chip{border-color:#3d6b4d}html[data-theme=dark] .tag{background:#27432f;color:#c4ebcd}html[data-theme=dark] .tag.v{background:#e0b83a;color:#3d2d00}
+/* нижняя панель на иконках-картинках */
+nav button img.ni{width:36px;height:36px;border-radius:12px;display:block;margin:0 auto 3px;opacity:.82;filter:saturate(.85);transition:transform .2s ease,box-shadow .2s ease,opacity .2s ease,filter .2s ease}
+nav button.on img.ni{opacity:1;filter:none;transform:translateY(-2px) scale(1.08);box-shadow:0 0 0 2px #2f7d4f,0 5px 12px rgba(47,125,79,.35)}
+nav button.on::before{display:none}nav button i{height:auto}nav button{padding:2px 0 4px}
+html[data-theme=dark] nav button img.ni{filter:brightness(.86) saturate(.85)}html[data-theme=dark] nav button.on img.ni{filter:brightness(.95);box-shadow:0 0 0 2px #93e4a5,0 5px 12px rgba(0,0,0,.4)}
 </style>
 </head>
 <body>
@@ -202,8 +247,8 @@ async function api(action,data={}){
 }
 function toast(t,err){const e=document.createElement('div');e.className='toast'+(err?' err':'');e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),2600)}
 const act=async(fn)=>{try{return await fn()}catch(e){toast(e.message,1)}};
-const head=(t,back=1,x='')=>`<div class="top">${back&&!root.includes(cur)?'<button class="back" aria-label="Назад" onclick="back()">‹</button>':''}<b>🌱 ${t}</b>${x}<button class="back" aria-label="Поиск" onclick="go('search','')">🔍</button>${me?.vip?'<span style="font-size:26px">👑</span>':''}</div>`;
-const tabs=[['home','🏠','Главная'],['garden','🌿','Грядки'],['calendar','🗓️','Календарь'],['lessons','📖','Уроки'],['more','☰','Ещё']];
+const head=(t,back=1,x='')=>`<div class="top">${back&&!root.includes(cur)?'<button class="back" aria-label="Назад" onclick="back()">‹</button>':''}<b>${t}</b>${x}<button class="back" aria-label="Поиск" onclick="go('search','')">🔍</button>${me?.vip?'<span style="font-size:26px">👑</span>':''}</div>`;
+const tabs=[['home','<img class="ni" src="/img/nav/home.webp" alt="">','Главная'],['garden','<img class="ni" src="/img/nav/garden.webp" alt="">','Грядки'],['calendar','<img class="ni" src="/img/nav/calendar.webp" alt="">','Календарь'],['lessons','<img class="ni" src="/img/nav/lessons.webp" alt="">','Уроки'],['more','<img class="ni" src="/img/nav/more.webp" alt="">','Ещё']];
 function go(v,a){stack.push([cur,curArg]);cur=v;curArg=a;draw()}
 let curArg;
 function back(){const p=stack.pop();if(p){cur=p[0];curArg=p[1];draw()}}
@@ -221,7 +266,7 @@ tg?.BackButton.onClick(back);
 const V={
 home:()=>`<h1>Привет, ${esc(me.name)}!</h1>
 <div class="grid">
-${[['lessons','📖','Уроки'],['garden','🪴','Мой огород'],['community','💬','Сообщество'],['shop','🧺','Магазин'],['vip','👑','VIP-клуб','vip'],['support','🛟','Поддержка'],['calendar','🗓️','Календарь']].map(([v,i,t,c])=>`<button class="tile ${c||''}" onclick="${v==='community'?'tab':'go'}('${v}')"><i>${i}</i>${t}</button>`).join('')}
+${[['lessons','📖','Уроки'],['garden','🪴','Мой огород'],['vip','👑','VIP-клуб','vip'],['support','🛟','Поддержка'],['calendar','🗓️','Календарь']].map(([v,i,t,c])=>`<button class="tile ${c||''}" onclick="go('${v}')"><i>${i}</i>${t}</button>`).join('')}
 </div>
 ${me.vip?'':`<button class="banner" onclick="go('vip')"><i>👑</i><span>VIP-доступ<small>Больше знаний. Больше возможностей.</small></span></button>`}
 ${me.admin?`<button class="btn ghost" onclick="go('admin')">⚙️ Панель администратора</button>`:''}`,
@@ -244,8 +289,6 @@ async support(){
   const {items}=await api('tickets');
   return head('VIP-эксперт')+(items.length?items.slice().reverse().map(t=>`<div class="msg me">${esc(t.text)}<div class="mute">${fd(t.created)}</div></div>${t.reply?`<div class="msg ex"><b>Эксперт 👑</b><br>${esc(t.reply)}</div>`:'<div class="mute center">Ждём ответа эксперта…</div>'}`).join(''):'<div class="card center">Опишите проблему с растением — эксперт ответит в течение 1–2 часов.</div>')+`<textarea id="tx" rows="3" maxlength="1000" placeholder="Напишите сообщение…"></textarea><button class="btn" onclick="sendT()">Отправить</button>`},
 
-community:()=>head('Сообщество',0)+`<div class="card center"><div style="font-size:52px">💬</div><b>Общайтесь с садоводами</b><div class="mute">Делитесь фото, задавайте вопросы, находите друзей</div><button class="btn" onclick="link('${esc(me.cfg.community)}')">Открыть сообщество</button></div>`,
-shop:()=>head('Магазин')+`<div class="card center"><div style="font-size:48px">🧺</div><b>Скоро открытие</b><div class="mute">Копите монеты за уроки и игры: у вас сейчас 🪙 ${me.coins}</div></div>`,
 
 async garden(){const {items}=await api('plants');return head('Мой огород')+(items.length?items.map(p=>`<div class="card"><div class="row"><b>🌿 ${esc(p.name)}</b><span class="mute" style="text-align:right">полив раз в ${p.every} дн.</span></div><div class="mute">Последний полив: ${fd(p.last)}</div><div class="row" style="margin-top:8px"><button class="btn sm" onclick="plant('plant_water',${p.id})">💧 Полил(а)</button><button class="btn sm ghost" onclick="plant('plant_del',${p.id})">Удалить</button></div></div>`).join(''):'<div class="card center">Добавьте первое растение, и мы напомним о поливе</div>')+`<div class="card"><input id="pn" maxlength="40" placeholder="Название (например, томаты)"><input id="pe" type="number" min="1" max="60" value="3" aria-label="Полив раз в N дней"><div class="mute">Поливать раз в N дней</div><button class="btn" onclick="addPlant()">Добавить растение</button></div>`},
 
@@ -379,7 +422,7 @@ const ansT=k=>act(async()=>{if(TS.busy)return;TS.busy=1;TS.a[TS.i]=TS.t.question
   TS.busy=0;draw()});
 // вопросы и ответы
 const FAQ=[['Как пройти урок?','Откройте «Уроки», выберите урок и листайте слайды кнопкой «Далее». В конце ответьте верно минимум на 2 из 3 вопросов — тогда урок засчитается.'],['Как продлить серию дней?','Пройдите новый урок или тест, которых вы ещё не проходили. Повторное прохождение серию не продлевает и монеты не даёт. Награды: 5, 30 и 100 дней подряд. Если пропустить день, серия обнулится.'],['Как получить VIP?','«VIP-клуб» → «Купить VIP» или введите промокод в «Профиль» → «Ввести промокод».'],['Что даёт VIP?','200 уроков, поддержку экспертов с фото, эксклюзивные PDF и золотой значок.'],['Как активировать промокод?','Профиль → «Ввести промокод» или команда /promo КОД в боте. Каждый код можно использовать один раз.'],['Как работают тесты?','Раздел «Тесты»: 10 тематических и 3 общих (лёгкий, средний, сложный). После теста вы увидите разбор ошибок.'],['Как задать вопрос эксперту?','Раздел «Поддержка» (только VIP). К сообщению можно приложить фото растения.'],['Как добавить растение в огород?','«Энциклопедия» → растение → «Добавить в мой огород». Мы напомним о поливе.'],['Как работает поиск?','Нажмите 🔍 вверху любого экрана и введите название урока, растения или болезни.'],['Что такое закладки?','Нажмите ☆ на уроке, растении или болезни — они сохранятся в разделе «Закладки».']];
-V.faq=()=>head('Вопросы и ответы')+`<button class="btn" onclick="tab('home');setTimeout(startTour,700)">🐹 Экскурсия с землеройкой</button><video class="vid" controls playsinline preload="none" poster="/img/mole.jpg" src="/img/tour.mp4" onerror="this.remove()"></video>`+FAQ.map(([q,a])=>`<details class="card"><summary><b>${q}</b></summary><p>${a}</p></details>`).join('');
+V.faq=()=>head('Вопросы и ответы')+`<button class="btn" onclick="tab('home');setTimeout(startTour,700)">🐹 Экскурсия с землеройкой</button>`+FAQ.map(([q,a])=>`<details class="card"><summary><b>${q}</b></summary><p>${a}</p></details>`).join('');
 // ---- v5 ----
 const rv=r=>r.review.map((x,i)=>`<div class="card ${x.ok?'okc':'badc'}"><b>${i+1}. ${esc(x.q)}</b><p>${x.ok?'✅ Верно':'❌ Ваш ответ'}: ${esc(x.mine||'—')}</p>${x.ok?'':`<p>✅ Правильный ответ: ${esc(x.right)}</p>`}</div>`).join('');
 const ABV='АБВГ';
@@ -530,6 +573,44 @@ function tourShow(){const o=document.getElementById('tour'),s=TSL[TI];if(!o)retu
 function tourEnd(){const o=document.getElementById('tour');if(o)o.remove();SET.toured=true;saveSet();try{window.scrollTo(0,0)}catch{}}
 function maybeTour(){if(SET.toured||!me||!me.profile||cur!=='home'||document.getElementById('tour'))return;startTour()}
 V.more=()=>head('Ещё',0)+[['tests','📝','Тесты'],['moon','🌙','Лунный календарь'],['hacks','💡','Лайфхаки'],['dict','📖','Словарь огородника'],['plants','🌿','Энциклопедия: растения, болезни, вредители'],['weather','🌦️','Погода для огорода'],['board','🏆','Рейтинг'],['marks','🔖','Закладки'],['files','📄','Материалы (PDF)'],['vip','👑','VIP-клуб'],['support','🛟','Поддержка'],['profile','👤','Профиль'],['settings','⚙️','Настройки'],['faq','❓','Вопросы и ответы'],['tour','🐹','Экскурсия с землеройкой'],...(me.admin?[['admin','🛠','Панель администратора']]:[])].map(([v,e,t])=>`<button class="les" onclick="${v==='tour'?"tab('home');setTimeout(startTour,700)":`go('${v}')`}"><span class="n">${e}</span><span>${t}</span><span style="margin-left:auto">›</span></button>`).join('');
+// ---- v10: компактная админ-панель по вкладкам ----
+S2.at='Обзор';S2.bt='Все';let AUQ='',BT='',ARM=false;
+const dd=t=>t?new Date(t).toLocaleDateString('ru-RU'):'—';
+const ADM={
+ async 'Обзор'(){const o=await api('admin_overview'),c=(n,t)=>`<div><b>${n}</b>${t}</div>`;
+  return `<div class="stat">${c(o.users,'Пользователи')}${c(o.vip,'VIP сейчас')}${c(o.active,'Активны сегодня')}${c(o.active7,'Активны за 7 дней')}${c(o.new7,'Новые за 7 дней')}${c(o.lessonsDone,'Пройдено уроков')}${c(o.testsDone,'Пройдено тестов')}${c(o.tickets,'Открытые тикеты')}</div>`
+  +(o.top.length?`<div class="card"><b>🔥 Популярные уроки</b>${o.top.map((x,i)=>`<div class="row" style="margin-top:6px"><span style="flex:4">${i+1}. ${esc(x.title)}</span><b style="text-align:right">${x.n}</b></div>`).join('')}</div>`:'')
+  +`<div class="card mute">Промокодов: ${o.promos}. Показатели считаются по первым 2000 пользователям.</div>`},
+ async 'Промокоды'(){const {items}=await api('admin_promos');
+  return `<details class="card"><summary><b>➕ Создать промокод</b></summary><input id="ac" placeholder="КОД (A–Z, 0–9)"><select id="at"><option value="vip">VIP (дни)</option><option value="coins">Монеты</option><option value="discount">Скидка %</option></select><input id="av" type="number" placeholder="Значение"><input id="al" type="number" placeholder="Лимит активаций (0 — без лимита)"><input id="ad" type="number" placeholder="Срок, дней (0 — бессрочно)"><button class="btn" onclick="newPromo()">Создать</button></details>`
+  +(items.length?items.map(x=>`<div class="card row"><div style="flex:3"><b>${esc(x.code)}</b> <span class="mute">${{vip:'VIP '+x.value+' дн.',coins:x.value+' монет',discount:'скидка '+x.value+'%'}[x.type]}</span><div class="mute">Использовано ${x.used}${x.limit?' из '+x.limit:''} • ${x.expires?'до '+fd(x.expires):'бессрочно'} • ${x.active?'активен':'выключен'}</div></div><button class="btn sm ghost" style="flex:none" onclick="adm('admin_promo_toggle',{code:'${esc(x.code)}'})">${x.active?'Выкл':'Вкл'}</button><button class="btn sm ghost" style="flex:none" onclick="if(confirm('Удалить промокод?'))adm('admin_promo_del',{code:'${esc(x.code)}'})">✕</button></div>`).join(''):'<div class="card center mute">Промокодов пока нет</div>')},
+ async 'Люди'(){const {items,total}=await api('admin_users',{q:AUQ}),now=Date.now();
+  return `<div class="card"><div class="row"><input id="uq" value="${esc(AUQ)}" placeholder="Telegram ID или имя" onkeydown="if(event.key==='Enter')findU()"><button class="btn sm" style="flex:none" onclick="findU()">Найти</button></div><div class="mute">Всего пользователей: ${total}. ${AUQ?'Результаты поиска.':'Показаны последние новые.'}</div></div>`
+  +(items.length?items.map(u=>`<div class="card"><div class="row"><b style="flex:3">${esc(u.name)} <span class="mute">#${u.id}</span></b><span class="tag ${u.vip_until>now?'v':''}" style="flex:none">${u.vip_until>now?'VIP до '+dd(u.vip_until):'без VIP'}</span></div><div class="mute">Серия ${u.streak} • монет ${u.coins} • уроков ${u.done} • дней ${u.days} • с ${dd(u.joined)}</div><div class="row" style="margin-top:8px;flex-wrap:wrap"><button class="btn sm ghost" onclick="uAct('${u.id}','vip+',30)">+30 дн.</button><button class="btn sm ghost" onclick="uAct('${u.id}','vip+',365)">+1 год</button><button class="btn sm ghost" onclick="uAct('${u.id}','vip-',0)">Снять VIP</button><button class="btn sm ghost" onclick="uAct('${u.id}','coins',100)">+100 🪙</button></div></div>`).join(''):'<div class="card center mute">Никого не найдено</div>')},
+ async 'Тикеты'(){const {items}=await api('admin_tickets'),op=items.filter(x=>x.status==='open'),cl=items.filter(x=>x.status!=='open'),card=x=>`<div class="card"><b>#${x.id} ${esc(x.name)}</b> <span class="mute">${dd(x.created)}${x.photo?' • 📷 фото':''}</span><p style="margin:6px 0">${esc(x.text)}</p>${x.reply?`<div class="msg ex">${esc(x.reply)}</div>`:`<input id="r${x.id}" placeholder="Ответ"><button class="btn sm" style="margin-top:8px" onclick="reply(${x.id})">Ответить</button>`}</div>`;
+  return (op.length?op.map(card).join(''):'<div class="card center mute">Открытых тикетов нет</div>')+(cl.length?`<details class="card"><summary><b>Закрытые (${cl.length})</b></summary>${cl.map(card).join('')}</details>`:'')},
+ async 'Рейтинг'(){const {items}=await api('lb');window.LBI=items;
+  return `<details class="card"><summary><b>➕ Добавить или изменить участника</b></summary><input id="ln" maxlength="24" placeholder="Ник"><input id="ls" type="number" placeholder="Рейтинг"><button class="btn" onclick="adm('admin_lb_set',{nick:$('#ln').value,score:$('#ls').value})">Сохранить</button></details>`
+  +(items.length?items.map((x,i)=>`<div class="card row"><span style="flex:3">${i+1}. ${esc(x.nick)}</span><b style="flex:none">${x.score}</b><button class="btn sm ghost" style="flex:none" onclick="adm('admin_lb_del',{nick:LBI[${i}].nick})">✕</button></div>`).join(''):'<div class="card center mute">Список пуст</div>')},
+ async 'Рассылка'(){const o=await api('admin_overview'),n={'Все':o.users,'VIP':o.vip,'Без VIP':o.users-o.vip}[S2.bt];
+  return `<div class="card"><b>📣 Рассылка через бота</b><textarea id="bt" rows="4" maxlength="1000" oninput="BT=this.value" placeholder="Текст сообщения">${esc(BT)}</textarea><div class="mute">Кому отправить:</div><div class="chips">${['Все','VIP','Без VIP'].map(x=>`<button class="chip ${S2.bt===x?'on':''}" onclick="S2.bt='${x}';ARM=false;draw()">${x}</button>`).join('')}</div>`
+  +(ARM?`<div class="card tipc">Отправить сообщение ${n} получателям?<div class="row" style="margin-top:8px"><button class="btn sm" onclick="sendBc()">Да, отправить</button><button class="btn sm ghost" onclick="ARM=false;draw()">Отмена</button></div></div>`:`<button class="btn" onclick="armBc()">Отправить (${n})</button>`)
+  +`<div class="mute">Сообщение получат только те, кто запускал бота и не заблокировал его.</div></div>`}
+};
+const findU=()=>{AUQ=$('#uq').value.trim();draw()};
+const uAct=(uid,a,value)=>act(async()=>{if(a==='vip-'&&!confirm('Снять VIP у пользователя?'))return;await api('admin_user_act',{uid,act:a,value});toast('Готово');draw()});
+const armBc=()=>{BT=(($('#bt')&&$('#bt').value)||BT).trim();if(BT.length<3)return toast('Введите текст сообщения',1);ARM=true;draw()};
+const sendBc=()=>act(async()=>{const text=BT.trim(),target={'Все':'all','VIP':'vip','Без VIP':'free'}[S2.bt];let off=0,sent=0,fail=0,total=0;ARM=false;toast('Отправка…');do{const r=await api('admin_broadcast',{text,target,offset:off});sent+=r.sent;fail+=r.failed;total=r.total;off=r.next}while(off!=null);BT='';toast(`Отправлено ${sent} из ${total}${fail?`, ошибок ${fail}`:''}`);draw()});
+V.admin=async()=>{let body;try{body=await ADM[S2.at]()}catch(e){body=`<div class="card">${esc(e.message)}</div>`}
+  return head('Админ-панель')+`<div class="hrs mchips">${Object.keys(ADM).map(x=>`<button class="chip ${S2.at===x?'on':''}" onclick="S2.at='${x}';draw()">${x}</button>`).join('')}</div>`+body};
+// ---- v11: вкладка «Бот» в админ-панели (приветствие) ----
+let BG=null,BB=null;
+const botPrev=(t,n='Анна')=>esc(t).replace(/\{name\}/g,`<b>${esc(n)}</b>`).replace(/\n/g,'<br>');
+ADM['Бот']=async()=>{const c=await api('admin_bot_get');if(BG===null)BG=c.greeting;if(BB===null)BB=c.button;
+  return `<div class="card"><b>🤖 Приветствие бота (команда /start)</b><textarea id="bg" rows="6" maxlength="1000" oninput="BG=this.value;$('#bpv').innerHTML=botPrev(BG)">${esc(BG)}</textarea><div class="mute">Вместо <b>{name}</b> подставится имя пользователя. Пустые строки и эмодзи можно использовать.</div><b style="display:block;margin-top:10px">Текст кнопки под приветствием</b><input id="bb" maxlength="40" value="${esc(BB)}" oninput="BB=this.value"><button class="btn" onclick="saveBot()">Сохранить</button><div class="row" style="margin-top:8px"><button class="btn sm ghost" onclick="testBot()">Прислать мне для проверки</button><button class="btn sm ghost" onclick="resetBot()">Сбросить на стандартное</button></div></div><div class="card"><b>Так это увидит пользователь</b><div class="msg ex" id="bpv" style="max-width:100%;margin-top:8px">${botPrev(BG)}</div></div>`};
+const saveBot=()=>act(async()=>{await api('admin_bot_set',{greeting:BG,button:BB});toast('Приветствие сохранено');BG=BB=null;draw()});
+const testBot=()=>act(async()=>{await api('admin_bot_set',{greeting:BG,button:BB});await api('admin_bot_test');toast('Отправил вам сообщение в чат с ботом')});
+const resetBot=()=>act(async()=>{await api('admin_bot_reset');BG=BB=null;toast('Возвращено стандартное приветствие');draw()});
 const _sp=document.getElementById&&document.getElementById('splash');
 Promise.all([init(),new Promise(r=>setTimeout(r,SET.motion?2100:300))]).finally(()=>{if(_sp){_sp.classList.add('hide');setTimeout(()=>_sp.remove(),600)};setTimeout(maybeTour,700)});
 </script>

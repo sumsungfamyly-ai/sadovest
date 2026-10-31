@@ -15,7 +15,7 @@ Mini App (уроки, VIP, промокоды, огород и календар�
 2. Залейте проект в GitHub (новый репозиторий, загрузите все файлы из папки).
 3. vercel.com → Add New → Project → выберите репозиторий → Framework Preset: Other → Deploy.
 4. В проекте: Storage → Create/Connect → Upstash Redis (Marketplace). Переменные базы добавятся сами.
-5. Settings → Environment Variables: BOT_TOKEN, ADMIN_IDS, WEBHOOK_SECRET, CRON_SECRET (= WEBHOOK_SECRET), COMMUNITY_URL, BUY_URL.
+5. Settings → Environment Variables: BOT_TOKEN, ADMIN_IDS, WEBHOOK_SECRET, CRON_SECRET (= WEBHOOK_SECRET), BUY_URL.
 6. Deployments → Redeploy.
 7. Откройте в браузере один раз: https://ВАШ-ПРОЕКТ.vercel.app/api/setup?key=ВАШ_WEBHOOK_SECRET
 8. В Telegram напишите боту /start и нажмите «Открыть Садовест».
