@@ -404,7 +404,22 @@ const tipsFor=()=>{const p=me.profile||{};return `${MON[new Date().getMonth()]} 
 const obq=(k,t,o)=>`<div class="card"><b>${t}</b><div class="chips">${o.map(x=>`<button class="chip ${OB[k]===x?'on':''}" onclick="OB.${k}='${x}';draw()">${x}</button>`).join('')}</div></div>`;
 const togPl=i=>{const x=PL[i];OB.place=OB.place.includes(x)?OB.place.filter(y=>y!==x):[...OB.place,x];draw()};
 V.onboard=()=>`<h1>Добро пожаловать! 🌱</h1><div class="mute">Ответьте на три вопроса — без них приложение не откроется</div><div class="card"><b>1. Где вы выращиваете растения? (можно несколько)</b><div class="chips">${PL.map((x,i)=>`<button class="chip ${OB.place.includes(x)?'on':''}" onclick="togPl(${i})">${x}</button>`).join('')}</div></div>${obq('level','2. Ваш опыт?',['Новичок','Любитель','Опытный'])}<div class="card"><b>3. Ваш город или регион</b><input value="${esc(OB.city||'')}" oninput="OB.city=this.value" placeholder="Например, Краснодар"></div><button class="btn" onclick="saveOB()">Начать</button>`;
-const saveOB=()=>act(async()=>{if(!OB.place.length||!OB.level||!(OB.city||'').trim())throw new Error('Ответьте на все три вопроса');await api('onboard',OB);await refresh();tab('home');setTimeout(maybeTour,900)});
+const saveOB = () => act(async () => {
+  if (!OB.place.length || !OB.level || !(OB.city || '').trim()) {
+    toast('Пожалуйста, заполните все поля: место, опыт и город', 1);
+    return;
+  }
+  try {
+    await api('onboard', OB);
+    await refresh();
+    // Принудительно устанавливаем профиль, чтобы избежать мгновенного возврата в onboard
+    if (me) me.profile = true; 
+    tab('home');
+    setTimeout(maybeTour, 900);
+  } catch (e) {
+    throw new Error('Не удалось сохранить профиль. Попробуйте еще раз.');
+  }
+});
 V.home=()=>`<h1>Привет, ${esc(me.name)}!</h1><input placeholder="🔍 Поиск по урокам, растениям, болезням…" onkeydown="if(event.key==='Enter')go('search',this.value)"><div class="card tipc" style="margin-top:12px">🌤 <b>Совет:</b> ${esc(tipsFor())}</div><div class="card row"><span>🔥 <b>${me.streak}</b> дн. подряд</span><span style="text-align:right">🪙 <b>${me.coins}</b></span></div><div class="mute center">Продлить серию: пройдите урок или тест</div><div class="grid" style="margin-top:10px">${[['lessons','📖','Уроки'],['tests','📝','Тесты'],['garden','🪴','Мой огород'],['plants','🌿','Энциклопедия'],['weather','🌦️','Погода'],['faq','❓','Вопросы и ответы'],['board','🏆','Рейтинг'],['marks','🔖','Закладки'],['files','📄','Материалы'],['vip','👑','VIP-клуб','vip'],['support','🛟','Поддержка'],['calendar','🗓️','Календарь']].map(([v,i,t,c])=>`<button class="tile ${c||''}" onclick="${['lessons','plants'].includes(v)?'tab':'go'}('${v}')"><i>${i}</i>${t}</button>`).join('')}</div>${me.vip?'':`<button class="banner" onclick="go('vip')"><i>👑</i><span>VIP-доступ<small>200 уроков и поддержка экспертов</small></span></button>`}${me.admin?`<button class="btn ghost" onclick="go('admin')">⚙️ Панель администратора</button>`:''}`;
 // исправление: ответы в уроке сбрасывались, а на экране оставались выбранными
 const pickA=(qi,k)=>{LS.a[qi]=LS.l.quiz[qi].o[k];const y=window.scrollY;draw().then(()=>window.scrollTo(0,y))};
