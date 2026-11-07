@@ -136,7 +136,7 @@ const H = {
     if (!place.length || !['Новичок', 'Любитель', 'Опытный'].includes(b.level) || !city) deny('Ответьте на все три вопроса', 400);
     u.profile = { place, level: b.level, city }; await save(u); return { ok: 1 };
   },
-  async tests({ u }) { return { items: TESTS.map(t => ({ id: t.id, title: t.title, level: t.level, section: t.section, n: testSize(t), best: (u.tests || {})[t.id] ?? null })) }; },
+  async tests({ u }) { return { items: TESTS.map(t => ({ id: t.id, num: t.num || null, gen: !!t.gen, title: t.title, level: t.level, section: t.section, n: testSize(t), best: (u.tests || {})[t.id] ?? null })) }; },
   async test({ u, b }) {
     const t = TESTS.find(x => x.id === Number(b.id)); if (!t) deny('Тест не найден', 404);
     const qs = pickQs(t); u.run = { id: t.id, keys: qs.map(([q, r]) => [q, r]) }; await save(u);

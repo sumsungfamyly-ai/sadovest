@@ -431,7 +431,7 @@ const pickA=(qi,k)=>{LS.a[qi]=LS.l.quiz[qi].o[k];const y=window.scrollY;draw().t
 // тесты
 let TS=null;
 V.tests=async()=>{const {items}=await api('tests');
-  const row=t=>`<button class="les" onclick="startTest(${t.id})"><span class="n">${t.id>10?'⭐':t.id}</span><span>${esc(t.title)}<div class="mute">${t.section} • ${t.n} вопросов${t.best!=null?' • лучший: '+t.best+'/'+t.n:''}</div></span></button>`;
+  const row=t=>`<button class="les" onclick="startTest(${t.id})"><span class="n">${t.gen?'⭐':t.num}</span><span>${esc(t.title)}<div class="mute">${t.section} • ${t.n} вопросов${t.best!=null?' • лучший: '+t.best+'/'+t.n:''}</div></span></button>`;
   return head('Тесты')+'<div class="mute">Успешно пройденный тест (минимум половина верных) продлевает серию дней. Монеты начисляются за улучшение результата.</div>'+[['Начинающий','🌱'],['Любитель','🌿'],['Мастер','🌳']].map(([l,e])=>`<h2>${e} ${l}</h2>`+items.filter(t=>t.level===l).map(row).join('')).join('')};
 const startTest=id=>act(async()=>{TS={t:await api('test',{id}),i:0,a:[],res:null,busy:0};go('testrun')});
 V.testrun=()=>{const {t,i}=TS;
