@@ -4,7 +4,8 @@ import path from 'path';
 import { SOON } from '../lib/lessons.js';
 import { TESTS, pickQs, testSize, shuffle } from '../lib/tests.js';
 import { ENC, FREE } from '../lib/enc.js';
-import { botCfg, greet, say, bump, sendFile, verify, getUser, save, isVip, activate, achieve, LESSONS, admins, newPromo, listPromos, stats, newTicket, replyTicket, grantVip, loadUsers, withLock } from '../lib/core.js';
+import { aiStatus, aiAsk, aiToday } from '../lib/ai.js';
+import { botCfg, greet, say, sendFile, verify, getUser, save, isVip, activate, achieve, LESSONS, admins, newPromo, listPromos, stats, newTicket, replyTicket, grantVip, loadUsers, withLock } from '../lib/core.js';
 
 const USER_CAP = 20000; // сколько пользователей максимум загружаем для сводки и поиска
 
@@ -24,7 +25,7 @@ async function sendPlain(chat_id, text, tries = 2) {
 }
 const H = {
   async me({ u, admin }) {
-    return { id: u.id, name: u.name, vip: isVip(u), streak: (u.lastAct === new Date().toISOString().slice(0, 10) || u.lastAct === new Date(Date.now() - 864e5).toISOString().slice(0, 10)) ? u.streak : 0, best: u.best, bookmarks: u.bookmarks, profile: u.profile, newReward: await (async () => { const n = u.newReward; if (n) { u.newReward = 0; await save(u); } return n || 0; })(), vip_until: u.vip_until, done: u.progress.length, total: LESSONS.length, coins: u.coins, days: u.days, ach: u.ach, notify: u.notify, admin, discount: u.discount || null,
+    return { id: u.id, name: u.name, vip: isVip(u), bookmarks: u.bookmarks, profile: u.profile, vip_until: u.vip_until, done: u.progress.length, total: LESSONS.length, coins: u.coins, days: u.days, ach: (u.ach || []).filter(k => !/^s\d+$/.test(k)), notify: u.notify, admin, discount: u.discount || null,
       cfg: { buy: process.env.BUY_URL || '' } };
   },
   async lessons({ u }) {
@@ -48,7 +49,6 @@ const H = {
     u.reading = null;
     if (score < 2) { await save(u); return { passed: false, score, total: review.length, review }; }
     const first = !u.progress.includes(l.id); if (first) { u.progress.push(l.id); u.coins += 2; }
-    if (first) await bump(u);
     achieve(u); await save(u); return { passed: true, score, total: review.length, review, gain: first ? 2 : 0, repeat: !first };
   },
   async promo({ u, b }) { return { msg: await activate(u, b.code) }; },
@@ -74,7 +74,7 @@ const H = {
     let done = 0, tests = 0;
     for (const u of us) { done += (u.progress || []).length; tests += Object.keys(u.tests || {}).length; (u.progress || []).forEach(i => { cnt[i] = (cnt[i] || 0) + 1; }); }
     const top = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id, n]) => ({ title: (LESSONS.find(l => l.id == id) || {}).title || 'Урок ' + id, n }));
-    return { ...st, vip: us.filter(u => isVip(u)).length, users: ids.length, active: us.filter(u => u.lastDay === today).length, active7: us.filter(u => (u.lastDay || '') >= w).length, new7: us.filter(u => (u.joined || 0) > now - 7 * 864e5).length, lessonsDone: done, testsDone: tests, top };
+    return { ...st, vip: us.filter(u => isVip(u)).length, users: ids.length, active: us.filter(u => u.lastDay === today).length, active7: us.filter(u => (u.lastDay || '') >= w).length, new7: us.filter(u => (u.joined || 0) > now - 7 * 864e5).length, lessonsDone: done, testsDone: tests, ai: await aiToday(), top };
   },
   async admin_users({ admin, b }) {
     needAdmin(admin);
@@ -82,7 +82,7 @@ const H = {
     let list;
     if (/^\d+$/.test(q)) { const u = await getJ('user:' + q); list = u ? [u] : []; }
     else { const us = await loadUsers(ids.slice(0, USER_CAP)); list = q ? us.filter(u => String(u.name).toLowerCase().includes(q)) : us.sort((a, c) => (c.joined || 0) - (a.joined || 0)); }
-    return { total: ids.length, items: list.slice(0, 15).map(u => ({ id: u.id, name: u.name, vip_until: u.vip_until || 0, streak: u.streak || 0, coins: u.coins || 0, done: (u.progress || []).length, days: u.days || 0, joined: u.joined || 0 })) };
+    return { total: ids.length, items: list.slice(0, 15).map(u => ({ id: u.id, name: u.name, vip_until: u.vip_until || 0, coins: u.coins || 0, done: (u.progress || []).length, days: u.days || 0, joined: u.joined || 0 })) };
   },
   async admin_user_act({ admin, b }) {
     needAdmin(admin);
@@ -148,11 +148,12 @@ const H = {
     const review = keys.map(([q, right], i) => ({ q, right, mine: a[i], ok: a[i] === right })), score = review.filter(x => x.ok).length;
     u.tests = u.tests || {}; const old = u.tests[id] || 0, coins = Math.floor(Math.max(0, score - old) / 3);
     const need = Math.ceil(keys.length / 2);
-    if (score >= need) await bump(u); // серия продлевается любым успешно пройденным тестом (монеты — только за улучшение)
     if (score > old) u.tests[id] = score; u.coins += coins; u.run = null; await save(u);
     return { score, total: keys.length, review, coins };
   },
   async lb({ u }) { return { items: await board(), you: u.coins }; },
+  async ai_status({ u }) { return aiStatus(u, isVip(u)); },
+  async ai_ask({ u, b }) { return aiAsk(u, isVip(u), b.q, b.history); },
   async enc_get({ u, b }) {
     const t = b.t === 'd' ? 'd' : 'p', i = Number(b.i), list = ENC[t];
     if (!Number.isInteger(i) || i < 0 || i >= list.length) deny('Запись не найдена', 404);
