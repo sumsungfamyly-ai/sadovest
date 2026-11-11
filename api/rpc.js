@@ -4,7 +4,6 @@ import path from 'path';
 import { SOON } from '../lib/lessons.js';
 import { TESTS, pickQs, testSize, shuffle } from '../lib/tests.js';
 import { ENC, FREE } from '../lib/enc.js';
-import { aiStatus, aiAsk, aiToday } from '../lib/ai.js';
 import { botCfg, greet, say, sendFile, verify, getUser, save, isVip, activate, achieve, LESSONS, admins, newPromo, listPromos, stats, newTicket, replyTicket, grantVip, loadUsers, withLock } from '../lib/core.js';
 
 const USER_CAP = 20000; // сколько пользователей максимум загружаем для сводки и поиска
@@ -59,10 +58,23 @@ const H = {
   async ticket_new({ u, b }) { await newTicket(u, b.text, b.photo); return { ok: 1 }; },
   async plants({ u }) { return { items: u.plants }; },
   async plant_add({ u, b }) {
-    const name = String(b.name || '').trim().slice(0, 40), every = Math.min(60, Math.max(1, Number(b.every) || 3));
+    const name = String(b.name || '').trim(), rawEvery = String(b.every ?? '');
+    const every = Number(rawEvery);
     if (!name) deny('Введите название растения', 400);
+    if (name.length > 40) deny('Название растения: максимум 40 символов', 400);
+    if (!/^\d{1,2}$/.test(rawEvery) || !Number.isInteger(every) || every < 1 || every > 60) deny('Интервал полива: целое число от 1 до 60 дней', 400);
     if (u.plants.length >= 30) deny('Максимум 30 растений', 400);
     u.plants.push({ id: Date.now(), name, every, last: Date.now() }); achieve(u); await save(u); return { items: u.plants };
+  },
+  async plant_interval({ u, b }) {
+    const plant = u.plants.find(x => x.id === Number(b.id));
+    if (!plant) deny('Растение не найдено', 404);
+    const rawEvery = String(b.every ?? '');
+    const every = Number(rawEvery);
+    if (!/^\d{1,2}$/.test(rawEvery) || !Number.isInteger(every) || every < 1 || every > 60) deny('Интервал полива: целое число от 1 до 60 дней', 400);
+    plant.every = every;
+    await save(u);
+    return { items: u.plants };
   },
   async plant_water({ u, b }) { const p = u.plants.find(x => x.id === Number(b.id)); if (p) p.last = Date.now(); await save(u); return { items: u.plants }; },
   async plant_del({ u, b }) { u.plants = u.plants.filter(x => x.id !== Number(b.id)); await save(u); return { items: u.plants }; },
@@ -74,7 +86,7 @@ const H = {
     let done = 0, tests = 0;
     for (const u of us) { done += (u.progress || []).length; tests += Object.keys(u.tests || {}).length; (u.progress || []).forEach(i => { cnt[i] = (cnt[i] || 0) + 1; }); }
     const top = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id, n]) => ({ title: (LESSONS.find(l => l.id == id) || {}).title || 'Урок ' + id, n }));
-    return { ...st, vip: us.filter(u => isVip(u)).length, users: ids.length, active: us.filter(u => u.lastDay === today).length, active7: us.filter(u => (u.lastDay || '') >= w).length, new7: us.filter(u => (u.joined || 0) > now - 7 * 864e5).length, lessonsDone: done, testsDone: tests, ai: await aiToday(), top };
+    return { ...st, vip: us.filter(u => isVip(u)).length, users: ids.length, active: us.filter(u => u.lastDay === today).length, active7: us.filter(u => (u.lastDay || '') >= w).length, new7: us.filter(u => (u.joined || 0) > now - 7 * 864e5).length, lessonsDone: done, testsDone: tests, top };
   },
   async admin_users({ admin, b }) {
     needAdmin(admin);
@@ -152,8 +164,6 @@ const H = {
     return { score, total: keys.length, review, coins };
   },
   async lb({ u }) { return { items: await board(), you: u.coins }; },
-  async ai_status({ u }) { return aiStatus(u, isVip(u)); },
-  async ai_ask({ u, b }) { return aiAsk(u, isVip(u), b.q, b.history); },
   async enc_get({ u, b }) {
     const t = b.t === 'd' ? 'd' : 'p', i = Number(b.i), list = ENC[t];
     if (!Number.isInteger(i) || i < 0 || i >= list.length) deny('Запись не найдена', 404);
@@ -206,9 +216,10 @@ export default async function handler(req, res) {
     });
     res.json(out);
   } catch (e) {
-    const code = Number.isInteger(e.code) && e.code >= 400 && e.code < 600 ? e.code : 400;
-    // в лог пишем только неожиданные сбои (файлы, база, баги), а не обычные «промокод не найден»
-    if (typeof e.code === 'string' || e.constructor !== Error || /^DB:/.test(e.message)) console.error(e);
+    // обычные ошибки пользователя («промокод не найден») — 400, неожиданные сбои (файлы, база, баги) — 500 и запись в лог
+    const unexpected = typeof e.code === 'string' || e.constructor !== Error || /^DB:/.test(e.message);
+    const code = Number.isInteger(e.code) && e.code >= 400 && e.code < 600 ? e.code : unexpected ? 500 : 400;
+    if (unexpected) console.error(e);
     res.status(code).json({ error: e.message });
   }
 }
