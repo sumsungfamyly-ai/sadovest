@@ -26,8 +26,6 @@ const demo = {
   bookmarks: [],
   coins: 24,
   days: 12,
-  streak: 3,
-  best: 3,
   notify: true,
   tickets: [],
   promos: [{ code: 'DEMO10', type: 'discount', value: 10, limit: 0, expires: 0, active: true, used: 0, created: Date.now() }],
@@ -58,11 +56,8 @@ function me(req) {
     id: demo.id,
     name: demo.name,
     vip,
-    streak: demo.streak,
-    best: demo.best,
     bookmarks: demo.bookmarks,
     profile: demo.profile,
-    newReward: 0,
     vip_until: vip ? Date.now() + 30 * DAY : 0,
     done: demo.progress.size,
     total: LESSONS.length,
@@ -207,7 +202,7 @@ async function api(req, body) {
     case 'lb': return { items: [{ nick: 'Зелёный сад', score: 42 }, { nick: 'Росток', score: 31 }], you: demo.coins };
     case 'admin_stats': return { users: 1, vip: vip ? 1 : 0, tickets: demo.tickets.length, promos: demo.promos.length };
     case 'admin_overview': return { users: 1, vip: vip ? 1 : 0, tickets: demo.tickets.length, promos: demo.promos.length, active: 1, active7: 1, new7: 1, lessonsDone: demo.progress.size, testsDone: Object.keys(demo.tests).length, top: [] };
-    case 'admin_users': return { total: 1, items: [{ id: demo.id, name: demo.name, vip_until: vip ? Date.now() + 30 * DAY : 0, streak: demo.streak, coins: demo.coins, done: demo.progress.size, days: demo.days, joined: Date.now() }] };
+    case 'admin_users': return { total: 1, items: [{ id: demo.id, name: demo.name, vip_until: vip ? Date.now() + 30 * DAY : 0, coins: demo.coins, done: demo.progress.size, days: demo.days, joined: Date.now() }] };
     case 'admin_promos': return { items: demo.promos };
     case 'admin_promo_new': {
       const promo = { ...body, used: 0, active: true, created: Date.now(), expires: 0 };
