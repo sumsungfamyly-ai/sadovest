@@ -24,7 +24,7 @@ async function sendPlain(chat_id, text, tries = 2) {
 }
 const H = {
   async me({ u, admin }) {
-    return { id: u.id, name: u.name, vip: isVip(u), bookmarks: u.bookmarks, profile: u.profile, vip_until: u.vip_until, done: u.progress.length, total: LESSONS.length, coins: u.coins, days: u.days, ach: (u.ach || []).filter(k => !/^s\d+$/.test(k)), notify: u.notify, admin, discount: u.discount || null,
+    return { id: u.id, name: u.name, vip: isVip(u), bookmarks: u.bookmarks, profile: u.profile, vip_until: u.vip_until, done: u.progress.length, total: LESSONS.length, coins: u.coins, ach: (u.ach || []).filter(k => !/^s\d+$/.test(k) && k !== 'week'), notify: u.notify, admin, discount: u.discount || null,
       cfg: { buy: process.env.BUY_URL || '' } };
   },
   async lessons({ u }) {
@@ -94,7 +94,7 @@ const H = {
     let list;
     if (/^\d+$/.test(q)) { const u = await getJ('user:' + q); list = u ? [u] : []; }
     else { const us = await loadUsers(ids.slice(0, USER_CAP)); list = q ? us.filter(u => String(u.name).toLowerCase().includes(q)) : us.sort((a, c) => (c.joined || 0) - (a.joined || 0)); }
-    return { total: ids.length, items: list.slice(0, 15).map(u => ({ id: u.id, name: u.name, vip_until: u.vip_until || 0, coins: u.coins || 0, done: (u.progress || []).length, days: u.days || 0, joined: u.joined || 0 })) };
+    return { total: ids.length, items: list.slice(0, 15).map(u => ({ id: u.id, name: u.name, vip_until: u.vip_until || 0, coins: u.coins || 0, done: (u.progress || []).length, joined: u.joined || 0 })) };
   },
   async admin_user_act({ admin, b }) {
     needAdmin(admin);
