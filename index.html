@@ -1,0 +1,877 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light dark">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Садовест</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script type="module" src="/plant-recognition.js?v=24"></script>
+<link rel="preload" as="image" href="/img/splash/art.webp?v=24" type="image/webp">
+<style>
+/* ================= СадоВест · «Изумрудное сияние» ================= */
+:root{
+  --bg:#ecfdf5;--card:rgba(255,255,255,.82);--cs:#fff;--ink:#0b2a1f;--mute:#47685a;--line:rgba(10,143,102,.2);
+  --g1:#0a8f66;--g2:#066f4d;--g3:#0c9a8e;--mint:#34d399;--lime:#a3e635;--gold:#f6c744;--goldbg:#fff3c4;--red:#c0392b;
+  /* переливы: яркий — для фонов и рамок, тёмный — под белый текст, «текстовый» — для заголовков */
+  --irid:linear-gradient(115deg,#0a8f66,#14b8a6 20%,#5fd38a 42%,#a3e635 56%,#2dd4bf 76%,#0a8f66);
+  --irid-d:linear-gradient(115deg,#066f4d,#0a8f66 18%,#0c9a8e 38%,#1a9a55 58%,#3f9b2a 74%,#0c9a8e 90%,#066f4d);
+  --irid-t:linear-gradient(100deg,#065f46,#0a8f66 25%,#0c9a8e 50%,#2e8b3d 75%,#065f46);
+  --sh:0 1px 2px rgba(6,80,56,.06),0 14px 30px -10px rgba(6,110,76,.2);--glow:rgba(20,184,166,.5);
+  --page:linear-gradient(180deg,#b7efd3 0%,#d6f8e6 38%,#eefcf5 100%);--navbg:rgba(255,255,255,.9);--soft:rgba(52,211,153,.16);--soft2:rgba(45,212,191,.12);
+}
+html[data-theme=dark]{
+  --bg:#04120c;--card:rgba(13,42,30,.76);--cs:#0d2a1e;--ink:#e6fff3;--mute:#9cc9b3;--line:rgba(94,234,168,.24);
+  --g1:#34d399;--g2:#6ee7b7;--g3:#2dd4bf;--goldbg:#3a3418;
+  --irid-t:linear-gradient(100deg,#6ee7b7,#34d399 25%,#5eead4 50%,#bef264 75%,#6ee7b7);
+  --sh:0 1px 2px rgba(0,0,0,.45),0 16px 32px -12px rgba(0,0,0,.7);--glow:rgba(52,211,153,.4);
+  --page:linear-gradient(180deg,#052418 0%,#04170f 45%,#030f0a 100%);--navbg:rgba(6,26,18,.9);--soft:rgba(52,211,153,.14);--soft2:rgba(45,212,191,.1);color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg);background:var(--page) fixed;min-height:100%}
+html,body{margin:0;color:var(--ink);font:600 16px/1.42 Manrope,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{background:transparent;min-height:100vh}
+/* живой фон: мягкие изумрудные, бирюзовые и лаймовые сияния */
+body::before,body::after{content:"";position:fixed;inset:-25%;z-index:-1;pointer-events:none;transition:opacity .6s ease;will-change:transform}
+body::before{background:radial-gradient(38% 32% at 16% 16%,rgba(16,185,129,.62),transparent 70%),radial-gradient(36% 30% at 86% 12%,rgba(20,184,166,.5),transparent 70%),radial-gradient(42% 36% at 82% 82%,rgba(163,230,53,.46),transparent 70%),radial-gradient(38% 32% at 10% 88%,rgba(52,211,153,.5),transparent 70%);animation:drift 28s ease-in-out infinite alternate}
+body::after{opacity:0;background:radial-gradient(38% 32% at 16% 16%,rgba(16,185,129,.46),transparent 70%),radial-gradient(36% 30% at 84% 10%,rgba(45,212,191,.36),transparent 70%),radial-gradient(40% 34% at 80% 84%,rgba(132,204,22,.24),transparent 70%),radial-gradient(38% 32% at 12% 90%,rgba(6,148,100,.3),transparent 70%);animation:drift 32s ease-in-out infinite alternate-reverse}
+html[data-theme=dark] body::before{opacity:0}html[data-theme=dark] body::after{opacity:1}
+@keyframes drift{from{transform:translate3d(-3%,-2%,0) rotate(0) scale(1)}to{transform:translate3d(3%,3%,0) rotate(9deg) scale(1.1)}}
+@keyframes shine{from{background-position:0% 0}to{background-position:150% 0}}
+@keyframes shineb{from{background-position:0 0,0% 0}to{background-position:0 0,150% 0}}
+@keyframes sweep{0%,55%{transform:translateX(-130%)}100%{transform:translateX(130%)}}
+@keyframes in{from{opacity:0;transform:translateY(14px)}}
+@keyframes fill{from{width:0}}
+@keyframes float{50%{transform:translateY(-8px)}}
+@keyframes bob{50%{transform:translateY(-5px)}}
+@keyframes pop{from{transform:scale(.92);opacity:0}}
+
+#app{max-width:520px;margin:0 auto;padding:12px 14px calc(104px + env(safe-area-inset-bottom))}
+h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:6px 0 12px;color:var(--g2)}
+h2{font-size:18px;font-weight:800;letter-spacing:-.01em;margin:20px 0 8px;color:var(--g2)}
+.card h2{margin-top:0}
+/* переливающийся зелёный текст заголовков */
+.brand,.sh h2,.view>h1:not([style]){background:var(--irid-t);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:shine 10s linear infinite}
+.top{display:flex;align-items:center;gap:8px}.top b{font-size:19px;font-weight:800;flex:1}
+.back,.ib{border:0;background:var(--card);color:var(--ink);border-radius:14px;width:40px;height:40px;font-size:19px;box-shadow:var(--sh);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.ib{border-radius:50%;width:42px;height:42px}
+.center{text-align:center}.mute{color:var(--mute);font-size:14px;font-weight:600}.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}
+.plant-row>*{min-width:0;overflow-wrap:anywhere;word-break:break-word}
+.plant-row>b{flex:1 1 50%}
+.plant-row>.mute{flex:0 1 45%;text-align:right}
+
+/* ---- плитки меню: переливающаяся рамка ---- */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{border-radius:22px;padding:16px 8px;text-align:center;font:800 15px Manrope,system-ui,sans-serif;color:var(--ink);min-height:98px;border:1.5px solid transparent;background:linear-gradient(var(--cs),var(--cs)) padding-box,var(--irid) border-box;background-size:auto,300% 100%;animation:shineb 12s linear infinite;box-shadow:var(--sh)}
+.tile i{display:block;font-style:normal;font-size:36px;margin-bottom:4px;filter:drop-shadow(0 5px 6px rgba(6,111,77,.28))}
+.tile.vip,.banner{background:linear-gradient(115deg,#fff0ac,#f6c744 30%,#ffe58a 50%,#f1bd2f 70%,#fff0ac);background-size:300% 100%;color:#3f2f00;border:1.5px solid #e6b92e;animation:shine 8s linear infinite;box-shadow:0 12px 26px -10px rgba(214,160,20,.75)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin:10px 0;box-shadow:var(--sh)}
+.card.glow,.glow{box-shadow:0 14px 34px -12px var(--glow),var(--sh)}
+.card.glow{border:1.5px solid transparent;background:linear-gradient(var(--cs),var(--cs)) padding-box,var(--irid) border-box;background-size:auto,300% 100%;animation:shineb 10s linear infinite}
+.tipc{background:var(--goldbg)!important;border-color:rgba(214,160,20,.45)!important;animation:none!important}
+
+/* ---- кнопки: перелив + блик ---- */
+.btn{position:relative;overflow:hidden;display:block;width:100%;border:0;border-radius:18px;padding:15px;font:800 17px Manrope,system-ui,sans-serif;color:#fff;margin-top:10px;background:var(--irid-d);background-size:300% 100%;animation:shine 9s linear infinite;text-shadow:0 1px 2px rgba(0,40,25,.45);box-shadow:0 12px 24px -10px rgba(6,111,77,.75),inset 0 1px 0 rgba(255,255,255,.38),inset 0 -2px 0 rgba(0,0,0,.14);transition:transform .15s,box-shadow .25s}
+.btn::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 36%,rgba(255,255,255,.42) 50%,transparent 64%);transform:translateX(-130%);animation:sweep 4.6s ease-in-out infinite;pointer-events:none}
+.btn:active{transform:scale(.97)}
+.btn.gold{background:linear-gradient(115deg,#f9dc72,#e8b52c 30%,#fdeea8 50%,#e8b52c 70%,#f9dc72);background-size:300% 100%;color:#3a2b00;font-size:19px;text-shadow:none;box-shadow:0 12px 24px -10px rgba(201,150,18,.8),inset 0 1px 0 rgba(255,255,255,.65)}
+.btn.ghost{color:var(--g2);text-shadow:none;border:1.5px solid transparent;background:linear-gradient(var(--cs),var(--cs)) padding-box,var(--irid-d) border-box;background-size:auto,300% 100%;animation:shineb 9s linear infinite;box-shadow:var(--sh)}
+.btn.ghost::after{display:none}
+.btn.sm{display:inline-block;width:auto;padding:8px 14px;font-size:14px;margin:0;border-radius:12px}
+.btn[disabled]{filter:grayscale(.7);opacity:.6;animation:none}
+.banner{position:relative;display:flex;align-items:center;gap:10px;border-radius:20px;padding:14px;margin-top:12px;width:100%;font:800 15px Manrope,system-ui,sans-serif;text-align:left}
+.banner small{display:block;font-weight:600;opacity:.8}.banner i{font-style:normal;font-size:34px}
+input,textarea,select{width:100%;border:1.5px solid var(--line);background:var(--cs);color:var(--ink);border-radius:14px;padding:13px;font:600 16px Manrope,system-ui,sans-serif;margin-top:8px;transition:border-color .2s,box-shadow .2s}
+input:focus,textarea:focus,select:focus{outline:0;border-color:var(--g1);box-shadow:0 0 0 4px rgba(20,184,166,.22)}
+button:focus-visible{outline:3px solid var(--mint);outline-offset:2px}
+
+/* ---- списки ---- */
+.les{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:18px;padding:12px 14px;margin:8px 0;font:700 15px Manrope,system-ui,sans-serif;color:var(--ink);box-shadow:var(--sh);transition:transform .15s,box-shadow .25s,border-color .25s}
+.les .n{width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,rgba(52,211,153,.34),rgba(45,212,191,.2));color:var(--g2);display:grid;place-items:center;font-weight:800;flex:none;overflow:hidden}
+.n img{width:100%;height:100%;object-fit:cover;border-radius:10px;display:block}
+.les.lock{opacity:.6}.lk{opacity:.7}
+.les.pick{background:linear-gradient(135deg,rgba(52,211,153,.26),rgba(163,230,53,.16));border-color:var(--g1);box-shadow:0 8px 22px -10px var(--glow)}
+.tag{font-size:11px;font-weight:800;border-radius:9px;padding:3px 8px;background:linear-gradient(135deg,rgba(52,211,153,.34),rgba(45,212,191,.22));color:var(--g2);margin-left:auto;flex:none}
+.tag.v{background:linear-gradient(135deg,#ffe58a,#f6c744);color:#3a2b00}
+.bar{height:10px;border-radius:8px;background:rgba(10,143,102,.16);overflow:hidden;margin-top:8px}
+.bar div{height:100%;border-radius:8px;background:var(--irid);background-size:300% 100%;animation:fill 1.2s ease both,shine 6s linear infinite;box-shadow:0 0 12px rgba(52,211,153,.7)}
+.ava{width:92px;height:92px;border-radius:50%;margin:8px auto;display:grid;place-items:center;font:800 40px Manrope,system-ui,sans-serif;color:#fff;background:var(--irid-d);background-size:300% 100%;animation:shine 8s linear infinite;border:3px solid var(--cs);box-shadow:0 0 0 3px rgba(52,211,153,.55),0 14px 30px -8px var(--glow);position:relative}
+.ava.vip{box-shadow:0 0 0 4px var(--gold),0 0 32px rgba(246,199,68,.55)}.ava s{position:absolute;right:-4px;bottom:-2px;font-size:28px;text-decoration:none}
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat div{background:var(--irid-d);background-size:300% 100%;animation:shine 10s linear infinite;color:#fff;border-radius:18px;padding:13px;font-weight:600;box-shadow:0 12px 24px -12px rgba(6,111,77,.8);text-shadow:0 1px 2px rgba(0,40,25,.35)}.stat b{display:block;font-size:26px;font-weight:800}
+.msg{border-radius:16px;padding:10px 12px;margin:8px 0;max-width:88%;font-size:15px}.me{background:linear-gradient(135deg,rgba(52,211,153,.4),rgba(45,212,191,.28));color:var(--ink);margin-left:auto}.ex{background:var(--card);border:1px solid var(--line)}
+
+/* ---- нижняя панель: парящее стекло ---- */
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:min(500px,calc(100% - 20px));display:flex;padding:6px;border-radius:28px;background:var(--navbg);border:1px solid var(--line);backdrop-filter:blur(20px) saturate(1.6);-webkit-backdrop-filter:blur(20px) saturate(1.6);box-shadow:0 18px 40px -12px rgba(6,90,62,.5),0 2px 6px rgba(6,90,62,.12);z-index:30}
+nav[hidden]{display:none}
+nav button{flex:1;border:0;background:none;color:var(--mute);font:800 11px Manrope,system-ui,sans-serif;padding:2px 0 4px;position:relative}
+nav button i{display:block;font-style:normal;font-size:24px;height:auto}
+nav button.on{color:var(--g2)}
+nav button img.ni{width:36px;height:36px;border-radius:12px;display:block;margin:0 auto 3px;opacity:.82;filter:saturate(.85);transition:transform .2s ease,box-shadow .2s ease,opacity .2s ease,filter .2s ease}
+nav button.on img.ni{opacity:1;filter:none;transform:translateY(-2px) scale(1.1);box-shadow:0 0 0 2px var(--mint),0 8px 18px -4px var(--glow)}
+nav button.on::after{content:"";display:block;width:20px;height:3px;margin:3px auto 0;border-radius:3px;background:var(--irid);background-size:300% 100%;animation:shine 5s linear infinite}
+html[data-theme=dark] nav button img.ni{filter:brightness(.88) saturate(.9)}html[data-theme=dark] nav button.on img.ni{filter:brightness(1)}
+.toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:var(--irid-d);background-size:300% 100%;animation:shine 8s linear infinite;color:#fff;padding:11px 18px;border-radius:16px;z-index:90;max-width:90%;font-weight:800;box-shadow:0 14px 30px -10px rgba(6,90,62,.7)}.toast.err{background:var(--red);animation:none}
+.load{text-align:center;padding:50px;font-size:44px}
+@media(prefers-reduced-motion:no-preference){.sprout{animation:sw 1.6s ease-in-out infinite}@keyframes sw{50%{transform:rotate(-8deg) scale(1.08)}}}
+.view{animation:in .4s ease both}
+.tile,.btn,.les,.pl{transition:transform .15s,box-shadow .25s}.tile:active,.les:active,.pl:active{transform:scale(.96)}
+.tile:hover,.pl:hover,.les:hover{box-shadow:0 14px 30px -10px var(--glow)}
+
+/* ---- грядки, растения ---- */
+.grid3{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pl{border:1px solid var(--line);background:var(--card);border-radius:18px;padding:10px 2px;font:800 12px Manrope,system-ui,sans-serif;color:var(--ink);text-align:center;box-shadow:var(--sh)}.pl i{display:block;font-style:normal;font-size:30px}
+.pl i img{width:44px;height:44px;border-radius:12px;object-fit:cover;display:block;margin:0 auto 2px}
+.sec{animation:in .5s both;animation-delay:var(--d);box-shadow:var(--sh),inset 4px 0 0 var(--g1)}.sec p{margin:6px 0 0;line-height:1.55}
+.big{font-size:68px;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 10px 12px rgba(6,111,77,.3))}
+.dots{display:flex;gap:6px;justify-content:center;margin:10px 0}.dot{width:34px;height:34px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:16px}.dot.on{background:var(--gold);box-shadow:0 0 14px var(--gold)}
+.opt{position:relative;overflow:visible}.opt.right{background:var(--irid-d);color:#fff;border-color:var(--mint)}.opt.wrong{background:#7a1f16;color:#fff}.sp{display:none}
+.pbig{width:150px;height:150px;border-radius:24px;object-fit:cover;box-shadow:0 14px 30px -10px var(--glow);background:#fff;border:2px solid var(--cs)}
+.vid{width:100%;border-radius:18px;margin:10px 0;background:#000;max-height:260px}
+details summary{cursor:pointer}details p{margin:8px 0 0}
+details.lh summary{cursor:pointer;list-style:none}details.lh summary::-webkit-details-marker{display:none}.lh .mute{font-weight:700}
+
+/* ---- тесты и уроки ---- */
+.qbox{background:var(--irid-d);background-size:300% 100%;animation:shine 12s linear infinite;color:#fff;border-radius:20px;padding:16px;font:800 18px/1.35 Manrope,system-ui,sans-serif;margin:14px 0 8px;box-shadow:0 14px 28px -12px rgba(6,111,77,.8);text-shadow:0 1px 2px rgba(0,40,25,.35)}
+.qbox small{display:block;opacity:.85;font-weight:700;font-size:12px;letter-spacing:.1em;margin-bottom:6px}
+.ans{background:var(--cs);border:1.5px solid var(--line);font-weight:600}.ans .n{background:var(--soft);color:var(--g2)}
+.okc{box-shadow:var(--sh),inset 5px 0 0 var(--g1)}.badc{box-shadow:var(--sh),inset 5px 0 0 var(--red)}.okc p,.badc p{margin:6px 0 0}
+html[data-theme=dark] .badc{background:rgba(120,30,25,.28)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.stat2{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 12px;box-shadow:var(--sh)}.stat2 small{color:var(--mute);display:block}.stat2 b{font-size:18px}
+.hrs{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}.hr{flex:none;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 10px;text-align:center;font-size:13px}
+.wday{display:block;width:100%;text-align:left;font:600 15px Manrope,system-ui,sans-serif;color:var(--ink)}
+.wd{background:var(--goldbg);border-radius:14px;padding:10px 12px;margin:8px 0}.wd b{color:var(--g2)}html[data-theme=dark] .wd b{color:#f6c744}
+.hk small{display:inline-block;background:var(--soft);color:var(--g2);border-radius:9px;padding:2px 8px;font-weight:800;font-size:11px;margin-bottom:6px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.mchips{padding-bottom:8px;margin-bottom:6px}.mchips .chip{flex:none}
+.chip{border:1.5px solid var(--line);background:var(--cs);color:var(--g2);border-radius:999px;padding:8px 15px;font:800 14px Manrope,system-ui,sans-serif;transition:transform .15s}.chip:active{transform:scale(.95)}
+.chip.on{background:var(--irid-d);background-size:300% 100%;animation:shine 8s linear infinite;color:#fff;border-color:transparent;text-shadow:0 1px 2px rgba(0,40,25,.35);box-shadow:0 8px 16px -8px rgba(6,111,77,.8)}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tg{flex:none;width:54px;height:31px;border-radius:20px;border:0;background:rgba(120,150,135,.4);position:relative;transition:background .25s}
+.tg i{position:absolute;top:3px;left:3px;width:25px;height:25px;border-radius:50%;background:#fff;transition:left .22s;box-shadow:0 2px 5px rgba(0,0,0,.3)}
+.tg.on{background:var(--irid-d);background-size:300% 100%;animation:shine 8s linear infinite}.tg.on i{left:26px}
+
+/* ---- главная ---- */
+.hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px}.hdr .logo{font-size:38px}.brand{font:800 26px Manrope,system-ui,sans-serif;line-height:1}.hdr>div:nth-child(2){flex:1}
+.hero{position:relative;margin:-12px -14px 0;border-radius:0 0 32px 32px;padding:12px 18px 20px;min-height:236px;color:#fff;overflow:hidden;box-shadow:0 22px 40px -18px rgba(4,80,56,.7);background:linear-gradient(100deg,rgba(3,70,48,.94) 0%,rgba(6,111,77,.68) 46%,rgba(13,148,136,.1) 100%),url(/img/hero.jpg) center 35%/cover,linear-gradient(135deg,#066f4d,#14b8a6)}
+.hero>*{position:relative;z-index:1}
+.hero::before{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;z-index:2;background:var(--irid);background-size:300% 100%;animation:shine 6s linear infinite;box-shadow:0 0 18px rgba(163,230,53,.8)}
+.hero::after{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(115deg,transparent 28%,rgba(255,255,255,.2) 44%,rgba(190,242,100,.22) 52%,rgba(94,234,212,.16) 60%,transparent 74%);background-size:260% 100%;animation:sheen 8s ease-in-out infinite;pointer-events:none}
+@keyframes sheen{0%{background-position:130% 0}100%{background-position:-60% 0}}
+.hero .hdr{margin-bottom:18px}.hero .hdr .logo{font-size:32px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.4))}.hero .hdr .sub{color:#fff;font-weight:800;font-size:14px;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+.hero .ib{background:rgba(255,255,255,.9);color:#0b2a1f;border-color:transparent}
+.hero h1{color:#fff;margin:0 0 6px;font-size:30px;text-shadow:0 2px 12px rgba(0,0,0,.5)}.hero p{margin:0 0 14px;max-width:68%;font-size:16px;line-height:1.35;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.hbtn{border:0;border-radius:16px;padding:12px 22px;font:800 16px Manrope,system-ui,sans-serif;color:#0b3d2a;background:linear-gradient(115deg,#d9fbe8,#bef264 50%,#d9fbe8);background-size:300% 100%;animation:shine 6s linear infinite;box-shadow:0 10px 22px -8px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.7)}
+.hart{position:absolute;right:14px;bottom:8px;font-size:48px;opacity:.9}
+.qt{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:16px 0}.qt button{padding:0;border:0;background:none;border-radius:20px;box-shadow:0 12px 22px -10px rgba(6,100,70,.55);transition:transform .15s,box-shadow .2s}
+.qt button:active{transform:scale(.95)}.qt img{width:100%;display:block;border-radius:20px}html[data-theme=dark] .qt img{filter:brightness(.92) saturate(.95)}
+.sh{display:flex;justify-content:space-between;align-items:center;margin:16px 0 6px}.sh h2{margin:0;font-size:21px}.lnk{border:0;background:none;font:800 14px Manrope,system-ui,sans-serif;color:var(--g2)}
+.tk{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin:8px 0;box-shadow:var(--sh)}.tk b{display:block}
+.chk{flex:none;width:30px;height:30px;border-radius:50%;border:2px solid var(--g1);background:var(--cs);box-shadow:0 0 0 4px rgba(52,211,153,.16);transition:background .2s,transform .15s}.chk:active{background:var(--mint);transform:scale(.9)}
+.wcard{display:flex;align-items:center;gap:12px;width:100%;border:1px solid var(--line);border-radius:22px;padding:14px;margin:12px 0;background:linear-gradient(135deg,rgba(125,211,252,.4),rgba(52,211,153,.34) 55%,rgba(190,242,100,.3));font:600 14px Manrope,system-ui,sans-serif;color:var(--ink);text-align:left;box-shadow:var(--sh)}
+html[data-theme=dark] .wcard{background:linear-gradient(135deg,rgba(40,100,140,.4),rgba(16,120,90,.4) 55%,rgba(80,130,20,.3))}
+.wcard .wi{font-size:40px}.wcard .wt{font-size:32px;font-weight:800}.wcard .adv{flex:1;border-left:1px solid var(--line);padding-left:12px;font-size:13px;min-width:0;overflow-wrap:anywhere}
+@media(max-width:480px){.wcard{flex-wrap:wrap;gap:8px 12px}.wcard .adv{flex:1 1 100%;border-left:0;border-top:1px solid var(--line);padding:8px 0 0}}@media(max-width:360px){.hero p{max-width:76%}}
+
+/* ---- календарь ---- */
+.mg{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:8px 0}.mg b{text-align:center;font-size:12px;color:var(--mute)}
+.md{border:2px solid transparent;border-radius:13px;background:var(--card);padding:4px 0;text-align:center;font:700 12px Manrope,system-ui,sans-serif;color:var(--ink);min-height:48px}.md i{display:block;font-style:normal;font-size:20px;line-height:1.1}
+.md.g{border-color:rgba(52,211,153,.8);background:linear-gradient(180deg,var(--card),var(--soft))}.md.r{border-color:#e08a80;background:rgba(224,138,128,.14)}.md.t{box-shadow:0 0 0 2px var(--g2),0 8px 16px -6px var(--glow)}.md.sel{background:var(--soft);color:var(--g2)}
+
+/* ---- праздник и подсказки ---- */
+.cele{position:fixed;inset:0;z-index:20;background:rgba(2,30,20,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:grid;place-items:center;padding:24px;animation:in .25s both}
+.cbox{background:var(--cs);color:var(--ink);border-radius:26px;padding:28px 24px;text-align:center;max-width:340px;border:1.5px solid transparent;background:linear-gradient(var(--cs),var(--cs)) padding-box,var(--irid) border-box;background-size:auto,300% 100%;animation:pop .3s ease both,shineb 8s linear infinite;box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}
+.ci{font-size:52px}.cbox h2{margin:8px 0}.cbox p{color:var(--mute);margin:0 0 8px}
+.rays,.crown{display:none}
+#tour{position:fixed;inset:0;z-index:70}
+#tour .spot{position:fixed;border-radius:18px;box-shadow:0 0 0 9999px rgba(2,26,18,.7),0 0 0 3px #bef264,0 0 22px 4px rgba(190,242,100,.7);transition:all .3s;pointer-events:none}
+#tour .dim{position:fixed;inset:0;background:rgba(2,26,18,.7)}
+#tour .tb{position:fixed;left:12px;right:12px;max-width:500px;margin:0 auto;display:flex;gap:10px;align-items:flex-end;animation:in .3s both}
+#tour .mole{width:92px;height:92px;flex:none;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 8px 20px rgba(0,0,0,.45);animation:bob 1.4s ease-in-out infinite;background:#fff}
+#tour .bub{flex:1;background:#fff;color:#0b2a1f;border-radius:20px;padding:12px 14px;box-shadow:0 14px 30px -8px rgba(0,0,0,.5);font-weight:700;line-height:1.35}
+#tour .tr{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}#tour .tr .mute{color:#47685a}
+#tour .x{position:fixed;top:12px;right:12px;z-index:72;border:0;border-radius:18px;padding:8px 14px;font:800 14px Manrope,system-ui,sans-serif;color:#0b2a1f;background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+
+/* ---- заставка: картина с живой анимацией ---- */
+#splash{position:fixed;inset:0;z-index:60;overflow:hidden;background:#07351f;transition:opacity .6s ease,transform .7s cubic-bezier(.4,0,.2,1)}
+#splash.hide{opacity:0;transform:scale(1.07);pointer-events:none}
+.sp-bg{position:absolute;inset:-3%;background:#0b3d26 url(/img/splash/bg.webp?v=24) center/100% 100%;filter:saturate(1.35) brightness(.95)}
+.sp-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,30,18,.35),rgba(2,30,18,0) 22%,rgba(2,30,18,0) 74%,rgba(2,24,14,.5))}
+.sp-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;--aw:min(147vw,98vh);--u:calc(var(--aw)/100)}
+.sp-art{position:relative;flex:none;width:var(--aw);height:var(--aw);opacity:0;-webkit-mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.45) 6%,#000 17%,#000 93%,rgba(0,0,0,.4) 97%,transparent 100%),linear-gradient(to right,transparent 0,#000 7%,#000 93%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.45) 6%,#000 17%,#000 93%,rgba(0,0,0,.4) 97%,transparent 100%),linear-gradient(to right,transparent 0,#000 7%,#000 93%,transparent 100%);mask-composite:intersect}
+.sp-art.ready{opacity:1;animation:spIn 1.1s cubic-bezier(.2,.8,.2,1) both,spKen 16s ease-in-out 1.1s infinite alternate}
+.sp-art>*{position:absolute}.sp-img{inset:0;width:100%;height:100%;display:block}
+@keyframes spIn{from{opacity:0;transform:scale(1.14);filter:blur(14px) saturate(1.4)}to{opacity:1;transform:none;filter:none}}
+@keyframes spKen{from{transform:scale(1) translate3d(0,0,0)}to{transform:scale(1.055) translate3d(-.8%,-.6%,0)}}
+/* солнце и лучи */
+.sp-sun{left:-8%;top:-8%;width:44%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,252,215,.95) 0,rgba(255,226,130,.5) 26%,rgba(255,200,90,.12) 52%,transparent 68%);mix-blend-mode:screen;animation:spSun 3.6s ease-in-out infinite}
+@keyframes spSun{50%{transform:scale(1.22);opacity:.78}}
+.sp-rays{left:-6%;top:-6%;width:80%;height:80%;background:repeating-conic-gradient(from 105deg at 12% 12%,rgba(255,244,180,0) 0 5deg,rgba(255,244,180,.34) 8deg,rgba(255,244,180,0) 12deg 17deg);-webkit-mask-image:radial-gradient(circle at 12% 12%,#000 0,transparent 68%);mask-image:radial-gradient(circle at 12% 12%,#000 0,transparent 68%);mix-blend-mode:screen;transform-origin:12% 12%;animation:spRays 9s ease-in-out infinite alternate}
+@keyframes spRays{from{transform:rotate(-7deg);opacity:.55}to{transform:rotate(7deg);opacity:1}}
+/* вывеска: сияние логотипа и бегущий блик */
+.sp-logo{left:41%;top:7.8%;width:18%;aspect-ratio:1.1;border-radius:50%;background:radial-gradient(ellipse,rgba(205,255,125,.75),rgba(120,230,60,.25) 45%,transparent 70%);mix-blend-mode:screen;animation:spGlow 2.4s ease-in-out infinite}
+@keyframes spGlow{50%{transform:scale(1.2);opacity:.6}}
+.sp-sign{inset:0;mix-blend-mode:soft-light;overflow:hidden}
+.sp-sign::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.9) 50%,transparent 62%);background-size:260% 100%;background-position:130% 0;animation:spSign 3.8s ease-in-out infinite}
+@keyframes spSign{0%,30%{background-position:130% 0}100%{background-position:-60% 0}}
+/* бабочки: крылья машут, сами летают */
+.sp-bf{will-change:transform;transform-origin:50% 55%}
+.sp-bf img{display:block;width:100%;transform-origin:50% 60%;animation:spFlap .42s ease-in-out infinite;filter:drop-shadow(0 6px 8px rgba(0,0,0,.28))}
+@keyframes spFlap{0%,100%{transform:scale(1,1)}50%{transform:scale(.5,1.06)}}
+.sp-bf.b1{animation:spFly1 13s ease-in-out infinite}
+.sp-bf.b2{animation:spFly2 16s ease-in-out -4s infinite}
+.sp-bf.b3{animation:spFly3 12s linear 1.5s infinite;opacity:0}.sp-bf.b3 img{animation-duration:.34s}
+@keyframes spFly1{0%,100%{transform:translate(0,0) rotate(-8deg)}20%{transform:translate(calc(var(--u)*-9),calc(var(--u)*-3)) rotate(-18deg)}40%{transform:translate(calc(var(--u)*-14),calc(var(--u)*6)) rotate(8deg)}60%{transform:translate(calc(var(--u)*-4),calc(var(--u)*11)) rotate(14deg)}80%{transform:translate(calc(var(--u)*6),calc(var(--u)*3)) rotate(-4deg)}}
+@keyframes spFly2{0%,100%{transform:translate(0,0) rotate(6deg)}25%{transform:translate(calc(var(--u)*-13),calc(var(--u)*-7)) rotate(-12deg)}50%{transform:translate(calc(var(--u)*-26),calc(var(--u)*2)) rotate(10deg)}75%{transform:translate(calc(var(--u)*-12),calc(var(--u)*13)) rotate(-6deg)}}
+@keyframes spFly3{0%{transform:translate(calc(var(--u)*-84),calc(var(--u)*20)) scale(.55) rotate(18deg);opacity:0}8%{opacity:.95}35%{transform:translate(calc(var(--u)*-52),calc(var(--u)*4)) scale(.55) rotate(-8deg)}65%{transform:translate(calc(var(--u)*-16),calc(var(--u)*-10)) scale(.55) rotate(12deg)}92%{opacity:.95}100%{transform:translate(calc(var(--u)*14),calc(var(--u)*-34)) scale(.55) rotate(-10deg);opacity:0}}
+/* блики на плодах и капли из лейки */
+.sp-spark{aspect-ratio:1;opacity:0;transform:scale(0);filter:drop-shadow(0 0 5px #fff);animation:spTw 3.2s ease-in-out infinite}
+.sp-spark::before{content:"";position:absolute;inset:0;background:#fff;clip-path:polygon(50% 0,57% 43%,100% 50%,57% 57%,50% 100%,43% 57%,0 50%,43% 43%)}
+.sp-spark::after{content:"";position:absolute;inset:22%;border-radius:50%;background:radial-gradient(circle,#fff 0,rgba(255,255,255,0) 70%)}
+@keyframes spTw{0%,100%{opacity:0;transform:scale(0) rotate(0)}12%{opacity:1;transform:scale(1) rotate(45deg)}30%{opacity:0;transform:scale(.25) rotate(90deg)}}
+.sp-drop{width:.9%;height:1.9%;border-radius:50% 50% 50% 50%/62% 62% 38% 38%;background:linear-gradient(160deg,rgba(255,255,255,.95),rgba(125,211,252,.9));opacity:0;animation:spDrop 2.7s cubic-bezier(.5,0,1,.6) infinite}
+@keyframes spDrop{0%{transform:translate(0,0) scale(.6);opacity:0}10%{opacity:.95}85%{opacity:.85}100%{transform:translate(calc(var(--u)*1.4),calc(var(--u)*9));opacity:0}}
+/* полоса загрузки: наша, живая, ровно поверх нарисованной */
+.sp-pb{left:22.73%;top:83.97%;width:54.07%;height:8.13%;border-radius:999px;padding:calc(var(--u)*.55);background:linear-gradient(180deg,#d6ff6a,#6fcf1d 38%,#3f9a10 70%,#7bd22a);box-shadow:0 calc(var(--u)*.8) calc(var(--u)*2.4) rgba(0,0,0,.55),0 0 calc(var(--u)*3) rgba(150,255,60,.45),inset 0 1px 0 rgba(255,255,255,.7)}
+.sp-pt{height:100%;border-radius:999px;padding:calc(var(--u)*.7);overflow:hidden;background:linear-gradient(180deg,#0b0f08,#1b2315 55%,#070a05);box-shadow:inset 0 calc(var(--u)*.4) calc(var(--u)*1.2) rgba(0,0,0,.85)}
+.sp-pf{position:relative;height:100%;width:0;min-width:calc(var(--u)*5);border-radius:999px;background:repeating-linear-gradient(-58deg,rgba(255,255,255,.2) 0 calc(var(--u)*2.2),rgba(255,255,255,0) calc(var(--u)*2.2) calc(var(--u)*4.4)),linear-gradient(180deg,#d4ff7a,#86e22a 38%,#4eb913 62%,#74d21f);background-size:calc(var(--u)*8.8) 100%,100% 100%;animation:spStripe .9s linear infinite;box-shadow:0 0 calc(var(--u)*2.5) rgba(160,255,70,.8)}
+@keyframes spStripe{to{background-position:calc(var(--u)*8.8) 0,0 0}}
+.sp-pf::after{content:"";position:absolute;left:4%;right:4%;top:11%;height:34%;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,.08))}
+.sp-pf::before{content:"";position:absolute;right:calc(var(--u)*-1.4);top:50%;width:calc(var(--u)*5);height:calc(var(--u)*5);transform:translateY(-50%);background:radial-gradient(circle,#fff 0,rgba(205,255,120,.9) 30%,rgba(150,255,60,0) 70%);animation:spTip 1s ease-in-out infinite}
+@keyframes spTip{50%{transform:translateY(-50%) scale(1.25);opacity:.8}}
+/* пыльца и падающие листья по всему экрану */
+.sp-fx{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.sp-pol i{position:absolute;width:var(--s);height:var(--s);border-radius:50%;background:radial-gradient(circle,#fff8c8,rgba(255,230,120,0) 70%);opacity:0;animation:spPol var(--d) ease-in-out var(--w) infinite}
+@keyframes spPol{0%{transform:translate(0,0);opacity:0}15%{opacity:.95}85%{opacity:.6}100%{transform:translate(var(--x),-22vh);opacity:0}}
+.sp-lv span{position:absolute;top:-8%;width:22px;height:22px;opacity:0;animation:spLeaf var(--d) linear var(--w) infinite}.sp-lv svg{display:block;width:100%;height:100%}
+@keyframes spLeaf{0%{transform:translate(0,-10vh) rotate(var(--r));opacity:0}8%{opacity:.9}50%{transform:translate(30px,48vh) rotate(calc(var(--r) + 160deg))}100%{transform:translate(-20px,112vh) rotate(calc(var(--r) + 330deg));opacity:.5}}
+/* ---- переливающаяся рамка у карточек (маска, фон остаётся прозрачным) ---- */
+.card,.les,.tk,.pl,.stat2,.hr,.wcard,.md{position:relative}
+.card::before,.les::before,.tk::before,.pl::before,.stat2::before,.hr::before,.wcard::before{content:"";position:absolute;inset:-1px;padding:1.5px;border-radius:inherit;background:var(--irid);background-size:300% 100%;opacity:.55;pointer-events:none;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.card.glow::before{display:none}
+.tile:hover::before,.les:active::before,.card:active::before{opacity:1}
+.card,.tk,.stat2,.hr{background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(236,253,245,.8))}
+html[data-theme=dark] :is(.card,.tk,.stat2,.hr){background:linear-gradient(135deg,rgba(16,52,38,.88),rgba(10,36,26,.82))}
+html[data-theme=dark] :is(.card,.les,.tk,.pl,.stat2,.hr,.wcard)::before{opacity:.7}
+.card.tipc,.card.okc,.card.badc{background:var(--goldbg)}
+.card.okc{background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(220,252,231,.85))}html[data-theme=dark] .card.okc{background:rgba(16,70,45,.7)}
+.card.badc{background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(254,226,226,.85))}
+
+
+/* ---- настройки доступности ---- */
+.nomo *,.nomo body::before,.nomo::before{animation:none!important;transition:none!important}body.nomo::before,body.nomo::after{animation:none!important}
+body.fs-s #app{zoom:.92}body.fs-l #app{zoom:1.12}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01s!important;animation-iteration-count:1!important}}
+
+/* ================= v25 · «Лунный изумруд»: тёмное стекло, мягкое свечение ================= */
+html[data-theme=dark]{
+  --bg:#06120d;--cs:#0d221a;--ink:#eaf8f0;--mute:#8fb0a0;--line:rgba(94,234,160,.22);
+  --g1:#3fe08a;--g2:#a9f3c8;--g3:#2dd4a0;--mint:#4ade80;--gold:#f5c542;--goldbg:rgba(245,197,66,.1);--red:#ff8272;
+  --c1:rgba(26,70,50,.74);--c2:rgba(9,30,21,.82);--t1:rgba(40,64,56,.78);--t2:rgba(18,36,30,.85);
+  --nav1:rgba(18,54,38,.94);--nav2:rgba(7,24,17,.96);--sh:0 10px 28px -14px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.06);--glow:rgba(63,224,138,.38);
+  --soft:rgba(63,224,138,.14);--soft2:rgba(63,224,138,.08);--page:#06120d;--navbg:var(--nav2);
+}
+html[data-theme=light]{
+  --bg:#e9f7ef;--cs:#fff;--ink:#0b2a1f;--mute:#4c6f5f;--line:rgba(20,140,80,.24);
+  --g1:#14a05a;--g2:#0b6b43;--g3:#0c9a8e;--mint:#34d399;--gold:#d99a10;--goldbg:#fff1c2;--red:#c0392b;
+  --c1:rgba(255,255,255,.94);--c2:rgba(226,246,236,.9);--t1:rgba(255,255,255,.95);--t2:rgba(222,243,232,.92);
+  --nav1:rgba(255,255,255,.96);--nav2:rgba(228,247,237,.96);--sh:0 10px 24px -14px rgba(6,90,56,.4);--glow:rgba(20,160,90,.3);
+  --soft:rgba(20,160,90,.14);--soft2:rgba(20,160,90,.08);--page:#e9f7ef;--navbg:var(--nav2);
+}
+html{background:var(--page)!important}
+html,body{font-family:Manrope,system-ui,-apple-system,Roboto,sans-serif}
+body::before{background:radial-gradient(46% 30% at 10% 6%,rgba(34,197,94,.2),transparent 70%),radial-gradient(50% 34% at 100% 96%,rgba(16,185,129,.16),transparent 70%)!important;animation:none!important;inset:0}
+html[data-theme=light] body::before{opacity:.8}
+body::after{display:none}
+h1,h2{color:var(--ink)}
+.brand,.sh h2,.view>h1:not([style]){background:none!important;-webkit-text-fill-color:currentColor!important;color:var(--ink)!important;animation:none!important}
+.card::before,.les::before,.tk::before,.pl::before,.stat2::before,.hr::before,.wcard::before{display:none!important}
+.tile,.btn,.chip.on,.tg.on,.bar div,.ava,.stat div,.qbox,.opt.right,.toast,.hbtn,.banner,.btn.ghost,.card.glow{animation:none!important}
+
+/* стеклянные карточки */
+html[data-theme] :is(.card,.tk,.stat2,.hr,.wcard,.card.glow){background:linear-gradient(160deg,var(--c1),var(--c2));border:1px solid var(--line);border-radius:24px;box-shadow:var(--sh);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+html[data-theme] .card.glow{border-color:rgba(94,234,160,.45);box-shadow:var(--sh),0 0 26px -10px var(--glow)}
+html[data-theme] .card.okc{background:linear-gradient(160deg,rgba(40,160,90,.3),rgba(9,30,21,.82))}
+html[data-theme] .card.badc{background:linear-gradient(160deg,rgba(220,80,70,.28),rgba(30,12,10,.82))}
+html[data-theme] .card.tipc{background:linear-gradient(160deg,rgba(245,197,66,.14),rgba(40,32,10,.5))!important;border-color:rgba(245,197,66,.4)!important}
+.wd{background:var(--goldbg)}
+
+/* основные кнопки: зелёный глянец, шеврон справа */
+.btn,.hbtn{border-radius:22px;font:700 16px Manrope,system-ui,sans-serif;color:#fff;text-shadow:none;background:linear-gradient(135deg,#4ee07c,#1fa550 58%,#137a3c)!important;background-size:auto!important;border:1px solid rgba(170,255,195,.5);box-shadow:0 10px 24px -10px rgba(34,197,94,.65),inset 0 1px 0 rgba(255,255,255,.4),inset 0 -10px 18px rgba(0,60,22,.28)}
+.hbtn{padding:12px 22px;color:#fff}
+.btn::after{content:"›";inset:auto;right:18px;top:50%;width:auto;background:none;transform:translateY(-52%);animation:none;font-size:26px;line-height:1;opacity:.9}
+.btn.sm::after,.btn.gold::after{display:none}
+.btn.sm{border-radius:16px}
+html[data-theme] .btn.ghost{color:var(--ink);background:linear-gradient(160deg,var(--t1),var(--t2))!important;border:1px solid var(--line);box-shadow:var(--sh)}
+.btn.ghost::after{display:block}
+.btn.gold,.banner,.tile.vip{color:#ffe9a8!important;background:linear-gradient(135deg,rgba(96,72,18,.92),rgba(44,34,10,.96))!important;border:1.5px solid #e9bb35;box-shadow:0 0 26px -8px rgba(246,199,68,.5),inset 0 1px 0 rgba(255,236,160,.25)}
+.btn.gold{font-size:17px;text-align:center}
+.banner{border-radius:22px}.banner small{opacity:.85;font-weight:600}.banner::after{content:"›";margin-left:auto;font-size:26px}
+.card.prem{background:linear-gradient(160deg,rgba(96,72,18,.9),rgba(34,26,8,.95))!important;border:1.5px solid #e9bb35;color:#ffe9a8;box-shadow:0 0 34px -10px rgba(246,199,68,.5)}
+.card.prem h1{color:#ffe9a8!important}
+
+/* плитки, списки, статусы */
+html[data-theme] .tile{border:1px solid var(--line);border-radius:24px;background:linear-gradient(160deg,var(--t1),var(--t2));background-size:auto}
+.tile i{filter:drop-shadow(0 4px 8px rgba(0,0,0,.35))}
+html[data-theme] .les{border-radius:999px;padding:11px 16px;background:linear-gradient(90deg,var(--c1),var(--c2));border:1px solid rgba(63,224,138,.4);box-shadow:var(--sh)}
+.les::after{content:"›";color:var(--mute);font-size:24px;line-height:1;margin-left:6px}
+.les .n{border-radius:50%;background:var(--soft);color:var(--g2)}
+.les.pick{border-color:var(--g1);box-shadow:0 0 22px -8px var(--glow)}
+.tag{border-radius:999px;padding:4px 11px;background:rgba(63,224,138,.15);color:var(--g2);border:1px solid rgba(63,224,138,.4)}
+.tag.v{background:rgba(245,197,66,.16);color:#f8cf55;border-color:rgba(245,197,66,.5)}
+html[data-theme=light] .tag.v{color:#8a5d00}
+.pl{border-radius:20px;background:linear-gradient(160deg,var(--t1),var(--t2));border-color:var(--line)}
+.bar{background:rgba(255,255,255,.08);height:12px}
+html[data-theme=light] .bar{background:rgba(20,140,80,.15)}
+.bar div{background:linear-gradient(90deg,#2ec866,#8bf0a8)!important;background-size:auto!important;box-shadow:0 0 12px rgba(63,224,138,.6)}
+
+/* кнопки-переключатели, чипы, тумблер, навигация */
+.chip{background:linear-gradient(160deg,var(--t1),var(--t2));border:1px solid var(--line);color:var(--ink);font-weight:700}
+.chip.on{background:linear-gradient(135deg,#4ee07c,#1c9e4b)!important;color:#fff;border-color:rgba(170,255,195,.5);text-shadow:none;box-shadow:0 8px 18px -8px rgba(34,197,94,.7),inset 0 1px 0 rgba(255,255,255,.35)}
+.tg{background:#4a5654}
+.tg.on{background:linear-gradient(135deg,#1c9e4b,#0f6f37)!important}
+.tg i{background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.4)}.tg.on i{background:#c9fbdc}
+.chk{border-color:var(--g1);background:transparent}
+.back,.ib{background:linear-gradient(160deg,var(--t1),var(--t2));border:1px solid var(--line);color:var(--ink);border-radius:14px}
+.ib{border-radius:50%}
+.hero .ib{background:rgba(10,36,26,.55);color:#fff;border:1px solid rgba(160,255,200,.35)}
+input,textarea,select{background:linear-gradient(160deg,var(--t1),var(--t2));border:1px solid var(--line);border-radius:16px}
+input:focus,textarea:focus,select:focus{border-color:var(--g1);box-shadow:0 0 0 3px rgba(63,224,138,.25)}
+
+nav{border-radius:32px;padding:7px;background:linear-gradient(160deg,var(--nav1),var(--nav2));border:1px solid rgba(63,224,138,.4);box-shadow:0 18px 40px -10px rgba(0,0,0,.7),0 0 28px -10px var(--glow)}
+nav button{border-radius:24px;padding:7px 0 6px;font:700 11px Manrope,system-ui,sans-serif;transition:background .2s,color .2s}
+nav button i{display:grid;place-items:center;height:28px}
+nav svg.ni{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:#fff;background:linear-gradient(160deg,#4ee07c,#17883f);box-shadow:0 8px 22px -6px rgba(63,224,138,.7),inset 0 1px 0 rgba(255,255,255,.4)}
+nav button.on::after{width:5px;height:5px;border-radius:50%;margin:2px auto 0;background:#e3ffe9;animation:none}
+
+/* главная */
+.hero{background:linear-gradient(100deg,rgba(4,22,15,.95) 0%,rgba(8,52,33,.72) 55%,rgba(8,52,33,.25) 100%),url(/img/hero.jpg) center 35%/cover,#0a3a26;border-bottom:1px solid rgba(94,234,160,.35);box-shadow:0 22px 40px -18px rgba(0,0,0,.8),0 0 30px -12px var(--glow)}
+.hero::after{animation:none;opacity:.5}
+.hero::before{animation:none;background:linear-gradient(90deg,transparent,#3fe08a,transparent);box-shadow:0 0 18px rgba(63,224,138,.8)}
+.qt button{border:1px solid var(--line);box-shadow:0 12px 22px -12px rgba(0,0,0,.7)}
+.wcard{border-radius:24px}
+html[data-theme=dark] .wcard{background:linear-gradient(135deg,rgba(40,90,130,.4),rgba(16,90,64,.55))}
+.stat div,.qbox{background:linear-gradient(160deg,rgba(26,100,60,.9),rgba(10,50,30,.92))!important;background-size:auto!important;border:1px solid rgba(94,234,160,.4)}
+.opt.right{background:linear-gradient(135deg,#2ec866,#137a3c)!important}
+.toast{background:linear-gradient(135deg,#2ec866,#137a3c)!important;border:1px solid rgba(170,255,195,.5)}
+.ava{background:linear-gradient(135deg,#2ec866,#137a3c)!important;background-size:auto!important}
+html[data-theme=dark] .cbox{background:linear-gradient(160deg,#133a29,#08170f)}
+
+/* лунный календарь */
+.moonp{border:1px solid var(--line);border-radius:30px;padding:14px;margin-bottom:12px;background:linear-gradient(170deg,var(--c1),var(--c2));box-shadow:var(--sh)}
+.mh{display:flex;align-items:center;gap:14px}.mh b{display:block;font-size:22px;font-weight:800}.mh span{color:var(--mute);font-size:14px}.mh .mo{flex:none}
+.mnav{display:flex;align-items:center;justify-content:space-between;margin:12px 0 8px}.mnav b{font-size:16px}
+.sq{width:40px;height:40px;border-radius:14px;font-size:22px;color:var(--ink);border:1px solid var(--line);background:linear-gradient(160deg,var(--t1),var(--t2))}
+.mg{gap:6px;margin:6px 0 0}.mg b{font-size:12px;font-weight:700}
+.md{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:58px;border:1.5px solid rgba(255,255,255,.06);border-radius:15px;background:linear-gradient(160deg,var(--t1),var(--t2));font:700 13px Manrope,system-ui,sans-serif;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.md i{display:block;line-height:0}.mo{display:block}
+.md .mo{filter:drop-shadow(0 0 4px rgba(246,200,67,.35))}
+.md.g{border-color:#3fe08a;box-shadow:0 0 14px -3px rgba(63,224,138,.6)}
+.md.r{border-color:#ee8f6e;background:linear-gradient(160deg,rgba(150,70,40,.4),rgba(40,22,16,.7));box-shadow:0 0 14px -4px rgba(238,143,110,.55)}
+.md.t{outline:2px solid #9ff7be;outline-offset:1px;box-shadow:0 0 16px -2px var(--glow)}
+.md.sel{background:linear-gradient(160deg,rgba(63,224,138,.3),rgba(20,70,45,.6));color:var(--ink)}
+.mi{display:flex;align-items:center;gap:14px;margin-top:0}.mi b{font-size:17px}.mi .mute{font-size:14px}.mi>div{flex:1;min-width:0}.mi .chev{font-size:28px;color:var(--mute)}
+.rec{position:relative;overflow:hidden}.rec>b{display:flex;align-items:center;gap:8px}.rec p{margin:8px 0 0;max-width:86%}
+.rec .lf{width:20px;height:20px;fill:var(--g1)}.rec::after{content:"";position:absolute;right:-14px;bottom:-18px;width:120px;height:120px;opacity:.2;background:radial-gradient(circle at 40% 60%,#3fe08a,transparent 65%)}
+
+/* v25.1 · ближе к референсу */
+.qt{gap:10px}.qt button.t2{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:92px;padding:10px 4px;border-radius:24px;background:linear-gradient(160deg,var(--t1),var(--t2));border:1px solid var(--line);color:var(--ink);font:700 12px/1.2 Manrope,system-ui,sans-serif;text-align:center}
+.ti{width:32px;height:32px;fill:none;stroke:#3fe08a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 6px rgba(63,224,138,.5))}.ti.y{stroke:#f5c542}
+.mh{position:relative;margin:-14px -14px 12px;padding:16px 16px 26px;border-radius:30px 30px 0 0;background:radial-gradient(1px 1px at 20% 30%,#fff9,transparent),radial-gradient(1px 1px at 78% 22%,#fff8,transparent),radial-gradient(1px 1px at 60% 60%,#fff6,transparent),linear-gradient(180deg,#0a1a2c,#0b2a22 85%);overflow:hidden}
+.mh::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-18px;height:46px;border-radius:50%;background:rgba(20,60,45,.85);filter:blur(6px)}
+.mh>*{position:relative;z-index:1}.mh b{font-size:24px;color:#fff}.mh span{color:#a9c4b6}
+.inf{margin-left:auto;width:36px;height:36px;border-radius:50%;border:2px solid rgba(190,210,200,.7);background:none;color:#cfe3d8;font:700 18px Manrope,serif;font-style:italic}
+.mg>b{display:none}.mg{margin-top:0}
+.md{min-height:60px;border-radius:16px}
+nav{overflow:visible;padding:8px 6px}
+nav button.on{flex:0 0 72px;height:72px;margin:-18px 2px -4px;border-radius:50%;padding:12px 0 0;border:1px solid rgba(190,255,210,.6);box-shadow:0 10px 26px -6px rgba(63,224,138,.8),inset 0 2px 0 rgba(255,255,255,.45),inset 0 -10px 16px rgba(0,70,28,.3)}
+nav button.on::after{position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);margin:0;background:#9ff7be;box-shadow:0 0 8px #3fe08a}
+.les .n{width:38px;height:38px}
+.btn.sm.ghost::after,.btn.sm::after{display:none!important}
+</style>
+</head>
+<body>
+<div id="splash"><div class="sp-bg"></div><div class="sp-stage"><div class="sp-art" id="spArt"><img class="sp-img" src="/img/splash/art.webp?v=24" alt="" decoding="async" fetchpriority="high" onload="this.parentNode.classList.add('ready')"><div class="sp-sun"></div><div class="sp-rays"></div><div class="sp-logo"></div><div class="sp-sign" style="clip-path:polygon(23.92% 11.96%,33.49% 8.61%,67.78% 8.93%,75.76% 11.16%,77.75% 15.95%,76.56% 26.32%,71.77% 31.50%,39.87% 33.33%,30.30% 33.09%,23.92% 28.71%,21.93% 20.73%)"></div><div class="sp-bf b1" style="left:69.777%;top:1.595%;width:12.041%"><img src="/img/splash/bf1.webp?v=24" alt=""></div><div class="sp-bf b2" style="left:66.826%;top:33.174%;width:10.526%"><img src="/img/splash/bf2.webp?v=24" alt=""></div><div class="sp-bf b3" style="left:66.826%;top:33.174%;width:10.526%"><img src="/img/splash/bf2.webp?v=24" alt=""></div><i class="sp-spark" style="left:46.013%;top:46.013%;width:5.582%;animation-delay:0s"></i><i class="sp-spark" style="left:51.037%;top:51.037%;width:4.466%;animation-delay:0.9s"></i><i class="sp-spark" style="left:18.501%;top:60.606%;width:4.785%;animation-delay:0.4s"></i><i class="sp-spark" style="left:26.077%;top:65.630%;width:3.987%;animation-delay:1.5s"></i><i class="sp-spark" style="left:65.311%;top:51.754%;width:3.668%;animation-delay:2.1s"></i><i class="sp-spark" style="left:88.198%;top:55.662%;width:5.104%;animation-delay:1.2s"></i><i class="sp-spark" style="left:91.228%;top:67.305%;width:4.466%;animation-delay:0.2s"></i><i class="sp-spark" style="left:43.062%;top:70.574%;width:3.190%;animation-delay:1.9s"></i><i class="sp-spark" style="left:31.738%;top:49.282%;width:3.509%;animation-delay:0.7s"></i><i class="sp-drop" style="left:89.952%;top:66.667%;animation-delay:0s"></i><i class="sp-drop" style="left:91.069%;top:67.145%;animation-delay:0.45s"></i><i class="sp-drop" style="left:89.155%;top:67.464%;animation-delay:0.9s"></i><i class="sp-drop" style="left:90.590%;top:67.783%;animation-delay:1.35s"></i><i class="sp-drop" style="left:91.707%;top:66.826%;animation-delay:1.8s"></i><i class="sp-drop" style="left:89.633%;top:66.986%;animation-delay:2.25s"></i><div class="sp-pb"><div class="sp-pt"><div class="sp-pf" id="spFill"></div></div></div></div></div><div class="sp-fx"><div class="sp-pol"><i style="left:44%;top:54%;--s:7px;--d:11s;--w:0.3s;--x:28px"></i><i style="left:15%;top:81%;--s:4px;--d:10s;--w:1.3s;--x:-29px"></i><i style="left:58%;top:88%;--s:4px;--d:7s;--w:0.5s;--x:14px"></i><i style="left:10%;top:50%;--s:5px;--d:11s;--w:3.8s;--x:-33px"></i><i style="left:76%;top:85%;--s:4px;--d:7s;--w:0.3s;--x:-23px"></i><i style="left:40%;top:88%;--s:5px;--d:10s;--w:0.7s;--x:-1px"></i><i style="left:74%;top:58%;--s:4px;--d:10s;--w:3.4s;--x:-16px"></i><i style="left:50%;top:47%;--s:4px;--d:10s;--w:0.4s;--x:-14px"></i><i style="left:66%;top:89%;--s:6px;--d:9s;--w:3.5s;--x:18px"></i><i style="left:49%;top:73%;--s:5px;--d:12s;--w:1.1s;--x:-9px"></i><i style="left:13%;top:73%;--s:7px;--d:8s;--w:4.4s;--x:-4px"></i><i style="left:80%;top:44%;--s:4px;--d:10s;--w:2.5s;--x:3px"></i><i style="left:22%;top:97%;--s:7px;--d:6s;--w:5.8s;--x:-31px"></i><i style="left:74%;top:75%;--s:6px;--d:11s;--w:2.1s;--x:23px"></i><i style="left:77%;top:93%;--s:4px;--d:12s;--w:0.6s;--x:-6px"></i><i style="left:63%;top:43%;--s:4px;--d:11s;--w:4.2s;--x:33px"></i><i style="left:90%;top:92%;--s:6px;--d:11s;--w:2.3s;--x:4px"></i><i style="left:5%;top:94%;--s:6px;--d:7s;--w:3.7s;--x:23px"></i><i style="left:10%;top:62%;--s:6px;--d:7s;--w:4.4s;--x:10px"></i><i style="left:53%;top:98%;--s:4px;--d:7s;--w:2.7s;--x:30px"></i><i style="left:38%;top:52%;--s:7px;--d:12s;--w:3.3s;--x:13px"></i><i style="left:48%;top:83%;--s:5px;--d:7s;--w:0.5s;--x:-21px"></i></div><div class="sp-lv"><span style="left:8%;--d:11s;--w:0s;--r:40deg;color:#7bd34a"><svg viewBox="0 0 24 24"><path d="M3 21C3 11 10 3 21 3c0 11-7 18-18 18z" fill="currentColor"/><path d="M3 21C9 14 13 10 21 3" stroke="rgba(255,255,255,.55)" stroke-width="1.2" fill="none"/></svg></span><span style="left:30%;--d:13s;--w:2.5s;--r:-30deg;color:#a3e635"><svg viewBox="0 0 24 24"><path d="M3 21C3 11 10 3 21 3c0 11-7 18-18 18z" fill="currentColor"/><path d="M3 21C9 14 13 10 21 3" stroke="rgba(255,255,255,.55)" stroke-width="1.2" fill="none"/></svg></span><span style="left:55%;--d:12s;--w:5s;--r:60deg;color:#4cc26a"><svg viewBox="0 0 24 24"><path d="M3 21C3 11 10 3 21 3c0 11-7 18-18 18z" fill="currentColor"/><path d="M3 21C9 14 13 10 21 3" stroke="rgba(255,255,255,.55)" stroke-width="1.2" fill="none"/></svg></span><span style="left:74%;--d:14s;--w:1.2s;--r:-50deg;color:#8fdc3a"><svg viewBox="0 0 24 24"><path d="M3 21C3 11 10 3 21 3c0 11-7 18-18 18z" fill="currentColor"/><path d="M3 21C9 14 13 10 21 3" stroke="rgba(255,255,255,.55)" stroke-width="1.2" fill="none"/></svg></span><span style="left:90%;--d:10.5s;--w:6.5s;--r:25deg;color:#5ecb55"><svg viewBox="0 0 24 24"><path d="M3 21C3 11 10 3 21 3c0 11-7 18-18 18z" fill="currentColor"/><path d="M3 21C9 14 13 10 21 3" stroke="rgba(255,255,255,.55)" stroke-width="1.2" fill="none"/></svg></span></div></div></div>
+<div id="app"><div class="load"><span class="sprout" style="display:inline-block">🌱</span></div></div>
+<nav id="nav" hidden></nav>
+<script src="/enc.js?v=24"></script>
+<script src="/data.js?v=24"></script>
+<script src="/data2.js?v=24"></script>
+<script src="/data3.js?v=24"></script>
+<script>
+const tg=window.Telegram?.WebApp;tg?.ready();tg?.expand();
+const $=s=>document.querySelector(s),app=$('#app');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fd=t=>new Date(t).toLocaleDateString('ru-RU');
+let me=null,stack=[],cur='home';
+const ACH={first:['🌱','Первый урок'],five:['📚','5 уроков'],garden:['🪴','Свой огород'],week:['📅','7 дней с нами'],promo:['🏷️','Промокод'],vip:['👑','VIP-садовод']};
+async function api(action,data={}){
+  const r=await fetch('/api/rpc',{method:'POST',headers:{'content-type':'application/json','x-init':tg?.initData||''},body:JSON.stringify({action,...data})});
+  const j=await r.json().catch(()=>({error:'Ошибка сети'}));if(!r.ok)throw new Error(j.error||'Ошибка');return j;
+}
+function toast(t,err){const e=document.createElement('div');e.className='toast'+(err?' err':'');e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),2600)}
+const act=async(fn)=>{try{return await fn()}catch(e){toast(e.message,1)}};
+const head=(t,back=1,x='')=>`<div class="top">${back&&!root.includes(cur)?'<button class="back" aria-label="Назад" onclick="back()">‹</button>':''}<b>${t}</b>${x}<button class="back" aria-label="Поиск" onclick="go('search','')">🔍</button>${me?.vip?'<span style="font-size:26px">👑</span>':''}</div>`;
+const tabs=[['home','<svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 11 12 3.8l8.5 7.2"/><path d="M5.5 9.8V20h13V9.8"/><path d="M10 20v-5.5h4V20"/></svg>','Главная'],['garden','<svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 13c0-3.6-2.6-6-6.5-6 0 3.8 2.6 6 6.5 6z"/><path d="M12 11c0-3.2 2.3-5.6 6-5.6 0 3.6-2.4 5.6-6 5.6z"/><path d="M8 21h8"/></svg>','Грядки'],['calendar','<svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 17.3h.01M12 17.3h.01"/></svg>','Календарь'],['lessons','<svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.6 3.5 5v13.5c3.5-.4 6.5 0 8.5 1.5 2-1.5 5-1.9 8.5-1.5V5c-3.5-.4-6.5 0-8.5 1.5z"/><path d="M12 6.5V20"/></svg>','Уроки'],['more','<svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18.5" cy="12" r="1.4"/></svg>','Ещё']];
+function go(v,a){if(v==='lesson')LS=null;stack.push([cur,curArg]);cur=v;curArg=a;draw()}
+let curArg;
+function back(){const p=stack.pop();if(p){cur=p[0];curArg=p[1];if(cur==='lesson'&&LS&&LS.res)LS=null;draw()}}
+function tab(v){stack=[];cur=v;curArg=null;draw()}
+const root=['home','garden','calendar','lessons','more'];
+let DRN=0;
+async function draw(){
+  const my=++DRN;
+  if(me&&!me.profile)cur='onboard';
+  const nav=$('#nav');nav.hidden=!me||!root.includes(cur);
+  nav.innerHTML=tabs.map(([v,i,t])=>`<button class="${v===cur?'on':''}" onclick="tab('${v}')"><i>${i}</i>${t}</button>`).join('');
+  window.scrollTo(0,0);
+  if(tg){tg.BackButton[stack.length?'show':'hide']();}
+  let html;
+  try{html='<div class="view">'+await V[cur](curArg)+'</div>'}catch(e){html=head('Садовест',0)+`<div class="card center">${esc(e.message)}<button class="btn" onclick="init()">Повторить</button></div>`}
+  if(my!==DRN)return; // пока грузился этот экран, пользователь уже ушёл на другой
+  app.innerHTML=html;
+}
+tg?.BackButton.onClick(back);
+const V={
+home:()=>`<h1>Привет, ${esc(me.name)}!</h1>
+<div class="grid">
+${[['lessons','📖','Уроки'],['garden','🪴','Мой огород'],['vip','👑','VIP-клуб','vip'],['support','🛟','Поддержка'],['calendar','🗓️','Календарь']].map(([v,i,t,c])=>`<button class="tile ${c||''}" onclick="go('${v}')"><i>${i}</i>${t}</button>`).join('')}
+</div>
+${me.vip?'':`<button class="banner" onclick="go('vip')"><i>👑</i><span>VIP-доступ<small>Больше знаний. Больше возможностей.</small></span></button>`}
+${me.admin?`<button class="btn ghost" onclick="go('admin')">⚙️ Панель администратора</button>`:''}`,
+
+async lessons(){
+  const {items}=await api('lessons');const row=l=>`<button class="les ${l.locked?'lock':''}" onclick="${l.locked?"go('vip')":`go('lesson',${l.id})`}"><span class="n">${l.locked?'🔒':l.done?'✅':l.id}</span><span>${esc(l.title)}</span><span class="tag ${l.free?'':'v'}">${l.free?'Бесплатно':'VIP'}</span></button>`;
+  return head('Уроки',0)+`<div class="mute">Доступно уроков: ${me.vip?items.length:items.filter(l=>l.free).length} из ${items.length}</div><h2>Бесплатные уроки</h2>`+items.filter(l=>l.free).map(row).join('')+`<h2>VIP-уроки (${items.filter(l=>!l.free).length})</h2>`+items.filter(l=>!l.free).map(row).join('')},
+
+async lesson(id){const l=await api('lesson',{id});
+  return head('Урок')+`<div class="card"><h2 style="margin-top:0">${esc(l.title)}</h2><p>${esc(l.text)}</p></div><button class="btn" ${l.done?'disabled':''} onclick="finish(${l.id})">${l.done?'✅ Пройден':'Отметить пройденным'}</button>`},
+
+vip:()=>`${head('VIP-клуб')}<div class="card prem"><div class="center" style="font-size:56px">👑</div><h1 class="center" style="margin:0">VIP-клуб</h1><p class="center" style="margin:2px 0 14px">Больше знаний — больше возможностей</p>
+${['📚 Расширенные VIP-уроки','🛟 Профессиональная поддержка','⭐ Эксклюзивные материалы','🏅 Золотой значок'].map(t=>`<p style="margin:8px 0;font-weight:800">${t}</p>`).join('')}
+${me.vip?`<p class="center" style="font-weight:800">VIP активен до ${fd(me.vip_until)}</p>`:''}
+${me.discount?`<p class="center" style="font-weight:800">🏷 Ваша скидка ${me.discount.value}% (промокод ${esc(me.discount.code)})<br><small style="font-weight:600">Укажите этот промокод при оплате</small></p>`:''}
+<button class="btn gold" onclick="buy()">${me.vip?'Продлить VIP':'Купить VIP'}</button></div>${promoBox()}`,
+
+promo:()=>head('Промокод')+promoBox(),
+async support(){
+  if(!me.vip)return head('VIP-эксперт')+`<div class="card center"><div style="font-size:44px">🔒</div><b>Поддержка доступна только VIP-пользователям</b><div class="mute">Ответ в течение 1–2 часов</div><button class="btn gold" onclick="go('vip')">Открыть VIP</button></div>`;
+  const {items}=await api('tickets');
+  return head('VIP-эксперт')+(items.length?items.slice().reverse().map(t=>`<div class="msg me">${esc(t.text)}<div class="mute">${fd(t.created)}</div></div>${t.reply?`<div class="msg ex"><b>Эксперт 👑</b><br>${esc(t.reply)}</div>`:'<div class="mute center">Ждём ответа эксперта…</div>'}`).join(''):'<div class="card center">Опишите проблему с растением — эксперт ответит в течение 1–2 часов.</div>')+`<textarea id="tx" rows="3" maxlength="1000" placeholder="Напишите сообщение…"></textarea><button class="btn" onclick="sendT()">Отправить</button>`},
+
+
+async garden(){const {items}=await api('plants');return head('Мой огород')+(items.length?items.map(p=>`<div class="card"><div class="row"><b>🌿 ${esc(p.name)}</b><span class="mute" style="text-align:right">полив каждые ${p.every} дн.</span></div><div class="mute">Последний полив: ${fd(p.last)}</div><div class="row" style="margin-top:8px"><button class="btn sm" onclick="plant('plant_water',${p.id})">💧 Полил(а)</button><button class="btn sm ghost" onclick="plant('plant_del',${p.id})">Удалить</button></div></div>`).join(''):'<div class="card center">Добавьте первое растение, и мы напомним о поливе</div>')+`<div class="card"><input id="pn" maxlength="40" placeholder="Название (например, томаты)"><input id="pe" type="number" min="1" max="60" value="3" aria-label="Полив раз в N дней"><div class="mute">Поливать раз в N дней</div><button class="btn" onclick="addPlant()">Добавить растение</button></div>`},
+
+async calendar(){const {items}=await api('plants');const l=items.map(p=>({...p,next:p.last+p.every*864e5})).sort((a,b)=>a.next-b.next);
+  return head('Календарь')+(l.length?l.map(p=>`<div class="card row"><b>💧 ${esc(p.name)}</b><span style="text-align:right;color:${p.next<Date.now()?'var(--red)':'inherit'}">${p.next<Date.now()?'Пора!':fd(p.next)}</span></div>`).join(''):'<div class="card center">Добавьте растения в «Мой огород» — здесь появится расписание полива</div>')+`<div class="card row"><span>🔔 Напоминания в Telegram</span><button class="btn sm ${me.notify?'':'ghost'}" onclick="toggleN()">${me.notify?'Включены':'Выключены'}</button></div>`},
+
+
+profile(){return head('Профиль')+`<div class="center"><div class="ava ${me.vip?'vip':''}">${esc([...me.name][0]||'С').toUpperCase()}${me.vip?'<s>👑</s>':''}</div><h2 style="margin:4px 0">${esc(me.name)}</h2>${me.vip?`<div class="tag v" style="display:inline-block;font-size:14px;padding:6px 14px">VIP активен до ${fd(me.vip_until)}</div>`:'<div class="mute">Обычный аккаунт</div>'}</div>
+<div class="card">Пройдено уроков: ${me.done} из ${me.total}<div class="bar"><div style="width:${Math.round(me.done/me.total*100)}%"></div></div></div>
+<div class="stat" style="grid-template-columns:1fr 1fr 1fr"><div class="center"><b>${me.days}</b>дней</div><div class="center"><b>${me.ach.length}</b>наград</div><div class="center"><b>${me.coins}</b>монет</div></div>
+<h2>Достижения</h2><div class="grid">${Object.entries(ACH).map(([k,[i,t]])=>`<div class="card center" style="margin:0;opacity:${me.ach.includes(k)?1:.35}"><div style="font-size:30px">${i}</div>${t}</div>`).join('')}</div>
+<button class="btn" onclick="go('promo')">Ввести промокод</button>${me.admin?`<button class="btn ghost" onclick="go('admin')">⚙️ Панель администратора</button>`:''}`},
+
+async admin(){
+  const [s,p,t]=await Promise.all([api('admin_stats'),api('admin_promos'),api('admin_tickets')]);
+  return head('Администратор')+`<div class="stat"><div><b>${s.users}</b>Пользователи</div><div><b>${s.vip}</b>VIP</div><div><b>${s.tickets}</b>Тикеты</div><div><b>${s.promos}</b>Промокоды</div></div>
+<h2>Промокоды</h2>${p.items.map(x=>`<div class="card"><b>${esc(x.code)}</b> <span class="mute">${{vip:'VIP '+x.value+' дн.',coins:x.value+' монет',discount:'скидка '+x.value+'%'}[x.type]}</span><div class="mute">Использовано: ${x.used}${x.limit?' / '+x.limit:''} • ${x.expires?'до '+fd(x.expires):'без срока'} • ${x.active?'активен':'отключён'}</div><div class="row" style="margin-top:8px"><button class="btn sm ghost" onclick="adm('admin_promo_toggle',{code:'${esc(x.code)}'})">${x.active?'Отключить':'Включить'}</button><button class="btn sm ghost" onclick="if(confirm('Удалить?'))adm('admin_promo_del',{code:'${esc(x.code)}'})">Удалить</button></div></div>`).join('')||'<div class="mute">Пока нет</div>'}
+<div class="card"><b>Создать промокод</b><input id="ac" placeholder="КОД (A-Z, 0-9)"><select id="at"><option value="vip">VIP (дни)</option><option value="coins">Монеты</option><option value="discount">Скидка %</option></select><input id="av" type="number" placeholder="Значение"><input id="al" type="number" placeholder="Лимит активаций (0 — без лимита)"><input id="ad" type="number" placeholder="Срок действия, дней (0 — бессрочно)"><button class="btn" onclick="newPromo()">Создать</button></div>
+<div class="card"><b>Выдать VIP</b><input id="gu" type="number" placeholder="Telegram ID"><input id="gd" type="number" placeholder="Дней" value="30"><button class="btn" onclick="grant()">Выдать</button></div>
+<h2>Тикеты</h2>${t.items.map(x=>`<div class="card"><b>#${x.id} ${esc(x.name)}</b> <span class="mute">${x.status==='open'?'открыт':'закрыт'}</span><p>${esc(x.text)}</p>${x.reply?`<div class="msg ex">${esc(x.reply)}</div>`:`<input id="r${x.id}" placeholder="Ответ"><button class="btn sm" style="margin-top:8px" onclick="reply(${x.id})">Ответить</button>`}</div>`).join('')||'<div class="mute">Нет тикетов</div>'}`}
+};
+const promoBox=()=>`<div class="card"><b>Промокод</b><input id="pc" maxlength="20" autocapitalize="characters" placeholder="Введите промокод"><button class="btn" onclick="usePromo()">Активировать</button></div>`;
+function link(u){if(!u)return toast('Ссылка пока не настроена',1);u.startsWith('https://t.me')&&tg?tg.openTelegramLink(u):tg?tg.openLink(u):open(u)}
+const buy=()=>link((me.cfg.buy||'').replace(/\{code\}/g,encodeURIComponent(me.discount?.code||'')).replace(/\{discount\}/g,me.discount?.value||0).replace(/\{id\}/g,me.id));
+const refresh=async()=>{me=await api('me')};
+const usePromo=()=>act(async()=>{const was=me.vip;const r=await api('promo',{code:$('#pc').value});await refresh();if(!was&&me.vip)celebrate('👑','Добро пожаловать в VIP!',r.msg);else toast('✅ '+r.msg);tab('profile')});
+const finish=id=>act(async()=>{const b=me.ach.length;await api('done',{id});await refresh();me.ach.length>b?celebrate('🏅','Новое достижение!',ACH[me.ach[me.ach.length-1]][1]):toast('Урок пройден! +2 🪙');back()});
+const sendT=()=>act(async()=>{await api('ticket_new',{text:$('#tx').value,photo:PH});PH='';toast('Отправлено');draw()});
+const addPlant=()=>act(async()=>{const name=$('#pn').value.trim(),rawEvery=$('#pe').value.trim(),every=Number(rawEvery);if(!name)return toast('Введите название растения',1);if(name.length>40)return toast('Название растения: максимум 40 символов',1);if(!/^\d{1,2}$/.test(rawEvery)||!Number.isInteger(every)||every<1||every>60)return toast('Интервал полива: целое число от 1 до 60 дней',1);await api('plant_add',{name,every});await refresh();draw()});
+const plant=(a,id)=>act(async()=>{await api(a,{id});await refresh();draw()});
+const plantInterval=id=>act(async()=>{const rawEvery=$('#pi'+id).value.trim(),every=Number(rawEvery);if(!/^\d{1,2}$/.test(rawEvery)||!Number.isInteger(every)||every<1||every>60)return toast('Введите целое число от 1 до 60 дней',1);await api('plant_interval',{id,every});await refresh();draw();toast('Интервал полива обновлён')});
+const toggleN=()=>act(async()=>{await api('notify',{on:!me.notify});await refresh();draw()});
+const adm=(a,d)=>act(async()=>{await api(a,d);draw()});
+const newPromo=()=>adm('admin_promo_new',{code:$('#ac').value,type:$('#at').value,value:$('#av').value,limit:$('#al').value,days:$('#ad').value});
+const grant=()=>act(async()=>{await api('admin_grant',{uid:$('#gu').value,days:$('#gd').value});toast('VIP выдан')});
+const reply=id=>adm('admin_reply',{id,text:$('#r'+id).value});
+async function init(){applySet();
+  if(!tg?.initData){app.innerHTML=head('Садовест',0)+'<div class="card center"><div style="font-size:44px">📱</div>Откройте приложение через Telegram-бота «Садовест»</div>';return}
+  try{await refresh();if(!me.profile)cur='onboard';draw()}catch(e){app.innerHTML=head('Садовест',0)+`<div class="card center">${esc(e.message)}<button class="btn" onclick="init()">Повторить</button></div>`}
+}
+// ---- v2: уроки, каталог, игры, эффекты ----
+V.lesson=async id=>{const l=await api('lesson',{id});
+  return head('Урок')+`<div class="card glow"><h2 style="margin:0 0 6px">${esc(l.title)}</h2><div class="mute">${esc(l.intro)}</div></div>`+l.sections.map(([h,t],i)=>`<div class="card sec" style="--d:${i*.1}s"><b>${['🌱','💧','☀️','🛡️','📌'][i%5]} ${esc(h)}</b><p>${esc(t)}</p></div>`).join('')+`<div class="card tipc">💡 <b>Совет эксперта:</b> ${esc(l.tip)}</div><button class="btn" ${l.done?'disabled':''} onclick="finish(${l.id})">${l.done?'✅ Пройден':'Отметить пройденным'}</button>`};
+const plIdx=name=>{let b=-1;PLANTS.forEach((p,i)=>{if(name.includes(p.n)&&(b<0||p.n.length>PLANTS[b].n.length))b=i});return b};
+V.garden=async()=>{const {items}=await api('plants');
+  return head('Мой огород')+`<details class="card"><summary><b>➕ Добавить из каталога (${PLANTS.length})</b></summary><div class="grid3" style="margin-top:8px">${PLANTS.map((p,i)=>`<button class="pl ${encOk('p'+i)?'':'lk'}" onclick="go('plantinfo',${i})"><i>${encOk('p'+i)?(pimg(p.n)||p.e):'🔒'}</i>${p.n}</button>`).join('')}</div></details><h2>Мои растения</h2>`+(items.length?items.map(p=>{const k=plIdx(p.name);return `<div class="card"><div class="row plant-row"><b>${esc(p.name)}</b><span class="mute">полив каждые ${p.every} дн.</span></div><div class="mute">Последний полив: ${fd(p.last)}</div><div class="row" style="margin-top:8px"><button class="btn sm" onclick="plant('plant_water',${p.id})">💧 Полил(а)</button>${k>=0?`<button class="btn sm ghost" onclick="go('plantinfo',${k})">Советы</button>`:''}<button class="btn sm ghost" onclick="plant('plant_del',${p.id})">Удалить</button></div><details style="margin-top:10px"><summary class="mute">Изменить интервал полива</summary><div class="row" style="margin-top:8px"><input id="pi${p.id}" type="number" min="1" max="60" step="1" inputmode="numeric" value="${p.every}" aria-label="Новый интервал полива в днях"><button class="btn sm" onclick="plantInterval(${p.id})">Сохранить</button></div><div class="mute">Целое число от 1 до 60 дней</div></details></div>`}).join(''):'<div class="card center">Выберите растение в каталоге выше</div>')+`<div class="card"><b>Своё растение</b><input id="pn" maxlength="40" placeholder="Название (до 40 символов)"><input id="pe" type="number" min="1" max="60" step="1" inputmode="numeric" value="3" aria-label="Полив раз в N дней"><div class="mute">Поливать раз в целое число дней: от 1 до 60</div><button class="btn" onclick="addPlant()">Добавить</button></div>`};
+V.plantinfo=i=>{const p=PLANTS[i];return head(p.n)+`<div class="card glow center"><div class="big">${p.e}</div><h2 style="margin:0">${p.n}</h2><div class="mute">${p.k} • ${p.s} • полив каждые ${p.w} дн.</div></div><div class="card"><b>О растении</b><p>${p.i}</p><b>Когда сажать</b><p>${p.t}</p><b>Советы</b>${p.c.map(x=>`<p>✅ ${x}</p>`).join('')}</div><button class="btn" onclick="addP(${i})">Добавить в мой огород</button>`};
+const addP=i=>act(async()=>{const p=await encItem('p',i);await api('plant_add',{name:p.e+' '+p.n,every:p.w});await refresh();toast('Добавлено в огород 🌿');back()});
+// ---- v3 ----
+const chips=(k,o)=>`<div class="chips">${o.map(x=>`<button class="chip ${S2[k]===x?'on':''}" onclick="S2.${k}='${x}';draw()">${x}</button>`).join('')}</div>`;
+const S2={pt:'Растения',lv:'Все'};
+const bm=k=>`<button class="back" style="margin-left:auto" aria-label="Закладка" onclick="mark('${k}')">${me.bookmarks.includes(k)?'⭐':'☆'}</button>`;
+const mark=k=>act(async()=>{me.bookmarks=(await api('bookmark',{key:k})).bookmarks;draw()});
+// онбординг
+// главная
+// уроки по уровням
+V.lessons=async()=>{const {items}=await api('lessons'),L=['Начинающий','Любитель','Мастер'];
+  const row=l=>`<button class="les ${l.locked?'lock':''}" onclick="${l.locked?"go('vip')":`go('lesson',${l.id})`}"><span class="n">${l.locked?'🔒':l.done?'✅':l.id}</span><span>${esc(l.title)}</span><span class="tag ${l.free?'':'v'}">${l.free?'Бесплатно':'VIP'}</span></button>`;
+  return head('Уроки',0)+chips('lv',['Все',...L])+L.filter(l=>S2.lv==='Все'||S2.lv===l).map(l=>`<h2>${{Начинающий:'🌱',Любитель:'🌿',Мастер:'🌳'}[l]} ${l}</h2>`+items.filter(i=>i.level===l).map(row).join('')).join('')};
+// урок: слайды + 3 вопроса
+let LS=null;const ICO=['🌱','💧','☀️','🛡️','📌'];
+V.lesson=async id=>{if(!LS||LS.l.id!==id)LS={l:await api('lesson',{id}),i:0,a:[]};
+  const {l,i}=LS,sl=[...l.sections.map(([h,t],k)=>[ICO[k%5]+' '+h,t]),['🤯 Интересный факт',l.fact],['💡 Совет эксперта',l.tip]],n=sl.length,hd=head('Урок',1,bm('l:'+id));
+  if(i<n)return hd+(l.done?'<div class="card tipc">✅ Урок уже пройден. Повторное прохождение не даёт монет.</div>':'')+`<div class="mute">${esc(l.title)} • слайд ${i+1} из ${n}</div><div class="bar"><div style="width:${(i+1)/n*100}%"></div></div><div class="card sec glow"><b style="font-size:19px">${sl[i][0]}</b><p style="font-size:17px">${esc(sl[i][1])}</p></div><div class="row">${i?'<button class="btn ghost" onclick="LS.i--;draw()">‹ Назад</button>':''}<button class="btn" onclick="LS.i++;draw()">${i===n-1?'К вопросам ›':'Далее ›'}</button></div>`;
+  return hd+`<h2>Проверка: 3 вопроса</h2><div class="mute">Нужно верно ответить минимум на 2</div>`+l.quiz.map((q,qi)=>`<div class="card"><b>${esc(q.q)}</b>${q.o.map((x,k)=>`<button class="les ${LS.a[qi]===x?'pick':''}" onclick="pickA(${qi},${k})">${esc(x)}</button>`).join('')}</div>`).join('')+`<button class="btn" onclick="submitL()">Завершить урок</button>`};
+// энциклопедия
+V.plants=()=>{const P=S2.pt==='Растения',src=P?PLANTS:PESTS;let last='';
+  return head('Энциклопедия')+chips('pt',['Растения','Болезни и вредители'])+src.map((x,i)=>[x,i]).sort((a,b)=>a[0].n.localeCompare(b[0].n,'ru')).map(([x,i])=>{const L=x.n[0].toUpperCase(),h=L!==last?(last=L,`<h2>${L}</h2>`):'';return h+`<button class="les" onclick="go('${P?'plantinfo':'pestinfo'}',${i})"><span class="n">${x.e}</span><span>${x.n}<div class="mute">${x.k}</div></span></button>`}).join('')};
+V.plantinfo=i=>{const p=PLANTS[i];return head(p.n,1,bm('p:'+i))+`<div class="card glow center"><div class="big">${p.e}</div><h2 style="margin:0">${p.n}</h2><div class="mute">${p.k} • ${p.s} • полив каждые ${p.w} дн.</div></div><div class="card"><b>О растении</b><p>${p.i}</p><b>Когда сажать</b><p>${p.t}</p><b>Советы</b>${p.c.map(x=>`<p>✅ ${x}</p>`).join('')}</div><button class="btn" onclick="addP(${i})">Добавить в мой огород</button>`};
+V.pestinfo=i=>{const p=PESTS[i];return head(p.n,1,bm('d:'+i))+`<div class="card glow center"><div class="big">${p.e}</div><h2 style="margin:0">${p.n}</h2><div class="mute">${p.k}</div></div><div class="card"><b>Признаки</b><p>${p.i}</p><b>Как бороться</b>${p.c.map(x=>`<p>✅ ${x}</p>`).join('')}</div>`};
+// закладки и поиск
+V.marks=async()=>{const L=(await api('lessons')).items;
+  const row=k=>{const [t,i]=k.split(':'),o=t==='l'?L.find(x=>x.id==i):t==='p'?PLANTS[i]:PESTS[i];if(!o)return'';return `<button class="les" onclick="go('${t==='l'?'lesson':t==='p'?'plantinfo':'pestinfo'}',${i})"><span class="n">${t==='l'?'📖':o.e}</span><span>${esc(o.title||o.n)}</span></button>`};
+  return head('Закладки')+(me.bookmarks.length?me.bookmarks.map(row).join(''):'<div class="card center">Нажмите ☆ на уроке, растении или болезни, чтобы сохранить</div>')};
+let SL=[];
+const results=q=>{q=(q||'').toLowerCase().trim();if(!q)return'<div class="mute center">Введите запрос</div>';const o=[];
+  SL.filter(x=>x.title.toLowerCase().includes(q)).forEach(x=>o.push([`${x.locked?'🔒':'📖'} ${x.title}`,x.locked?"go('vip')":`go('lesson',${x.id})`]));
+  PLANTS.forEach((x,i)=>(x.n+(x.i||'')+(x.c||[]).join()).toLowerCase().includes(q)&&o.push([`${x.e} ${x.n}`,`go('plantinfo',${i})`]));
+  PESTS.forEach((x,i)=>(x.n+(x.i||'')+(x.c||[]).join()).toLowerCase().includes(q)&&o.push([`${x.e} ${x.n}`,`go('pestinfo',${i})`]));
+  HACKS.forEach((x,i)=>(x[1]+x[2]).toLowerCase().includes(q)&&o.push([`💡 ${x[1]}`,"go('hacks')"]));DICT.forEach(x=>(x[0]+x[1]).toLowerCase().includes(q)&&o.push([`📖 ${x[0]}: ${x[1].slice(0,40)}…`,"go('dict')"]));
+  return o.length?o.slice(0,30).map(([t,a])=>`<button class="les" onclick="${a}">${esc(t)}</button>`).join(''):'<div class="card center">Ничего не найдено</div>'};
+V.search=async q=>{SL=(await api('lessons')).items;return head('Поиск')+`<input value="${esc(q||'')}" oninput="$('#sr').innerHTML=results(this.value)" placeholder="Что ищем?"><div id="sr">${results(q)}</div>`};
+// погода
+V.weather=async()=>{const city=me.profile?.city||'Москва';
+  const g=await(await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=ru&name='+encodeURIComponent(city))).json();
+  if(!g.results)return head('Погода')+`<div class="card center">Город «${esc(city)}» не найден.</div>${cityBox()}`;
+  const {latitude:la,longitude:lo,name}=g.results[0],w=await(await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&forecast_days=7`)).json(),d=w.daily;
+  return head('Погода для огорода')+`<div class="mute">📍 ${esc(name)}</div>`+d.time.map((t,i)=>{const mx=d.temperature_2m_max[i],mn=d.temperature_2m_min[i],p=d.precipitation_sum[i],tip=mn<=1?'❄️ Заморозок: укройте рассаду и всходы':p>=3?'🌧 Дождь: полив не нужен':mx>=28?'🔥 Жара: поливайте вечером, притените':'✅ Хороший день для работ в саду';return `<div class="card"><div class="row"><b>${new Date(t).toLocaleDateString('ru-RU',{weekday:'short',day:'numeric',month:'short'})}</b><span style="text-align:right">${Math.round(mn)}…${Math.round(mx)} °C • ${p} мм</span></div><div class="mute">${tip}</div></div>`}).join('')+cityBox()};
+const cityBox=()=>`<div class="card"><b>Сменить город</b><input id="wc" placeholder="Город"><button class="btn" onclick="setCity()">Сохранить</button></div>`;
+const setCity=()=>act(async()=>{await api('onboard',{...me.profile,city:$('#wc').value});await refresh();draw()});
+// рейтинг
+V.board=async()=>{const {items,you}=await api('lb'),all=[...items,{nick:me.name+' (вы)',score:you,me:1}].sort((a,b)=>b.score-a.score);
+  return head('Рейтинг')+all.slice(0,30).map((x,i)=>`<div class="card row ${x.me?'glow':''}"><b>${['🥇','🥈','🥉'][i]||i+1}</b><span style="flex:3">${esc(x.nick)}</span><b style="text-align:right">${x.score} 🪙</b></div>`).join('')};
+const _adm=V.admin;V.admin=async()=>{const b=await _adm(),{items}=await api('lb');window.LBI=items;
+  return b+`<h2>Рейтинг (лидерборд)</h2>`+items.map((x,i)=>`<div class="card row"><span>${esc(x.nick)} — ${x.score}</span><button class="btn sm ghost" onclick="adm('admin_lb_del',{nick:LBI[${i}].nick})">Удалить</button></div>`).join('')+`<div class="card"><b>Добавить / изменить участника</b><input id="ln" maxlength="24" placeholder="Ник"><input id="ls" type="number" placeholder="Рейтинг"><button class="btn" onclick="adm('admin_lb_set',{nick:$('#ln').value,score:$('#ls').value})">Сохранить</button></div>`};
+// PDF
+const FILES=[['cal','📅','Календарь посадок',0],['water','💧','Чек-лист полива',0],['pests','🐛','Шпаргалка: болезни и вредители',1],['plan','🗓️','Годовой план садовода',1]];
+V.files=()=>head('Материалы')+'<div class="mute">PDF придёт вам в чат с ботом</div>'+FILES.map(([id,e,t,v])=>`<button class="les" onclick="${v&&!me.vip?"go('vip')":`getPdf('${id}')`}"><span class="n">${e}</span><span>${t}</span><span class="tag ${v?'v':''}">${v?(me.vip?'VIP':'🔒 VIP'):'Бесплатно'}</span></button>`).join('');
+const getPdf=id=>act(async()=>{await api('pdf',{id});toast('📄 Отправлено в чат с ботом')});
+// поддержка с фото
+let PH='';
+function pickPhoto(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);PH=c.toDataURL('image/jpeg',.8);$('#pv').src=PH;$('#pv').hidden=false};im.src=r.result};r.readAsDataURL(f)}
+V.support=async()=>{if(!me.vip)return head('VIP-эксперт')+`<div class="card center"><div style="font-size:44px">🔒</div><b>Поддержка доступна только VIP-пользователям</b><div class="mute">Ответ в течение 1–2 часов</div><button class="btn gold" onclick="go('vip')">Открыть VIP</button></div>`;
+  const {items}=await api('tickets');
+  return head('VIP-эксперт')+(items.length?items.slice().reverse().map(t=>`<div class="msg me">${esc(t.text)}${t.photo?'<div>📷 фото приложено</div>':''}<div class="mute">${fd(t.created)}</div></div>${t.reply?`<div class="msg ex"><b>Эксперт 👑</b><br>${esc(t.reply)}</div>`:'<div class="mute center">Ждём ответа эксперта…</div>'}`).join(''):'<div class="card center">Опишите проблему и приложите фото растения — эксперт ответит в течение 1–2 часов.</div>')+`<textarea id="tx" rows="3" maxlength="1000" placeholder="Напишите сообщение…"></textarea><img id="pv" hidden style="max-width:100%;border-radius:14px;margin-top:8px"><label class="btn ghost" style="display:block;text-align:center;box-sizing:border-box">📷 Прикрепить фото<input type="file" accept="image/*" hidden onchange="pickPhoto(this)"></label><button class="btn" onclick="sendT()">Отправить</button>`};
+// ---- v4 ----
+function celebrate(icon,title,sub){SND.reward();const o=document.createElement('div');o.className='cele';o.innerHTML=`<div class="cbox"><div class="ci">${icon}</div><h2>${esc(title)}</h2><p>${esc(sub)}</p><button class="btn" onclick="this.closest('.cele').remove()">Отлично</button></div>`;document.body.append(o)}
+function burst(){}
+let OB={place:[]};const PL=['Дача','Теплица','Балкон','Огород во дворе','Подоконник'];
+const tipsFor=()=>{const p=me.profile||{};return `${MON[new Date().getMonth()]} ${[].concat(p.place||[]).map(x=>PLACE[x]||'').join(' ')} ${LEVELT[p.level]||''}`};
+const obq=(k,t,o)=>`<div class="card"><b>${t}</b><div class="chips">${o.map(x=>`<button class="chip ${OB[k]===x?'on':''}" onclick="OB.${k}='${x}';draw()">${x}</button>`).join('')}</div></div>`;
+const togPl=i=>{const x=PL[i];OB.place=OB.place.includes(x)?OB.place.filter(y=>y!==x):[...OB.place,x];draw()};
+V.onboard=()=>`<h1>Добро пожаловать! 🌱</h1><div class="mute">Ответьте на три вопроса — без них приложение не откроется</div><div class="card"><b>1. Где вы выращиваете растения? (можно несколько)</b><div class="chips">${PL.map((x,i)=>`<button class="chip ${OB.place.includes(x)?'on':''}" onclick="togPl(${i})">${x}</button>`).join('')}</div></div>${obq('level','2. Ваш опыт?',['Новичок','Любитель','Опытный'])}<div class="card"><b>3. Ваш город или регион</b><input value="${esc(OB.city||'')}" oninput="OB.city=this.value" placeholder="Например, Краснодар"></div><button class="btn" onclick="saveOB()">Начать</button>`;
+const saveOB = () => act(async () => {
+  if (!OB.place.length || !OB.level || !(OB.city || '').trim()) {
+    toast('Пожалуйста, заполните все поля: место, опыт и город', 1);
+    return;
+  }
+  try {
+    await api('onboard', OB);
+    await refresh();
+    tab('home');
+    setTimeout(maybeTour, 900);
+  } catch (e) {
+    throw new Error('Не удалось сохранить профиль. Попробуйте еще раз.');
+  }
+});
+V.home=()=>`<h1>Привет, ${esc(me.name)}!</h1><input placeholder="🔍 Поиск по урокам, растениям, болезням…" onkeydown="if(event.key==='Enter')go('search',this.value)"><div class="card tipc" style="margin-top:12px">🌤 <b>Совет:</b> ${esc(tipsFor())}</div><div class="card row"><span>🪙 Монеты</span><span style="text-align:right"><b>${me.coins}</b></span></div><div class="grid" style="margin-top:10px">${[['lessons','📖','Уроки'],['tests','📝','Тесты'],['garden','🪴','Мой огород'],['plants','🌿','Энциклопедия'],['weather','🌦️','Погода'],['faq','❓','Вопросы и ответы'],['board','🏆','Рейтинг'],['marks','🔖','Закладки'],['files','📄','Материалы'],['vip','👑','VIP-клуб','vip'],['support','🛟','Поддержка'],['calendar','🗓️','Календарь']].map(([v,i,t,c])=>`<button class="tile ${c||''}" onclick="${['lessons','plants'].includes(v)?'tab':'go'}('${v}')"><i>${i}</i>${t}</button>`).join('')}</div>${me.vip?'':`<button class="banner" onclick="go('vip')"><i>👑</i><span>VIP-доступ<small>Все уроки и поддержка экспертов</small></span></button>`}${me.admin?`<button class="btn ghost" onclick="go('admin')">⚙️ Панель администратора</button>`:''}`;
+// исправление: ответы в уроке сбрасывались, а на экране оставались выбранными
+const pickA=(qi,k)=>{LS.a[qi]=LS.l.quiz[qi].o[k];const y=window.scrollY;draw().then(()=>window.scrollTo(0,y))};
+// тесты
+let TS=null;
+V.tests=async()=>{const {items}=await api('tests');
+  const row=(t,i)=>`<button class="les" onclick="startTest(${t.id})"><span class="n">${t.gen?'⭐':i+1}</span><span>${esc(t.title)}<div class="mute">${t.section} • ${t.n} вопросов${t.best!=null?' • лучший: '+t.best+'/'+t.n:''}</div></span></button>`;
+  return head('Тесты')+'<div class="mute">Тест засчитывается, если верно минимум половина ответов. Монеты начисляются за улучшение результата.</div>'+[['Начинающий','🌱'],['Любитель','🌿'],['Мастер','🌳']].map(([l,e])=>`<h2>${e} ${l}</h2>`+items.filter(t=>t.level===l).map((t,i,a)=>row(t,a.slice(0,i).filter(x=>!x.gen).length)).join('')).join('')};
+const startTest=id=>act(async()=>{TS={t:await api('test',{id}),i:0,a:[],res:null,busy:0};go('testrun')});
+V.testrun=()=>{const {t,i}=TS;
+  if(TS.res){const r=TS.res;return head(t.title)+`<div class="card center"><div class="big">${r.score>=r.total*.8?'🏆':r.score>=r.total/2?'👍':'📚'}</div><h2>${r.score} из ${r.total}</h2><div class="mute">${r.coins?`+${r.coins} 🪙`:'Попробуйте улучшить результат'}</div></div>`+(r.review.length?'<h2>Разбор ошибок</h2>'+r.review.map(x=>`<div class="card"><b>${esc(x.q)}</b><p>Ваш ответ: ${esc(x.mine||'—')}</p><p>✅ Верно: ${esc(x.right)}</p></div>`).join(''):'<div class="card center">Без ошибок! 🎉</div>')+'<button class="btn" onclick="back()">К тестам</button>'}
+  const q=t.questions[i];return head(t.title)+`<div class="mute">Вопрос ${i+1} из ${t.questions.length}</div><div class="bar"><div style="width:${i/t.questions.length*100}%"></div></div><div class="card"><b style="font-size:18px">${esc(q.q)}</b></div>`+q.o.map((x,k)=>`<button class="les" onclick="ansT(${k})">${esc(x)}</button>`).join('')};
+const ansT=k=>act(async()=>{if(TS.busy)return;TS.busy=1;
+  try{const n=TS.t.questions.length,a=[...TS.a];a[TS.i]=TS.t.questions[TS.i].o[k];
+    if(TS.i+1>=n){const res=await api('test_done',{answers:a});TS.a=a;TS.res=res;TS.i++;SND[res.score>=res.total/2?'ok':'bad']();await refresh().catch(()=>{})}
+    else{TS.a=a;TS.i++}}
+  finally{TS.busy=0}
+  draw()});
+// вопросы и ответы
+const FAQ=[['Как пройти урок?','Откройте «Уроки», выберите урок и листайте слайды кнопкой «Далее». В конце ответьте верно минимум на 2 из 3 вопросов — тогда урок засчитается.'],['Как заработать монеты?','За каждый новый засчитанный урок начисляются монеты, а в тестах — за улучшение результата. Повторное прохождение монет не даёт.'],['Как получить VIP?','«VIP-клуб» → «Купить VIP» или введите промокод в «Профиль» → «Ввести промокод».'],['Что даёт VIP?','Все уроки ({n} и новые по мере выхода), всю энциклопедию, поддержку экспертов с фото, эксклюзивные PDF и золотой значок.'],['Как активировать промокод?','Профиль → «Ввести промокод» или команда /promo КОД в боте. Каждый код можно использовать один раз.'],['Как работают тесты?','Раздел «Тесты»: 16 тематических и 3 общих (лёгкий, средний, сложный). После теста вы увидите разбор ошибок.'],['Как распознать растение по фото?','Откройте «Ещё» → «Распознать растение по фото», выберите снимок и нажмите «Распознать». Приложение покажет подходящую статью из энциклопедии Садовеста. Результат — подсказка, распознавание может ошибаться.'],['Как задать вопрос эксперту?','Раздел «Поддержка» (только VIP). К сообщению можно приложить фото растения.'],['Как добавить растение в огород?','«Энциклопедия» → растение → «Добавить в мой огород». Мы напомним о поливе.'],['Как работает поиск?','Нажмите 🔍 вверху любого экрана и введите название урока, растения или болезни.'],['Что такое закладки?','Нажмите ☆ на уроке, растении или болезни — они сохранятся в разделе «Закладки».']];
+V.faq=()=>head('Вопросы и ответы')+`<button class="btn" onclick="tab('home');setTimeout(startTour,700)">🐹 Экскурсия с землеройкой</button>`+FAQ.map(([q,a])=>`<details class="card"><summary><b>${q}</b></summary><p>${a.replace('{n}',me.total)}</p></details>`).join('');
+// ---- v5 ----
+const rv=r=>r.review.map((x,i)=>`<div class="card ${x.ok?'okc':'badc'}"><b>${i+1}. ${esc(x.q)}</b><p>${x.ok?'✅ Верно':'❌ Ваш ответ'}: ${esc(x.mine||'—')}</p>${x.ok?'':`<p>✅ Правильный ответ: ${esc(x.right)}</p>`}</div>`).join('');
+const ABV='АБВГ';
+V.lesson=async id=>{if(!LS||LS.l.id!==id)LS={l:await api('lesson',{id}),i:0,a:[],res:null};if(LS.res)return lessonRes();
+  const {l,i}=LS,sl=[...l.sections.map(([h,t],k)=>[ICO[k%5]+' '+h,t]),['🤯 Интересный факт',l.fact],['💡 Совет эксперта',l.tip]],n=sl.length,hd=head('Урок',1,bm('l:'+id));
+  if(i<n)return hd+`<div class="mute">${esc(l.title)} • слайд ${i+1} из ${n}</div><div class="bar"><div style="width:${(i+1)/n*100}%"></div></div><div class="card sec glow"><b style="font-size:19px">${sl[i][0]}</b><p style="font-size:17px">${esc(sl[i][1])}</p></div><div class="row">${i?'<button class="btn ghost" onclick="LS.i--;draw()">‹ Назад</button>':''}<button class="btn" onclick="LS.i++;draw()">${i===n-1?'К вопросам ›':'Далее ›'}</button></div>`;
+  return hd+`<h2>Проверка: 3 вопроса</h2><div class="mute">Нужно верно ответить минимум на 2 из 3. Иначе урок не засчитывается и его нужно пройти заново.</div>`+l.quiz.map((q,qi)=>`<div class="qbox"><small>ВОПРОС ${qi+1}</small>${esc(q.q)}</div>`+q.o.map((x,k)=>`<button class="les ans ${LS.a[qi]===x?'pick':''}" onclick="pickA(${qi},${k})"><span class="n">${ABV[k]}</span><span>${esc(x)}</span></button>`).join('')).join('')+`<button class="btn" onclick="submitL()">Завершить урок</button>`};
+const lessonRes=()=>{const r=LS.res;return head('Результат урока')+`<div class="card center ${r.passed?'glow':''}"><div class="big">${r.passed?'✅':'❌'}</div><h2>${r.passed?'Урок засчитан':'Урок не засчитан'}</h2>${r.repeat?'<p class="mute">Вы уже проходили этот урок: монеты за повторное прохождение не начисляются.</p>':''}<div class="mute">Верно ${r.score} из ${r.total}. Нужно минимум 2.${r.gain?` Награда: +${r.gain} 🪙`:''}</div>${r.passed?'':'<p><b>Перечитайте слайды и пройдите урок заново.</b></p>'}</div><h2>Разбор ответов</h2>`+rv(r)+(r.passed?'<button class="btn" onclick="LS=null;back()">К урокам</button>':'<button class="btn" onclick="LS=null;draw()">🔁 Перепройти урок</button>')};
+const submitL=()=>act(async()=>{if(![0,1,2].every(i=>LS.a[i]))throw new Error('Ответьте на все три вопроса');
+  LS.res=await api('done',{id:LS.l.id,answers:LS.a});SND[LS.res.passed?'ok':'bad']();await refresh();draw()});
+V.testrun=()=>{const {t,i}=TS;
+  if(TS.res){const r=TS.res;return head(t.title)+`<div class="card center"><div class="big">${r.score>=r.total*.8?'🏆':r.score>=r.total/2?'👍':'📚'}</div><h2>${r.score} из ${r.total}</h2><div class="mute">${r.coins?`+${r.coins} 🪙`:'Попробуйте улучшить результат'}</div></div><h2>Разбор ответов</h2>`+rv(r)+'<button class="btn" onclick="back()">К тестам</button>'}
+  const q=t.questions[i];return head(t.title)+`<div class="mute">Вопрос ${i+1} из ${t.questions.length}</div><div class="bar"><div style="width:${i/t.questions.length*100}%"></div></div><div class="qbox"><small>ВОПРОС ${i+1}</small>${esc(q.q)}</div>`+q.o.map((x,k)=>`<button class="les ans" onclick="ansT(${k})"><span class="n">${ABV[k]}</span><span>${esc(x)}</span></button>`).join('')};
+// энциклопедия: растения / болезни / вредители
+V.plants=()=>{const P=S2.pt==='Растения',src=(P?PLANTS:PESTS).map((x,i)=>[x,i]).filter(([x])=>P||(S2.pt==='Болезни'?x.k==='Болезнь':x.k==='Вредитель'));let last='';
+  return head('Энциклопедия')+chips('pt',['Растения','Болезни','Вредители'])+`<div class="mute">Записей: ${src.length}</div>`+src.sort((a,b)=>a[0].n.localeCompare(b[0].n,'ru')).map(([x,i])=>{const L=x.n[0].toUpperCase(),h=L!==last?(last=L,`<h2>${L}</h2>`):'';return h+`<button class="les" onclick="go('${P?'plantinfo':'pestinfo'}',${i})"><span class="n">${x.e}</span><span>${x.n}<div class="mute">${x.k}</div></span></button>`}).join('')};
+// PDF
+V.files=async()=>{const {items}=await api('files'),row=f=>`<button class="les" onclick="${f.vip&&!me.vip?"go('vip')":`getPdf('${f.id}')`}"><span class="n">📄</span><span>${esc(f.title)}</span><span class="tag ${f.vip?'v':''}">${f.vip?(me.vip?'VIP':'🔒 VIP'):'Бесплатно'}</span></button>`;
+  return head('Материалы')+'<div class="mute">PDF приходит вам в чат с ботом</div><h2>Бесплатно</h2>'+items.filter(f=>!f.vip).map(row).join('')+`<h2>Для VIP (${items.filter(f=>f.vip).length})</h2>`+items.filter(f=>f.vip).map(row).join('')};
+// погода
+const WC={0:['☀️','Ясно'],1:['🌤','Преимущественно ясно'],2:['⛅','Переменная облачность'],3:['☁️','Пасмурно'],45:['🌫','Туман'],48:['🌫','Изморозевый туман'],51:['🌦','Лёгкая морось'],53:['🌦','Морось'],55:['🌧','Сильная морось'],56:['🌧','Ледяная морось'],57:['🌧','Ледяная морось'],61:['🌧','Небольшой дождь'],63:['🌧','Дождь'],65:['🌧','Сильный дождь'],66:['🌧','Ледяной дождь'],67:['🌧','Ледяной дождь'],71:['🌨','Небольшой снег'],73:['❄️','Снег'],75:['❄️','Сильный снег'],77:['❄️','Снежные зёрна'],80:['🌦','Ливень'],81:['🌧','Сильный ливень'],82:['⛈','Очень сильный ливень'],85:['🌨','Снегопад'],86:['🌨','Сильный снегопад'],95:['⛈','Гроза'],96:['⛈','Гроза с градом'],99:['⛈','Сильная гроза с градом']};
+const wc=c=>WC[c]||['🌡','Переменная погода'],R=x=>Math.round(x??0),dt=(t,o)=>new Date(t+'T12:00:00').toLocaleDateString('ru-RU',o);
+let WX=null;
+async function loadWX(){const city=me.profile?.city||'Москва';
+  const g=await(await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=ru&name='+encodeURIComponent(city))).json();if(!g.results)return WX=null;
+  const {latitude:la,longitude:lo,name}=g.results[0],w=await(await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&timezone=auto&forecast_days=7&wind_speed_unit=ms&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,sunrise,sunset,uv_index_max,sunshine_duration&hourly=temperature_2m,precipitation_probability`)).json();
+  return WX={name,d:w.daily,h:w.hourly}}
+const dayTips=(mn,mx,p,pp,wind,uv)=>{const t=[];if(mn<=1)t.push('❄️ Ожидается заморозок: укройте рассаду и всходы агроволокном, с вечера полейте почву тёплой водой.');if(mx>=28)t.push('🔥 Жара: поливайте утром или вечером, притените рассаду, замульчируйте грядки.');if(p>=3||pp>=70)t.push('🌧 Вероятны осадки: полив не нужен, отложите опрыскивание и подкормки.');if(wind>=10)t.push('💨 Сильный ветер: подвяжите высокие растения, не опрыскивайте.');if(uv>=6)t.push('😎 Высокий УФ-индекс: притените молодую рассаду в полдень.');if(!t.length)t.push('✅ Хороший день для работ: пересадка, прополка, подкормка, плановый полив.');return t};
+V.weather=async()=>{const w=await loadWX();if(!w)return head('Погода')+`<div class="card center">Город «${esc(me.profile?.city||'')}» не найден.</div>${cityBox()}`;const d=w.d;
+  return head('Погода для огорода')+`<div class="mute">📍 ${esc(w.name)} • нажмите на день, чтобы увидеть подробности</div>`+d.time.map((t,i)=>{const [e,txt]=wc(d.weather_code[i]);return `<button class="card wday" onclick="go('wday',${i})"><div class="row"><b>${e} ${dt(t,{weekday:'short',day:'numeric',month:'short'})}</b><span style="text-align:right">${R(d.temperature_2m_min[i])}…${R(d.temperature_2m_max[i])} °C</span></div><div class="mute">${txt} • осадки ${d.precipitation_sum[i]} мм ›</div></button>`}).join('')+cityBox()};
+V.wday=async i=>{if(!WX&&!await loadWX())return head('Погода')+'<div class="card center">Нет данных</div>';const {d,h,name}=WX,[e,txt]=wc(d.weather_code[i]),S=(l,v)=>`<div class="stat2"><small>${l}</small><b>${v}</b></div>`;
+  const hrs=[0,3,6,9,12,15,18,21].map(k=>`<div class="hr"><b>${String(k).padStart(2,'0')}:00</b><div>${R(h.temperature_2m[i*24+k])}°</div><div class="mute">💧${h.precipitation_probability[i*24+k]??0}%</div></div>`).join('');
+  return head(dt(d.time[i],{weekday:'long',day:'numeric',month:'long'}))+`<div class="card glow center"><div class="big">${e}</div><h2 style="margin:0">${txt}</h2><div class="mute">📍 ${esc(name)}</div></div><div class="stats">${S('Температура',`${R(d.temperature_2m_min[i])}…${R(d.temperature_2m_max[i])} °C`)}${S('Ощущается как',`${R(d.apparent_temperature_min[i])}…${R(d.apparent_temperature_max[i])} °C`)}${S('Осадки',`${d.precipitation_sum[i]} мм`)}${S('Вероятность осадков',`${d.precipitation_probability_max[i]??0}%`)}${S('Ветер',`${R(d.wind_speed_10m_max[i])} м/с`)}${S('Порывы',`${R(d.wind_gusts_10m_max[i])} м/с`)}${S('Восход',d.sunrise[i].slice(11,16))}${S('Закат',d.sunset[i].slice(11,16))}${S('Солнце',`${(d.sunshine_duration[i]/3600).toFixed(1)} ч`)}${S('УФ-индекс',R(d.uv_index_max[i]))}</div><h2>По часам</h2><div class="hrs">${hrs}</div><h2>Что делать в огороде</h2>`+dayTips(d.temperature_2m_min[i],d.temperature_2m_max[i],d.precipitation_sum[i],d.precipitation_probability_max[i]??0,d.wind_speed_10m_max[i],d.uv_index_max[i]??0).map(x=>`<div class="card">${x}</div>`).join('')};
+
+// ---- v6: главный экран по макету, «Ещё», уроки ----
+const root2=['home','garden','calendar','lessons','more'];
+let GEO=null;
+async function geo(){const city=me.profile?.city||'Москва';if(GEO&&GEO.city===city)return GEO;const g=await(await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=ru&name='+encodeURIComponent(city))).json();if(!g.results)return null;const r=g.results[0];return GEO={city,la:r.latitude,lo:r.longitude,name:r.name}}
+async function loadCur(){const g=await geo();if(!g)return null;const w=await(await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${g.la}&longitude=${g.lo}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&wind_speed_unit=ms&timezone=auto`)).json();return w.current}
+V.home=async()=>{const [{items},cur]=await Promise.all([api('plants'),loadCur().catch(()=>null)]),now=Date.now(),end=new Date().setHours(23,59,59,999);
+  const tasks=items.map(p=>({p,nx:p.last+p.every*864e5})).filter(x=>x.nx<=end+864e5).sort((a,b)=>a.nx-b.nx).slice(0,3);
+  const adv=cur?(cur.temperature_2m<=1?'Заморозок: укройте рассаду':cur.temperature_2m>=28?'Жарко: поливайте вечером':cur.wind_speed_10m>=10?'Сильный ветер: подвяжите растения':'Отличные условия для работ в огороде'):'';
+  return `<div class="top"><b>Привет, ${esc(me.name)}!</b><button class="back" aria-label="Поиск" onclick="go('search','')">🔍</button><button class="back" aria-label="Профиль" onclick="go('profile')">👤</button></div>${moonBody()}
+<div class="sh"><h2>Сегодня в огороде</h2><button class="lnk" onclick="tab('calendar')">Все задачи →</button></div>
+${tasks.length?tasks.map(({p,nx})=>`<div class="tk"><button class="chk" aria-label="Отметить" onclick="plant('plant_water',${p.id})"></button><div><b>Полить: ${esc(p.name)}</b><span class="mute">${nx<=end?'Сегодня':'Завтра'} · каждые ${p.every} дн.</span></div></div>`).join(''):'<div class="card center mute">Добавьте растения в «Мои грядки», и задачи по поливу появятся здесь</div>'}
+${cur?`<button class="wcard" onclick="go('weather')"><span class="wi">${wc(cur.weather_code)[0]}</span><b class="wt">${cur.temperature_2m>0?'+':''}${R(cur.temperature_2m)}°</b><div><b>${wc(cur.weather_code)[1]}</b><div class="mute">Влажность ${R(cur.relative_humidity_2m)}%</div><div class="mute">Ветер ${R(cur.wind_speed_10m)} м/с</div></div><div class="adv">🌱 ${adv}</div></button>`:''}
+<div class="qt"><button class="t2" onclick="tab('garden')"><svg class="ti " viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 13c0-3.6-2.6-6-6.5-6 0 3.8 2.6 6 6.5 6z"/><path d="M12 11c0-3.2 2.3-5.6 6-5.6 0 3.6-2.4 5.6-6 5.6z"/></svg><span>Мои культуры</span></button><button class="t2" onclick="tab('calendar')"><svg class="ti " viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg><span>Календарь работ</span></button><button class="t2" onclick="S2.pt='Болезни';go('plants')"><svg class="ti y" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16h.01"/></svg><span>Болезни и вредители</span></button><button class="t2" onclick="tab('lessons')"><svg class="ti " viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.6 3.5 5v13.5c3.5-.4 6.5 0 8.5 1.5 2-1.5 5-1.9 8.5-1.5V5c-3.5-.4-6.5 0-8.5 1.5z"/><path d="M12 6.5V20"/></svg><span>Уроки и советы</span></button></div>
+${me.vip?'':`<button class="banner" onclick="go('vip')"><i>👑</i><span>VIP-доступ<small>Расширенные уроки и поддержка экспертов</small></span></button>`}
+<div class="card row"><span>🪙 Монеты</span><span style="text-align:right"><b>${me.coins}</b></span></div>
+<div class="card tipc">🌤 <b>Совет:</b> ${esc(tipsFor())}</div>`};
+V.more=()=>head('Ещё',0)+[['tests','📝','Тесты'],['plants','🌿','Энциклопедия: растения, болезни, вредители'],['weather','🌦️','Погода для огорода'],['board','🏆','Рейтинг'],['marks','🔖','Закладки'],['files','📄','Материалы (PDF)'],['vip','👑','VIP-клуб'],['support','🛟','Поддержка'],['profile','👤','Профиль'],['faq','❓','Вопросы и ответы'],...(me.admin?[['admin','⚙️','Панель администратора']]:[])].map(([v,e,t])=>`<button class="les" onclick="go('${v}')"><span class="n">${e}</span><span>${t}</span><span style="margin-left:auto">›</span></button>`).join('');
+V.lessons=async()=>{const {items,soon}=await api('lessons'),L=['Начинающий','Любитель','Мастер'];
+  const row=l=>`<button class="les ${l.locked?'lock':''}" onclick="${l.locked?"go('vip')":`go('lesson',${l.id})`}"><span class="n">${l.locked?'🔒':l.done?'✅':l.id}</span><span>${esc(l.title)}</span><span class="tag ${l.free?'':'v'}">${l.free?'Бесплатно':'VIP'}</span></button>`;
+  return head('Уроки',0)+chips('lv',['Все',...L])+L.filter(l=>S2.lv==='Все'||S2.lv===l).map(l=>{const a=items.filter(i=>i.level===l);return a.length?`<h2>${{Начинающий:'🌱',Любитель:'🌿',Мастер:'🌳'}[l]} ${l}</h2>`+a.map(row).join(''):''}).join('')+(soon?`<div class="card center">🕓 Ещё ${soon} VIP-уроков готовятся и будут появляться здесь по мере выхода</div>`:'')};
+// ---- v7: настройки, звук, тема, календарь, лайфхаки, словарь ----
+const SET={sound:true,vibe:true,theme:'dark',fs:'m',motion:true,toured:false};
+try{Object.assign(SET,JSON.parse(localStorage.getItem('sv_set2')||'{}'))}catch{}
+const saveSet=()=>{try{localStorage.setItem('sv_set2',JSON.stringify(SET))}catch{}};
+function applySet(){const dark=SET.theme==='dark'||(SET.theme==='auto'&&(tg?.colorScheme==='dark'||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)));
+  document.documentElement.dataset.theme=dark?'dark':'light';document.body.classList.toggle('nomo',!SET.motion);document.body.classList.remove('fs-s','fs-l');if(SET.fs!=='m')document.body.classList.add('fs-'+SET.fs);try{tg?.setHeaderColor?.(dark?'#06120d':'#e9f7ef');tg?.setBackgroundColor?.(dark?'#06120d':'#e9f7ef')}catch{}}
+let AC=null;
+function beep(f=520,d=.07,type='sine',v=.07){if(!SET.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch{}}
+const SND={tap:()=>beep(520),nav:()=>beep(700,.06,'triangle'),pick:()=>beep(430,.05,'square',.035),ok:()=>{beep(660,.09);setTimeout(()=>beep(880,.14),90)},bad:()=>beep(170,.22,'sawtooth',.05),reward:()=>[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.16),i*110)),
+  key:k=>k==='Enter'?beep(880,.08,'triangle'):k==='Backspace'?beep(300,.05,'sawtooth',.04):k===' '?beep(400,.04,'triangle',.04):beep(480+(k.charCodeAt(0)%12)*18,.03,'square',.03)};
+document.addEventListener('click',e=>{const b=e.target.closest('button,summary');if(!b)return;const c=b.className||'';SND[b.closest('nav')?'nav':/chip|ans|les/.test(c)?'pick':'tap']();if(SET.vibe)try{tg?.HapticFeedback?.impactOccurred('light')}catch{}},true);
+document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA/.test(e.target.tagName)&&e.key.length>0)SND.key(e.key)},true);
+// календарь огородника
+let CM=new Date().getMonth();
+V.calendar=async()=>{const {items}=await api('plants');
+  return head('Календарь огородника')+`<div class="hrs mchips">${MN.map((m,i)=>`<button class="chip ${i===CM?'on':''}" onclick="CM=${i};draw()">${m}</button>`).join('')}</div>`
+  +`<button class="btn" onclick="go('moon')">🌙 Лунный календарь</button>`+(items.length?`<div class="card glow"><b>💧 Мои растения: когда полить</b>${items.map(p=>{const nx=p.last+p.every*864e5;return `<div class="row" style="margin-top:6px"><span>${esc(p.name)}</span><span style="text-align:right;color:${nx<Date.now()?'var(--red)':'inherit'}">${nx<Date.now()?'Пора!':fd(nx)}</span></div>`}).join('')}</div>`:'')
+  +CATS.map(([e,t,d],k)=>`<div class="card sec" style="--d:${k*.04}s"><b>${e} ${t}</b><div class="mute">${d}</div><p>${esc(CAL[CM][k])}</p></div>`).join('')};
+// лайфхаки
+V.hacks=()=>head('Лайфхаки')+chips('hc',['Все',...HCATS])+HACKS.map((h,i)=>[h,i]).filter(([h])=>S2.hc==='Все'||h[0]===S2.hc).map(([h,i])=>`<div class="card hk"><small>${h[0]}</small><div class="row"><b style="flex:5">💡 ${esc(h[1])}</b>${bm('h:'+i)}</div><p style="margin:6px 0 0">${esc(h[2])}</p></div>`).join('');
+S2.hc='Все';
+// словарь огородника
+V.dict=()=>head('Словарь огородника')+'<div class="mute">Термины простыми словами</div><input placeholder="Найти термин…" oninput="$(\'#dl\').innerHTML=dictList(this.value)"><div id="dl">'+dictList('')+'</div>';
+const dictList=q=>{q=(q||'').toLowerCase();let last='';return [...DICT].sort((a,b)=>a[0].localeCompare(b[0],'ru')).filter(([t,d])=>!q||(t+d).toLowerCase().includes(q)).map(([t,d])=>{const L=t[0].toUpperCase(),h=L!==last?(last=L,`<h2>${L}</h2>`):'';return h+`<details class="card"><summary><b>${esc(t)}</b></summary><p>${esc(d)}</p></details>`}).join('')||'<div class="card center">Ничего не найдено</div>'};
+// настройки
+const tog=(k,on)=>`<button class="tg ${on?'on':''}" role="switch" aria-checked="${on}" onclick="setS('${k}',${!on})"><i></i></button>`;
+const setS=(k,v)=>{SET[k]=v;saveSet();applySet();draw()};
+const setN=on=>act(async()=>{await api('notify',{on});await refresh();draw()});
+V.settings=()=>head('Настройки')+`<div class="card"><div class="sw"><span>🔊 Звуки нажатий</span>${tog('sound',SET.sound)}</div></div><div class="card"><div class="sw"><span>📳 Вибрация</span>${tog('vibe',SET.vibe)}</div></div>
+<div class="card"><b>🌗 Тема</b><div class="chips">${[['auto','Авто'],['light','Светлая'],['dark','Тёмная']].map(([v,t])=>`<button class="chip ${SET.theme===v?'on':''}" onclick="setS('theme','${v}')">${t}</button>`).join('')}</div></div>
+<div class="card"><b>🔠 Размер текста</b><div class="chips">${[['s','Мелкий'],['m','Обычный'],['l','Крупный']].map(([v,t])=>`<button class="chip ${SET.fs===v?'on':''}" onclick="setS('fs','${v}')">${t}</button>`).join('')}</div></div>
+<div class="card"><div class="sw"><span>✨ Анимации</span>${tog('motion',SET.motion)}</div></div><div class="card"><div class="sw"><span>🔔 Уведомления в Telegram</span><button class="tg ${me.notify?'on':''}" role="switch" aria-checked="${me.notify}" onclick="setN(${!me.notify})"><i></i></button></div><div class="mute">Напоминания о поливе и об окончании VIP</div></div>
+<div class="card"><b>📍 Город: ${esc(me.profile?.city||'не указан')}</b><input id="wc" placeholder="Новый город"><button class="btn sm" style="margin-top:8px" onclick="setCity()">Сохранить город</button></div>
+<button class="btn" onclick="tab('home');setTimeout(startTour,700)">🐹 Экскурсия с землеройкой</button><button class="btn ghost" onclick="Object.assign(SET,{sound:true,vibe:true,theme:'dark',fs:'m',motion:true});saveSet();applySet();draw()">Сбросить настройки</button><div class="mute center" style="margin-top:12px">СадоВест • настройки хранятся на этом устройстве</div>`;
+// «Ещё»
+V.more=()=>head('Ещё',0)+[['tests','📝','Тесты'],['moon','🌙','Лунный календарь'],['hacks','💡','Лайфхаки'],['dict','📖','Словарь огородника'],['plants','🌿','Энциклопедия: растения, болезни, вредители'],['weather','🌦️','Погода для огорода'],['board','🏆','Рейтинг'],['marks','🔖','Закладки'],['files','📄','Материалы (PDF)'],['vip','👑','VIP-клуб'],['support','🛟','Поддержка'],['profile','👤','Профиль'],['settings','⚙️','Настройки'],['faq','❓','Вопросы и ответы'],...(me.admin?[['admin','🛠','Панель администратора']]:[])].map(([v,e,t])=>`<button class="les" onclick="go('${v}')"><span class="n">${e}</span><span>${t}</span><span style="margin-left:auto">›</span></button>`).join('');
+// закладки (уроки, растения, болезни, лайфхаки)
+V.marks=async()=>{const L=(await api('lessons')).items;
+  const row=k=>{const [t,i]=k.split(':'),o=t==='l'?L.find(x=>x.id==i):t==='p'?PLANTS[i]:t==='d'?PESTS[i]:HACKS[i];if(!o)return'';const go_=t==='l'?(o.locked?"go('vip')":`go('lesson',${i})`):t==='p'?`go('plantinfo',${i})`:t==='d'?`go('pestinfo',${i})`:"go('hacks')";return `<button class="les" onclick="${go_}"><span class="n">${t==='l'?'📖':t==='h'?'💡':o.e}</span><span>${esc(t==='l'?o.title:t==='h'?o[1]:o.n)}</span></button>`};
+  return head('Закладки')+(me.bookmarks.length?me.bookmarks.map(row).join(''):'<div class="card center">Нажмите ☆ на уроке, растении, болезни или лайфхаке, чтобы сохранить</div>')};
+// ---- v8: бесплатные/VIP записи энциклопедии, лайфхаки подробно, лунный календарь, новые слова ----
+const FREE_ENC=(()=>{const s=new Set();PLANTS.forEach((x,i)=>{if(!x.lock)s.add('p'+i)});PESTS.forEach((x,i)=>{if(!x.lock)s.add('d'+i)});return s})();
+const encOk=k=>me.vip||FREE_ENC.has(k);
+V.plants=()=>{const P=S2.pt==='Растения',src=(P?PLANTS:PESTS).map((x,i)=>[x,i]).filter(([x])=>P||(S2.pt==='Болезни'?x.k==='Болезнь':x.k==='Вредитель')),pre=P?'p':'d',free=src.filter(([x,i])=>FREE_ENC.has(pre+i)).length;let last='';
+  return head('Энциклопедия')+chips('pt',['Растения','Болезни','Вредители'])+`<div class="mute">Всего: ${src.length}${me.vip?'':` • бесплатно доступно ${free}, остальные — с VIP`}</div>`+src.sort((a,b)=>a[0].n.localeCompare(b[0].n,'ru')).map(([x,i])=>{const L=x.n[0].toUpperCase(),h=L!==last?(last=L,`<h2>${L}</h2>`):'',ok=encOk(pre+i);return h+`<button class="les ${ok?'':'lk'}" onclick="${ok?`go('${P?'plantinfo':'pestinfo'}',${i})`:"go('vip')"}"><span class="n">${ok?x.e:'🔒'}</span><span>${esc(x.n)}<div class="mute">${x.k}</div></span><span class="tag ${ok?'':'v'}">${ok?(me.vip?'':'Бесплатно'):'VIP'}</span></button>`}).join('')};
+const _pi=V.plantinfo,_di=V.pestinfo;
+V.plantinfo=i=>encOk('p'+i)?_pi(i):V.vip();
+V.pestinfo=i=>encOk('d'+i)?_di(i):V.vip();
+// лайфхаки: нажмите на карточку, чтобы раскрыть подробности
+V.hacks=()=>head('Лайфхаки')+'<div class="mute">Нажмите на лайфхак, чтобы прочитать подробно</div>'+chips('hc',['Все',...HCATS])+HACKS.map((h,i)=>[h,i]).filter(([h])=>S2.hc==='Все'||h[0]===S2.hc).map(([h,i])=>`<details class="card hk lh"><summary><small>${h[0]}</small><div><b>💡 ${esc(h[1])}</b></div><div class="mute">${esc(h[2])}</div></summary><div class="wd"><b>Подробно:</b><p style="margin:6px 0 0">${esc(h[3]||'')}</p></div>${bm('h:'+i)}</details>`).join('');
+// слайд «Новые слова» в уроке
+V.lesson=async id=>{if(!LS||LS.l.id!==id)LS={l:await api('lesson',{id}),i:0,a:[],res:null};if(LS.res)return lessonRes();
+  const {l,i}=LS,W=(l.words||[]).map(w=>[w,(DICT.find(d=>d[0]===w)||[])[1]]).filter(x=>x[1]),
+  sl=[...l.sections.map(([h,t],k)=>[ICO[k%5]+' '+h,esc(t)]),['🤯 Интересный факт',esc(l.fact)],['💡 Совет эксперта',esc(l.tip)],...(W.length?[['📚 Новые слова из урока',W.map(([w,d])=>`<div class="wd"><b>${esc(w)}</b> — ${esc(d)}</div>`).join('')]]:[])],n=sl.length,hd=head('Урок',1,bm('l:'+id));
+  if(i<n)return hd+(l.done?'<div class="card tipc">✅ Урок уже пройден. Повторное прохождение не даёт монет.</div>':'')+`<div class="mute">${esc(l.title)} • слайд ${i+1} из ${n}</div><div class="bar"><div style="width:${(i+1)/n*100}%"></div></div><div class="card sec glow"><b style="font-size:19px">${sl[i][0]}</b><div style="font-size:17px;margin-top:6px">${sl[i][1]}</div></div><div class="row">${i?'<button class="btn ghost" onclick="LS.i--;draw()">‹ Назад</button>':''}<button class="btn" onclick="LS.i++;draw()">${i===n-1?'К вопросам ›':'Далее ›'}</button></div>`;
+  return hd+`<h2>Проверка: 3 вопроса</h2><div class="mute">Нужно верно ответить минимум на 2 из 3. Иначе урок не засчитывается и его нужно пройти заново.</div>`+l.quiz.map((q,qi)=>`<div class="qbox"><small>ВОПРОС ${qi+1}</small>${esc(q.q)}</div>`+q.o.map((x,k)=>`<button class="les ans ${LS.a[qi]===x?'pick':''}" onclick="pickA(${qi},${k})"><span class="n">${ABV[k]}</span><span>${esc(x)}</span></button>`).join('')).join('')+`<button class="btn" onclick="submitL()">Завершить урок</button>`};
+// лунный календарь
+const SYN=29.530588853,NEW0=Date.UTC(2000,0,6,18,14),SIGNS=['Овен','Телец','Близнецы','Рак','Лев','Дева','Весы','Скорпион','Стрелец','Козерог','Водолей','Рыбы'],MOONS=['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'];
+const mAge=ms=>{const t=((ms-NEW0)/864e5)%SYN;return t<0?t+SYN:t};
+const mSign=ms=>SIGNS[Math.floor((((218.316+13.176396*((ms-Date.UTC(2000,0,1,12))/864e5))%360)+360)%360/30)];
+const mInfo=d=>{const ms=Date.UTC(d.getFullYear(),d.getMonth(),d.getDate(),12),a=mAge(ms),sg=mSign(ms),edge=a<1||a>SYN-1||Math.abs(a-SYN/2)<1,fert=['Рак','Скорпион','Рыбы'].includes(sg),mid=['Телец','Весы','Козерог'].includes(sg);
+  return {a,sg,edge,emoji:MOONS[Math.floor(a/SYN*8+.5)%8],ph:edge?(a<2||a>SYN-2?'Новолуние':'Полнолуние'):a<SYN/2?'Растущая Луна':'Убывающая Луна',cls:edge?'r':(fert?'g':''),
+  adv:edge?'Неблагоприятный день: не сеять и не пересаживать. Подходит для планирования, прополки и ухода за инструментом.':a<SYN/2?'Растущая Луна: сейте и сажайте культуры, плодоносящие над землёй (томаты, огурцы, капуста, зелень), хорошо поливать и подкармливать.':'Убывающая Луна: сейте и сажайте корнеплоды и луковичные (морковь, свёкла, лук, чеснок), обрезайте, пересаживайте, боритесь с вредителями.',
+  sgn:fert?'Знак плодородный: хороший день для посева и посадки.':mid?'Знак со средней плодородностью: допустимо сеять и сажать.':'Знак малоплодородный: лучше полоть, рыхлить и обрабатывать от вредителей.'}};
+const moonSvg=(a,z=24)=>{const f=a/SYN,k=Math.cos(2*Math.PI*f),rx=(Math.abs(k)*10).toFixed(2),w=f<.5,t=w?(k<0?1:0):(k<0?0:1);return `<svg class="mo" viewBox="0 0 24 24" width="${z}" height="${z}" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#2e3a73"/><path d="M12 2A10 10 0 0 ${w?1:0} 12 22A${rx} 10 0 0 ${t} 12 2z" fill="#f6c843"/><circle cx="12" cy="12" r="9.6" fill="none" stroke="rgba(255,255,255,.16)"/></svg>`};
+const MNG=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+let MY=new Date().getFullYear(),MM=new Date().getMonth(),MD=new Date().getDate();
+const moonNav=d=>{MM+=d;if(MM<0){MM=11;MY--}if(MM>11){MM=0;MY++}MD=1;draw()};
+const moonBody=()=>{const first=(new Date(MY,MM,1).getDay()+6)%7,days=new Date(MY,MM+1,0).getDate(),now=new Date(),dn=Math.min(MD,days),sel=mInfo(new Date(MY,MM,dn)),WD=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'][new Date(MY,MM,dn).getDay()];
+  let nxt='';for(let k=0;k<45&&!nxt;k++){const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+k),a=mAge(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate(),12));if(k&&(a<1||Math.abs(a-SYN/2)<.5)&&!nxt)nxt=`${a<1?'🌑 Новолуние':'🌕 Полнолуние'}: ${d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'})}`}
+  const cells=[...Array(days)].map((_,k)=>{const d=k+1,m=mInfo(new Date(MY,MM,d));return `<button class="md ${m.cls} ${d===dn?'sel':''} ${(d===now.getDate()&&MM===now.getMonth()&&MY===now.getFullYear())?'t':''}" onclick="MD=${d};draw()">${d}<i>${moonSvg(m.a,24)}</i></button>`}).join('');
+  return `<div class="moonp"><div class="mh">${moonSvg(sel.a,62)}<div><b>${dn} ${MNG[MM]}</b><span>${WD}</span></div><button class="inf" aria-label="Справка" onclick="toast('Расчёт приблизительный: календарь — ориентир')">i</button></div><div class="mnav"><button class="sq" aria-label="Предыдущий месяц" onclick="moonNav(-1)">‹</button><b>${MN[MM]} ${MY}</b><button class="sq" aria-label="Следующий месяц" onclick="moonNav(1)">›</button></div><div class="mg">${['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<b>${x}</b>`).join('')}${[...Array(first)].map(()=>'<span></span>').join('')}${cells}</div></div>
+<div class="card glow mi">${moonSvg(sel.a,62)}<div><b>${dn} ${MNG[MM]}: ${sel.ph}</b><div class="mute">Возраст Луны: ${sel.a.toFixed(1)} сут.</div><div class="mute">Луна в знаке: ${sel.sg}</div></div><span class="chev">›</span></div><div class="card rec"><b><svg class="lf" viewBox="0 0 24 24"><path d="M3 21C3 11 10 3 21 3c0 11-7 18-18 18z"/></svg>Рекомендация</b><p>${sel.adv}</p><p>${sel.sgn}</p></div>${nxt?`<div class="card tipc">Ближайшее: ${nxt}</div>`:''}<div class="mute center">🟩 благоприятные дни, 🟧 неблагоприятные (новолуние и полнолуние). Расчёт приблизительный: календарь — ориентир, а не закон.</div>`};
+V.moon=()=>head('Лунный календарь')+moonBody();
+// ---- v9: фото растений, экскурсия землеройки ----
+const PIMG={'Томат':'tomato','Огурец':'cucumber','Картофель':'potato','Морковь':'carrot','Капуста':'cabbage','Лук':'onion','Чеснок':'garlic','Перец':'pepper','Баклажан':'eggplant','Свёкла':'beet','Кабачок':'zucchini','Редис':'radish','Тыква':'pumpkin','Яблоня':'apple','Колоновидная яблоня':'apple','Груша':'pear','Виноград':'grape','Дыня':'melon','Вишня':'cherry','Слива':'plum','Абрикос':'apricot','Персик':'peach','Клубника':'strawberry','Земляника садовая':'strawberry','Малина':'raspberry','Ежевика':'blackberry','Голубика':'blueberry','Смородина':'currant','Красная смородина':'currant','Крыжовник':'gooseberry','Облепиха':'seabuckthorn','Кукуруза':'corn','Горох':'pea','Брокколи':'broccoli','Шпинат':'spinach','Салат':'lettuce','Петрушка':'parsley','Базилик':'basil','Мята':'mint','Укроп':'dill','Лук-батун':'scallion','Руккола':'arugula','Кинза':'cilantro','Тимьян':'thyme'};
+const pimg=(n,c='')=>PIMG[n]?`<img class="${c}" src="/img/plants/${PIMG[n]}.jpg" alt="${esc(n)}" loading="lazy">`:'';
+V.plants=()=>{const P=S2.pt==='Растения',src=(P?PLANTS:PESTS).map((x,i)=>[x,i]).filter(([x])=>P||(S2.pt==='Болезни'?x.k==='Болезнь':x.k==='Вредитель')),pre=P?'p':'d',free=src.filter(([x,i])=>FREE_ENC.has(pre+i)).length;let last='';
+  return head('Энциклопедия')+(P?`<button class="btn ghost" onclick="go('identify')">📷 Определить растение по фото</button>`:'')+chips('pt',['Растения','Болезни','Вредители'])+`<div class="mute">Всего: ${src.length}${me.vip?'':` • бесплатно доступно ${free}, остальные — с VIP`}${P?` • с фото: ${src.filter(([x])=>PIMG[x.n]).length}`:''}</div>`+src.sort((a,b)=>a[0].n.localeCompare(b[0].n,'ru')).map(([x,i])=>{const L=x.n[0].toUpperCase(),h=L!==last?(last=L,`<h2>${L}</h2>`):'',ok=encOk(pre+i);return h+`<button class="les ${ok?'':'lk'}" onclick="${ok?`go('${P?'plantinfo':'pestinfo'}',${i})`:"go('vip')"}"><span class="n">${ok?(P&&pimg(x.n)||x.e):'🔒'}</span><span>${esc(x.n)}<div class="mute">${x.k}</div></span><span class="tag ${ok?'':'v'}">${ok?(me.vip?'':'Бесплатно'):'VIP'}</span></button>`}).join('')};
+let scanPhoto='',scanResult=null,scanBusy=false,scanProgress=0;
+async function choosePlantPhoto(input){
+  const file=input.files?.[0];input.value='';if(!file)return;
+  if(!file.type.startsWith('image/'))return toast('Выберите файл-изображение',1);
+  if(file.size>15_000_000)return toast('Файл слишком большой. Выберите фото до 15 МБ.',1);
+  const url=URL.createObjectURL(file);
+  try{
+    const image=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Не удалось открыть это изображение'));im.src=url});
+    const scale=Math.min(1,1400/Math.max(image.width,image.height)),canvas=document.createElement('canvas');
+    canvas.width=Math.round(image.width*scale);canvas.height=Math.round(image.height*scale);
+    canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.82));
+    if(!blob)throw new Error('Не удалось подготовить фото');
+    if(blob.size>1_500_000)throw new Error('Фото слишком большое после сжатия. Выберите другое изображение.');
+    scanPhoto=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Не удалось прочитать фото'));reader.readAsDataURL(blob)});
+    scanResult=null;draw();
+  }catch(error){toast(error.message,1)}
+  finally{URL.revokeObjectURL(url)}
+}
+async function identifyPlant(){
+  if(!scanPhoto||scanBusy)return;
+  scanBusy=true;scanProgress=0;scanResult=null;draw();
+  try{
+    const guesses=await window.SadovestVision.recognizeCatalogPlant(scanPhoto,PLANTS,value=>{scanProgress=value;draw()});
+    const best=guesses[0],runnerUp=guesses[1];
+    const confident=best&&best.score>=.16&&(!runnerUp||best.score-runnerUp.score>=.04);
+    const match=confident?{...best,plant:PLANTS[best.catalogIndex]}:null;
+    const available=match&&encOk('p'+match.catalogIndex)?[match]:[];
+    const locked=match&&!encOk('p'+match.catalogIndex)?[match]:[];
+    scanResult={
+      plants:available,
+      lockedPlants:locked,
+      catalogMessage:available.length
+        ? ''
+        : locked.length
+          ? 'Похоже на VIP-растение. Откройте VIP, чтобы посмотреть его описание.'
+          : 'Не получилось уверенно определить растение из каталога. Попробуйте фото одного растения крупнее и при хорошем освещении.',
+    };
+  }
+  catch(error){toast(error.message||'Не удалось распознать фото. Попробуйте ещё раз.',1)}
+  finally{scanBusy=false;draw()}
+}
+V.identify=()=>{
+  const result=scanResult,plants=result?.plants||[];
+  const recognized=plants.map(({plant,catalogIndex})=>`<div class="card"><b>${esc(plant.n)}</b><div class="mute">Похоже, это растение есть в энциклопедии Садовеста.</div><button class="btn ghost" onclick="go('plantinfo',${catalogIndex})">Открыть описание в Садовесте</button></div>`).join('');
+  const resultHtml=!result?'':`${plants.length?'<h2>Похоже на</h2>'+recognized:result.lockedPlants?.length?'':`<div class="card center">${esc(result.catalogMessage)}</div>`}${result.lockedPlants?.length?`<div class="card tipc">🔒 Возможно, это VIP-растение: ${result.lockedPlants.map(item=>esc(item.plant.n)).join(', ')}<button class="btn gold" onclick="go('vip')">Открыть VIP</button></div>`:''}`;
+  const busy=scanBusy?`<div class="card center"><div class="big">🌿</div><b>${scanProgress<100?'Обрабатываем фото…':'Почти готово…'}</b><div class="bar"><div style="width:${scanProgress}%"></div></div></div>`:'';
+  return head('Распознать по фото')+`<div class="card"><b>Сфотографируйте одно растение</b><p class="mute">Покажем описание из энциклопедии Садовеста. Фото не отправляется на сервер. При первом запуске загрузится модуль распознавания (около 154 МБ).</p><label class="btn ghost" style="display:block;text-align:center;box-sizing:border-box">📷 ${scanPhoto?'Выбрать другое фото':'Сделать фото или выбрать из галереи'}<input type="file" accept="image/*" capture="environment" hidden onchange="choosePlantPhoto(this)"></label>${scanPhoto?`<img src="${scanPhoto}" alt="Выбранное растение" style="display:block;width:100%;max-height:360px;object-fit:contain;border-radius:16px;margin-top:12px">`:''}${busy||`<button class="btn" ${!scanPhoto?'disabled':''} onclick="identifyPlant()">🔍 Распознать растение</button>`}</div>${resultHtml}`;
+};
+// полный текст закрытых записей приходит с сервера и только для VIP
+const ENCC={};
+async function encItem(t,i){const L=t==='p'?PLANTS:PESTS;if(!L[i].lock)return L[i];return ENCC[t+i]||(ENCC[t+i]=(await api('enc_get',{t,i})).item)}
+V.plantinfo=async i=>{if(!encOk('p'+i))return V.vip();const p=await encItem('p',i),im=pimg(p.n,'pbig')||`<div class="big">${p.e}</div>`;
+  return head(p.n,1,bm('p:'+i))+`<div class="card glow center">${im}<h2 style="margin:6px 0 0">${p.n}</h2><div class="mute">${p.k} • ${p.s} • полив каждые ${p.w} дн.</div></div><div class="card"><b>О растении</b><p>${p.i}</p><b>Когда сажать</b><p>${p.t}</p><b>Советы</b>${p.c.map(x=>`<p>✅ ${x}</p>`).join('')}</div><button class="btn" onclick="addP(${i})">Добавить в мой огород</button>`};
+V.pestinfo=async i=>{if(!encOk('d'+i))return V.vip();const p=await encItem('d',i);return head(p.n,1,bm('d:'+i))+`<div class="card glow center"><div class="big">${p.e}</div><h2 style="margin:0">${p.n}</h2><div class="mute">${p.k}</div></div><div class="card"><b>Признаки</b><p>${p.i}</p><b>Как бороться</b>${p.c.map(x=>`<p>✅ ${x}</p>`).join('')}</div>`};
+// экскурсия с землеройкой
+const TOUR=[
+ {x:'Привет! Я землеройка-садовод. Покажу, где что находится в СадоВесте — это займёт меньше минуты.'},
+ {s:'.hbtn',x:'Вот тут твои грядки: добавляй растения, и я напомню, когда их поливать.'},
+ {s:'nav button:nth-child(4)',x:'Здесь ты будешь проходить уроки. Первые 10 бесплатные, после каждого — небольшой тест.'},
+ {s:'.banner',opt:1,x:'А здесь покупается VIP-доступ: все уроки, вся энциклопедия, PDF-шпаргалки и помощь экспертов.'},
+ {s:'nav button:nth-child(3)',x:'Календарь огородника: что и когда сеять, поливать и подкармливать. Там же лунный календарь.'},
+ {s:'nav button:nth-child(5)',x:'В «Ещё» спрятано много полезного: тесты, лайфхаки, словарь, энциклопедия, погода, VIP и настройки.'},
+ {s:'.ib[aria-label="Поиск"]',x:'А это поиск: он найдёт урок, растение, болезнь или лайфхак.'},
+ {x:'Вот и всё! Начни с первого бесплатного урока. Экскурсию можно повторить в «Ещё» → Настройки.'}];
+let TI=0,TSL=[];
+function startTour(n=0){if(cur==='home'&&!document.querySelector('.hbtn')&&n<25)return setTimeout(()=>startTour(n+1),150);TSL=TOUR.filter(s=>!s.opt||document.querySelector(s.s));TI=0;let o=document.getElementById('tour');if(!o){o=document.createElement('div');o.id='tour';document.body.append(o)}tourShow()}
+function tourShow(){const o=document.getElementById('tour'),s=TSL[TI];if(!o)return;if(!s)return tourEnd();
+  const el=s.s&&document.querySelector(s.s);
+  if(el&&!(el.closest&&el.closest('nav')))el.scrollIntoView({block:'center'});else if(!el)window.scrollTo(0,0);
+  const r=el?el.getBoundingClientRect():null,H=innerHeight,up=r&&r.top>H/2,pos=r?(up?`bottom:${Math.max(12,Math.min(H-170,H-r.top+16))}px`:`top:${Math.max(70,Math.min(H-200,r.bottom+16))}px`):'top:28%';
+  o.innerHTML=(r?`<div class="spot" style="left:${r.left-6}px;top:${r.top-6}px;width:${r.width+12}px;height:${r.height+12}px"></div>`:'<div class="dim"></div>')+`<button class="x" onclick="tourEnd()">✕ Закрыть</button><div class="tb" style="${pos}"><img class="mole" src="/img/mole.jpg" alt="Землеройка"><div class="bub"><div>${s.x}</div><div class="tr"><button class="btn sm ghost" onclick="tourEnd()">Пропустить</button><span class="mute">${TI+1}/${TSL.length}</span><button class="btn sm" onclick="TI++;tourShow()">${TI===TSL.length-1?'Готово':'Дальше'}</button></div></div></div>`}
+function tourEnd(){const o=document.getElementById('tour');if(o)o.remove();SET.toured=true;saveSet();try{window.scrollTo(0,0)}catch{}}
+function maybeTour(){if(SET.toured||!me||!me.profile||cur!=='home'||document.getElementById('tour'))return;startTour()}
+V.more=()=>head('Ещё',0)+[['identify','📷','Распознать растение по фото'],['tests','📝','Тесты'],['moon','🌙','Лунный календарь'],['hacks','💡','Лайфхаки'],['dict','📖','Словарь огородника'],['plants','🌿','Энциклопедия: растения, болезни, вредители'],['weather','🌦️','Погода для огорода'],['board','🏆','Рейтинг'],['marks','🔖','Закладки'],['files','📄','Материалы (PDF)'],['vip','👑','VIP-клуб'],['support','🛟','Поддержка'],['profile','👤','Профиль'],['settings','⚙️','Настройки'],['faq','❓','Вопросы и ответы'],['tour','🐹','Экскурсия с землеройкой'],...(me.admin?[['admin','🛠','Панель администратора']]:[])].map(([v,e,t])=>`<button class="les" onclick="${v==='tour'?"tab('home');setTimeout(startTour,700)":`go('${v}')`}"><span class="n">${e}</span><span>${t}</span><span style="margin-left:auto">›</span></button>`).join('');
+// ---- v10: компактная админ-панель по вкладкам ----
+S2.at='Обзор';S2.bt='Все';let AUQ='',BT='',ARM=false;
+const dd=t=>t?new Date(t).toLocaleDateString('ru-RU'):'—';
+const ADM={
+ async 'Обзор'(){const o=await api('admin_overview'),c=(n,t)=>`<div><b>${n}</b>${t}</div>`;
+  return `<div class="stat">${c(o.users,'Пользователи')}${c(o.vip,'VIP сейчас')}${c(o.active,'Активны сегодня')}${c(o.active7,'Активны за 7 дней')}${c(o.new7,'Новые за 7 дней')}${c(o.lessonsDone,'Пройдено уроков')}${c(o.testsDone,'Пройдено тестов')}${c(o.tickets,'Открытые тикеты')}</div>`
+  +(o.top.length?`<div class="card"><b>🔥 Популярные уроки</b>${o.top.map((x,i)=>`<div class="row" style="margin-top:6px"><span style="flex:4">${i+1}. ${esc(x.title)}</span><b style="text-align:right">${x.n}</b></div>`).join('')}</div>`:'')
+  +`<div class="card mute">Промокодов: ${o.promos}.</div>`},
+ async 'Промокоды'(){const {items}=await api('admin_promos');
+  return `<details class="card"><summary><b>➕ Создать промокод</b></summary><input id="ac" placeholder="КОД (A–Z, 0–9)"><select id="at"><option value="vip">VIP (дни)</option><option value="coins">Монеты</option><option value="discount">Скидка %</option></select><input id="av" type="number" placeholder="Значение"><input id="al" type="number" placeholder="Лимит активаций (0 — без лимита)"><input id="ad" type="number" placeholder="Срок, дней (0 — бессрочно)"><button class="btn" onclick="newPromo()">Создать</button></details>`
+  +(items.length?items.map(x=>`<div class="card row"><div style="flex:3"><b>${esc(x.code)}</b> <span class="mute">${{vip:'VIP '+x.value+' дн.',coins:x.value+' монет',discount:'скидка '+x.value+'%'}[x.type]}</span><div class="mute">Использовано ${x.used}${x.limit?' из '+x.limit:''} • ${x.expires?'до '+fd(x.expires):'бессрочно'} • ${x.active?'активен':'выключен'}</div></div><button class="btn sm ghost" style="flex:none" onclick="adm('admin_promo_toggle',{code:'${esc(x.code)}'})">${x.active?'Выкл':'Вкл'}</button><button class="btn sm ghost" style="flex:none" onclick="if(confirm('Удалить промокод?'))adm('admin_promo_del',{code:'${esc(x.code)}'})">✕</button></div>`).join(''):'<div class="card center mute">Промокодов пока нет</div>')},
+ async 'Люди'(){const {items,total}=await api('admin_users',{q:AUQ}),now=Date.now();
+  return `<div class="card"><div class="row"><input id="uq" value="${esc(AUQ)}" placeholder="Telegram ID или имя" onkeydown="if(event.key==='Enter')findU()"><button class="btn sm" style="flex:none" onclick="findU()">Найти</button></div><div class="mute">Всего пользователей: ${total}. ${AUQ?'Результаты поиска.':'Показаны последние новые.'}</div></div>`
+  +(items.length?items.map(u=>`<div class="card"><div class="row"><b style="flex:3">${esc(u.name)} <span class="mute">#${u.id}</span></b><span class="tag ${u.vip_until>now?'v':''}" style="flex:none">${u.vip_until>now?'VIP до '+dd(u.vip_until):'без VIP'}</span></div><div class="mute">Монет ${u.coins} • уроков ${u.done} • дней ${u.days} • с ${dd(u.joined)}</div><div class="row" style="margin-top:8px;flex-wrap:wrap"><button class="btn sm ghost" onclick="uAct('${u.id}','vip+',30)">+30 дн.</button><button class="btn sm ghost" onclick="uAct('${u.id}','vip+',365)">+1 год</button><button class="btn sm ghost" onclick="uAct('${u.id}','vip-',0)">Снять VIP</button><button class="btn sm ghost" onclick="uAct('${u.id}','coins',100)">+100 🪙</button></div></div>`).join(''):'<div class="card center mute">Никого не найдено</div>')},
+ async 'Тикеты'(){const {items}=await api('admin_tickets'),op=items.filter(x=>x.status==='open'),cl=items.filter(x=>x.status!=='open'),card=x=>`<div class="card"><b>#${x.id} ${esc(x.name)}</b> <span class="mute">${dd(x.created)}${x.photo?' • 📷 фото':''}</span><p style="margin:6px 0">${esc(x.text)}</p>${x.reply?`<div class="msg ex">${esc(x.reply)}</div>`:`<input id="r${x.id}" placeholder="Ответ"><button class="btn sm" style="margin-top:8px" onclick="reply(${x.id})">Ответить</button>`}</div>`;
+  return (op.length?op.map(card).join(''):'<div class="card center mute">Открытых тикетов нет</div>')+(cl.length?`<details class="card"><summary><b>Закрытые (${cl.length})</b></summary>${cl.map(card).join('')}</details>`:'')},
+ async 'Рейтинг'(){const {items}=await api('lb');window.LBI=items;
+  return `<details class="card"><summary><b>➕ Добавить или изменить участника</b></summary><input id="ln" maxlength="24" placeholder="Ник"><input id="ls" type="number" placeholder="Рейтинг"><button class="btn" onclick="adm('admin_lb_set',{nick:$('#ln').value,score:$('#ls').value})">Сохранить</button></details>`
+  +(items.length?items.map((x,i)=>`<div class="card row"><span style="flex:3">${i+1}. ${esc(x.nick)}</span><b style="flex:none">${x.score}</b><button class="btn sm ghost" style="flex:none" onclick="adm('admin_lb_del',{nick:LBI[${i}].nick})">✕</button></div>`).join(''):'<div class="card center mute">Список пуст</div>')},
+ async 'Рассылка'(){const o=await api('admin_overview'),n={'Все':o.users,'VIP':o.vip,'Без VIP':o.users-o.vip}[S2.bt];
+  return `<div class="card"><b>📣 Рассылка через бота</b><textarea id="bt" rows="4" maxlength="1000" oninput="BT=this.value" placeholder="Текст сообщения">${esc(BT)}</textarea><div class="mute">Кому отправить:</div><div class="chips">${['Все','VIP','Без VIP'].map(x=>`<button class="chip ${S2.bt===x?'on':''}" onclick="S2.bt='${x}';ARM=false;draw()">${x}</button>`).join('')}</div>`
+  +(ARM?`<div class="card tipc">Отправить сообщение ${n} получателям?<div class="row" style="margin-top:8px"><button class="btn sm" onclick="sendBc()">Да, отправить</button><button class="btn sm ghost" onclick="ARM=false;draw()">Отмена</button></div></div>`:`<button class="btn" onclick="armBc()">Отправить (${n})</button>`)
+  +`<div class="mute">Сообщение получат только те, кто запускал бота и не заблокировал его.</div></div>`}
+};
+const findU=()=>{AUQ=$('#uq').value.trim();draw()};
+const uAct=(uid,a,value)=>act(async()=>{if(a==='vip-'&&!confirm('Снять VIP у пользователя?'))return;await api('admin_user_act',{uid,act:a,value});toast('Готово');draw()});
+const armBc=()=>{BT=(($('#bt')&&$('#bt').value)||BT).trim();if(BT.length<3)return toast('Введите текст сообщения',1);ARM=true;draw()};
+const sendBc=()=>act(async()=>{const text=BT.trim(),target={'Все':'all','VIP':'vip','Без VIP':'free'}[S2.bt];let off=0,sent=0,fail=0,total=0;ARM=false;toast('Отправка…');do{const r=await api('admin_broadcast',{text,target,offset:off});sent+=r.sent;fail+=r.failed;total=r.total;off=r.next}while(off!=null);BT='';toast(`Отправлено ${sent} из ${total}${fail?`, ошибок ${fail}`:''}`);draw()});
+V.admin=async()=>{let body;try{body=await ADM[S2.at]()}catch(e){body=`<div class="card">${esc(e.message)}</div>`}
+  return head('Админ-панель')+`<div class="hrs mchips">${Object.keys(ADM).map(x=>`<button class="chip ${S2.at===x?'on':''}" onclick="S2.at='${x}';draw()">${x}</button>`).join('')}</div>`+body};
+// ---- v11: вкладка «Бот» в админ-панели (приветствие) ----
+let BG=null,BB=null;
+const botPrev=(t,n='Анна')=>esc(t).replace(/\{name\}/g,`<b>${esc(n)}</b>`).replace(/\n/g,'<br>');
+ADM['Бот']=async()=>{const c=await api('admin_bot_get');if(BG===null)BG=c.greeting;if(BB===null)BB=c.button;
+  return `<div class="card"><b>🤖 Приветствие бота (команда /start)</b><textarea id="bg" rows="6" maxlength="1000" oninput="BG=this.value;$('#bpv').innerHTML=botPrev(BG)">${esc(BG)}</textarea><div class="mute">Вместо <b>{name}</b> подставится имя пользователя. Пустые строки и эмодзи можно использовать.</div><b style="display:block;margin-top:10px">Текст кнопки под приветствием</b><input id="bb" maxlength="40" value="${esc(BB)}" oninput="BB=this.value"><button class="btn" onclick="saveBot()">Сохранить</button><div class="row" style="margin-top:8px"><button class="btn sm ghost" onclick="testBot()">Прислать мне для проверки</button><button class="btn sm ghost" onclick="resetBot()">Сбросить на стандартное</button></div></div><div class="card"><b>Так это увидит пользователь</b><div class="msg ex" id="bpv" style="max-width:100%;margin-top:8px">${botPrev(BG)}</div></div>`};
+const saveBot=()=>act(async()=>{await api('admin_bot_set',{greeting:BG,button:BB});toast('Приветствие сохранено');BG=BB=null;draw()});
+const testBot=()=>act(async()=>{await api('admin_bot_test',{greeting:BG,button:BB});toast('Черновик отправлен вам в чат (в рабочий текст не сохранён)')});
+const resetBot=()=>act(async()=>{await api('admin_bot_reset');BG=BB=null;toast('Возвращено стандартное приветствие');draw()});
+const APP_VER='2.4';try{console.log('СадоВест',APP_VER)}catch{}
+const _pfv=V.profile;V.profile=async(...a)=>(await _pfv(...a))+`<p class="mute center" style="margin:18px 0 4px;font-size:12px">Версия ${APP_VER}</p>`;
+const _sp=document.getElementById('splash');
+// Заставка: полоса плавно ползёт к ~90%, пока грузится приложение, и добегает до 100% по готовности
+const spRun=(()=>{
+  const fill=_sp&&_sp.querySelector('#spFill'),t0=performance.now(),minT=SET.motion?2800:250;let p=0,ready=false,over=false;
+  const leave=()=>{if(over)return;over=true;if(_sp){_sp.classList.add('hide');setTimeout(()=>_sp.remove(),800)}setTimeout(maybeTour,700)};
+  const tick=()=>{if(over)return;const el=performance.now()-t0;
+    const tgt=ready&&el>=minT?100:(el<minT?Math.min(90,el/minT*90):Math.min(97,90+(el-minT)/1200));
+    p+=(tgt-p)*(tgt>=100?.2:.1);if(fill)fill.style.width=p.toFixed(2)+'%';
+    if(ready&&el>=minT&&p>=99.4){if(fill)fill.style.width='100%';setTimeout(leave,320);over=over;return}
+    requestAnimationFrame(tick)};
+  requestAnimationFrame(tick);setTimeout(leave,15000);
+  return {done:()=>{ready=true}};
+})();
+if(_sp){const a=document.getElementById('spArt');setTimeout(()=>a&&a.classList.add('ready'),700)}
+Promise.resolve().then(()=>init()).catch(()=>{}).finally(()=>spRun.done());
+</script>
+</body>
+</html>
