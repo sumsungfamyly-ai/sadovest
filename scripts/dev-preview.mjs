@@ -25,9 +25,10 @@ const demo = {
   tests: {},
   bookmarks: [],
   coins: 24,
-  days: 12,
   notify: true,
   tickets: [],
+  newsSeen: 0,
+  news: [{ id: 1, title: 'Добро пожаловать в Садовест!', emoji: '🎉', text: 'Это демо-новость локального предпросмотра.\nДобавляйте свои новости в админ-панели.', pin: true, created: Date.now() - DAY }],
   promos: [{ code: 'DEMO10', type: 'discount', value: 10, limit: 0, expires: 0, active: true, used: 0, created: Date.now() }],
   run: null,
 };
@@ -62,7 +63,6 @@ function me(req) {
     done: demo.progress.size,
     total: LESSONS.length,
     coins: demo.coins,
-    days: demo.days,
     ach: [...(demo.progress.size ? ['first'] : []), ...(demo.plants.length >= 3 ? ['garden'] : [])],
     notify: demo.notify,
     admin: req.headers['x-preview-admin'] === '1',
@@ -200,9 +200,31 @@ async function api(req, body) {
       return { bookmarks: demo.bookmarks };
     }
     case 'lb': return { items: [{ nick: 'Зелёный сад', score: 42 }, { nick: 'Росток', score: 31 }], you: demo.coins };
+    case 'news': {
+      const items = [...demo.news].sort((a, b) => (b.pin ? 1 : 0) - (a.pin ? 1 : 0) || b.created - a.created).map(n => ({ ...n, fresh: n.created > demo.newsSeen }));
+      const unread = items.filter(n => n.fresh).length;
+      demo.newsSeen = Math.max(demo.newsSeen, ...demo.news.map(n => n.created), 0);
+      return { items, unread };
+    }
+    case 'news_badge': {
+      const last = [...demo.news].sort((a, b) => b.created - a.created)[0];
+      return { unread: demo.news.filter(n => n.created > demo.newsSeen).length, latest: last ? { id: last.id, title: last.title, emoji: last.emoji, created: last.created } : null };
+    }
+    case 'admin_news': return { items: [...demo.news].sort((a, b) => (b.pin ? 1 : 0) - (a.pin ? 1 : 0) || b.created - a.created) };
+    case 'admin_news_save': {
+      const title = String(body.title || '').trim(), text = String(body.text || '').trim();
+      if (title.length < 3 || title.length > 100) throw Object.assign(new Error('Заголовок: от 3 до 100 символов'), { status: 400 });
+      if (text.length < 3 || text.length > 4000) throw Object.assign(new Error('Текст: от 3 до 4000 символов'), { status: 400 });
+      const emoji = String(body.emoji || '').trim().slice(0, 8) || '📰', id = Number(body.id);
+      if (id) { const n = demo.news.find(x => x.id === id); if (!n) throw Object.assign(new Error('Новость не найдена'), { status: 404 }); Object.assign(n, { title, text, emoji, pin: !!body.pin, edited: Date.now() }); }
+      else demo.news.push({ id: Date.now(), title, text, emoji, pin: !!body.pin, created: Date.now() });
+      return { items: demo.news };
+    }
+    case 'admin_news_pin': { const n = demo.news.find(x => x.id === Number(body.id)); if (n) n.pin = !n.pin; return { items: demo.news }; }
+    case 'admin_news_del': demo.news = demo.news.filter(x => x.id !== Number(body.id)); return { items: demo.news };
     case 'admin_stats': return { users: 1, vip: vip ? 1 : 0, tickets: demo.tickets.length, promos: demo.promos.length };
     case 'admin_overview': return { users: 1, vip: vip ? 1 : 0, tickets: demo.tickets.length, promos: demo.promos.length, active: 1, active7: 1, new7: 1, lessonsDone: demo.progress.size, testsDone: Object.keys(demo.tests).length, top: [] };
-    case 'admin_users': return { total: 1, items: [{ id: demo.id, name: demo.name, vip_until: vip ? Date.now() + 30 * DAY : 0, coins: demo.coins, done: demo.progress.size, days: demo.days, joined: Date.now() }] };
+    case 'admin_users': return { total: 1, items: [{ id: demo.id, name: demo.name, vip_until: vip ? Date.now() + 30 * DAY : 0, coins: demo.coins, done: demo.progress.size, joined: Date.now() }] };
     case 'admin_promos': return { items: demo.promos };
     case 'admin_promo_new': {
       const promo = { ...body, used: 0, active: true, created: Date.now(), expires: 0 };

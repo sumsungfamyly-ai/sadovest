@@ -1,4 +1,5 @@
 import { r, getJ, setJ } from '../lib/db.js';
+import { listNews, saveNews } from '../lib/news.js';
 import fs from 'fs';
 import path from 'path';
 import { SOON } from '../lib/lessons.js';
@@ -138,6 +139,44 @@ const H = {
     if (g.length > 1000 || bt.length > 40) deny('Слишком длинный текст', 400);
     await say(u.id, greet(g, u.name), { reply_markup: { inline_keyboard: [[{ text: bt, web_app: { url: `https://${host}` } }]] } });
     return { ok: 1 };
+  },
+  async news({ u }) {
+    const items = await listNews(), seen = u.newsSeen || 0;
+    const out = { items: items.map(n => ({ ...n, fresh: n.created > seen })), unread: items.filter(n => n.created > seen).length };
+    const latest = items.reduce((m, n) => Math.max(m, n.created), 0);
+    if (latest > seen) { u.newsSeen = latest; await save(u); }
+    return out;
+  },
+  async news_badge({ u }) {
+    const items = await listNews(), seen = u.newsSeen || 0, last = [...items].sort((a, c) => c.created - a.created)[0];
+    return { unread: items.filter(n => n.created > seen).length, latest: last ? { id: last.id, title: last.title, emoji: last.emoji, created: last.created } : null };
+  },
+  async admin_news({ admin }) { needAdmin(admin); return { items: await listNews() }; },
+  async admin_news_save({ admin, b }) {
+    needAdmin(admin);
+    const title = String(b.title || '').trim(), text = String(b.text || '').trim(), emoji = String(b.emoji || '').trim().slice(0, 8) || '📰';
+    if (title.length < 3 || title.length > 100) deny('Заголовок: от 3 до 100 символов', 400);
+    if (text.length < 3 || text.length > 4000) deny('Текст: от 3 до 4000 символов', 400);
+    const list = await listNews(), id = Number(b.id);
+    if (id) {
+      const n = list.find(x => x.id === id); if (!n) deny('Новость не найдена', 404);
+      Object.assign(n, { title, text, emoji, pin: !!b.pin, edited: Date.now() });
+    } else {
+      if (list.length >= 100) deny('Максимум 100 новостей: удалите старые', 400);
+      list.push({ id: Date.now(), title, text, emoji, pin: !!b.pin, created: Date.now() });
+    }
+    await saveNews(list);
+    return { items: await listNews() };
+  },
+  async admin_news_pin({ admin, b }) {
+    needAdmin(admin);
+    const list = await listNews(), n = list.find(x => x.id === Number(b.id)); if (!n) deny('Новость не найдена', 404);
+    n.pin = !n.pin; await saveNews(list); return { items: await listNews() };
+  },
+  async admin_news_del({ admin, b }) {
+    needAdmin(admin);
+    await saveNews((await listNews()).filter(x => x.id !== Number(b.id)));
+    return { items: await listNews() };
   },
   async bookmark({ u, b }) {
     const k = String(b.key || '').slice(0, 10); if (!/^[lpdh]:\d+$/.test(k)) deny('Ошибка', 400);

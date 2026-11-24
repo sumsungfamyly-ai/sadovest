@@ -1,3 +1,4 @@
+import { listNews } from '../lib/news.js';
 import { botCfg, greet, getUser, isVip, fmt, say, esc, admins, activate, newPromo, stats, newTicket, replyTicket, grantVip, withLock, LESSONS } from '../lib/core.js';
 
 export default async function handler(req, res) {
@@ -15,7 +16,11 @@ export default async function handler(req, res) {
         const u = await getUser(m.from), chat = m.chat.id, adm = admins().includes(String(u.id));
         try {
           if (cmd === '/start') await say(chat, greet(cfg.greeting, u.name), openBtn);
-          else if (cmd === '/help') await say(chat, '/start — запуск\n/profile — профиль\n/vip — VIP-клуб\n/promo КОД — активировать промокод\n/support вопрос — тикет (VIP)' + (adm ? '\n\nАдмин:\n/grant ID дни\n/newpromo КОД тип значение лимит дни\n/stats\n/reply ID текст' : ''));
+          else if (cmd === '/help') await say(chat, '/start — запуск\n/news — последние новости\n/profile — профиль\n/vip — VIP-клуб\n/promo КОД — активировать промокод\n/support вопрос — тикет (VIP)' + (adm ? '\n\nАдмин:\n/grant ID дни\n/newpromo КОД тип значение лимит дни\n/stats\n/reply ID текст' : ''));
+          else if (cmd === '/news') {
+            const items = (await listNews()).slice(0, 5);
+            await say(chat, items.length ? '📰 <b>Новости Садовеста</b>\n\n' + items.map(n => `${esc(n.emoji || '📰')} <b>${esc(n.title)}</b>\n${esc(n.text.length > 300 ? n.text.slice(0, 300) + '…' : n.text)}\n<i>${fmt(n.created)}</i>`).join('\n\n') : 'Новостей пока нет.', openBtn);
+          }
           else if (cmd === '/profile') await say(chat, `👤 <b>${esc(u.name)}</b>\nСтатус: ${isVip(u) ? '👑 VIP до ' + fmt(u.vip_until) : 'обычный'}\nУроков: ${u.progress.length} из ${LESSONS.length}\nМонеты: ${u.coins}`, openBtn);
           else if (cmd === '/vip') await say(chat, isVip(u) ? `👑 VIP активен до ${fmt(u.vip_until)}` : '👑 VIP-клуб: расширенные VIP-уроки, поддержка экспертов, эксклюзивные материалы и золотой значок. Откройте приложение, чтобы купить VIP или ввести промокод.', openBtn);
           else if (cmd === '/promo') { if (!arg) await say(chat, 'Использование: /promo КОД'); else await activate(u, arg); }
