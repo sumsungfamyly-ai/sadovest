@@ -7,6 +7,7 @@ import { TESTS, pickQs, testSize, shuffle } from '../lib/tests.js';
 import { ENC, FREE } from '../lib/enc.js';
 import { botCfg, greet, say, sendFile, verify, getUser, save, isVip, activate, achieve, LESSONS, admins, newPromo, listPromos, stats, newTicket, replyTicket, grantVip, loadUsers, withLock } from '../lib/core.js';
 
+const NEWS_STYLES = ['plain', 'emerald', 'gold', 'rainbow', 'sunset', 'ocean', 'night'];
 const USER_CAP = 20000; // сколько пользователей максимум загружаем для сводки и поиска
 
 const deny = (m = 'Нет доступа', code = 403) => { const e = new Error(m); e.code = code; throw e; };
@@ -157,14 +158,25 @@ const H = {
     const title = String(b.title || '').trim(), text = String(b.text || '').trim(), emoji = String(b.emoji || '').trim().slice(0, 8) || '📰';
     if (title.length < 3 || title.length > 100) deny('Заголовок: от 3 до 100 символов', 400);
     if (text.length < 3 || text.length > 4000) deny('Текст: от 3 до 4000 символов', 400);
+    const style = NEWS_STYLES.includes(b.style) ? b.style : 'plain', layout = b.layout === 'bg' ? 'bg' : 'top', anim = b.anim !== false;
+    let imgB64 = '';
+    if (b.img) {
+      const m = /^data:image\/jpeg;base64,([A-Za-z0-9+/=]+)$/.exec(String(b.img));
+      if (!m || m[1].length > 600000) deny('Фото не подходит или слишком большое (после сжатия до 450 КБ)', 400);
+      imgB64 = m[1];
+    }
     const list = await listNews(), id = Number(b.id);
+    let n;
     if (id) {
-      const n = list.find(x => x.id === id); if (!n) deny('Новость не найдена', 404);
-      Object.assign(n, { title, text, emoji, pin: !!b.pin, edited: Date.now() });
+      n = list.find(x => x.id === id); if (!n) deny('Новость не найдена', 404);
+      Object.assign(n, { title, text, emoji, pin: !!b.pin, style, layout, anim, edited: Date.now() });
     } else {
       if (list.length >= 100) deny('Максимум 100 новостей: удалите старые', 400);
-      list.push({ id: Date.now(), title, text, emoji, pin: !!b.pin, created: Date.now() });
+      n = { id: Date.now(), title, text, emoji, pin: !!b.pin, style, layout, anim, img: false, created: Date.now() };
+      list.push(n);
     }
+    if (imgB64) { await r('SET', 'news:img:' + n.id, imgB64); n.img = true; n.imgv = Date.now(); }
+    else if (b.delimg && n.img) { await r('DEL', 'news:img:' + n.id); n.img = false; delete n.imgv; }
     await saveNews(list);
     return { items: await listNews() };
   },
@@ -176,6 +188,7 @@ const H = {
   async admin_news_del({ admin, b }) {
     needAdmin(admin);
     await saveNews((await listNews()).filter(x => x.id !== Number(b.id)));
+    await r('DEL', 'news:img:' + Number(b.id));
     return { items: await listNews() };
   },
   async bookmark({ u, b }) {
