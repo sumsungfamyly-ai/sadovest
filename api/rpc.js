@@ -10,6 +10,17 @@ import { botCfg, greet, say, sendFile, verify, getUser, save, isVip, activate, a
 const NEWS_STYLES = ['plain', 'emerald', 'gold', 'rainbow', 'sunset', 'ocean', 'night'];
 const USER_CAP = 20000; // сколько пользователей максимум загружаем для сводки и поиска
 
+// ---- Режимы: админ может закрыть раздел (или всё приложение) с сообщением, например «Технические работы» ----
+const MODE_KEYS = ['all', 'news', 'lessons', 'garden', 'calendar', 'tests', 'enc', 'identify', 'board', 'files', 'support', 'weather', 'moon', 'hacks', 'dict'];
+const ACTION_MODE = { news: 'news', news_badge: 'news', lessons: 'lessons', lesson: 'lessons', done: 'lessons', tests: 'tests', test: 'tests', test_done: 'tests', enc_get: 'enc', files: 'files', pdf: 'files', lb: 'board', tickets: 'support', ticket_new: 'support' };
+const DEFAULT_MODE_MSG = 'Технические работы. Скоро вернёмся!';
+let modesCache = { at: 0, v: {} };
+async function getModes(fresh = false) {
+  if (!fresh && Date.now() - modesCache.at < 3000) return modesCache.v;
+  let v = {}; try { v = (await getJ('cfg:modes')) || {}; } catch { v = modesCache.v; }
+  modesCache = { at: Date.now(), v }; return v;
+}
+const closedOnly = m => Object.fromEntries(Object.entries(m).filter(([k, x]) => MODE_KEYS.includes(k) && x && x.off).map(([k, x]) => [k, { off: true, msg: x.msg || DEFAULT_MODE_MSG }]));
 const deny = (m = 'Нет доступа', code = 403) => { const e = new Error(m); e.code = code; throw e; };
 const needAdmin = a => { if (!a) deny(); };
 
@@ -26,7 +37,7 @@ async function sendPlain(chat_id, text, tries = 2) {
 }
 const H = {
   async me({ u, admin }) {
-    return { id: u.id, name: u.name, vip: isVip(u), bookmarks: u.bookmarks, profile: u.profile, vip_until: u.vip_until, done: u.progress.length, total: LESSONS.length, coins: u.coins, ach: (u.ach || []).filter(k => !/^s\d+$/.test(k) && k !== 'week'), notify: u.notify, admin, discount: u.discount || null,
+    return { id: u.id, name: u.name, vip: isVip(u), bookmarks: u.bookmarks, profile: u.profile, vip_until: u.vip_until, done: u.progress.length, total: LESSONS.length, coins: u.coins, ach: (u.ach || []).filter(k => !/^s\d+$/.test(k) && k !== 'week'), notify: u.notify, admin, discount: u.discount || null, modes: closedOnly(await getModes(true)),
       cfg: { buy: process.env.BUY_URL || '' } };
   },
   async lessons({ u }) {
@@ -152,6 +163,16 @@ const H = {
     const items = await listNews(), seen = u.newsSeen || 0, last = [...items].sort((a, c) => c.created - a.created)[0];
     return { unread: items.filter(n => n.created > seen).length, latest: last ? { id: last.id, title: last.title, emoji: last.emoji, created: last.created } : null };
   },
+  async admin_modes_get({ admin }) { needAdmin(admin); const m = await getModes(true); return { modes: Object.fromEntries(MODE_KEYS.map(k => [k, { off: !!(m[k] && m[k].off), msg: (m[k] && m[k].msg) || '' }])), def: DEFAULT_MODE_MSG }; },
+  async admin_modes_set({ admin, b }) {
+    needAdmin(admin);
+    const key = String(b.key || ''); if (!MODE_KEYS.includes(key)) deny('Неизвестный раздел', 400);
+    const msg = String(b.msg || '').trim().slice(0, 300), m = { ...(await getModes(true)) };
+    m[key] = { off: !!b.off, msg, at: Date.now() };
+    await setJ('cfg:modes', m); modesCache = { at: Date.now(), v: m };
+    return await H.admin_modes_get({ admin });
+  },
+  async admin_modes_open_all({ admin }) { needAdmin(admin); await setJ('cfg:modes', {}); modesCache = { at: Date.now(), v: {} }; return await H.admin_modes_get({ admin }); },
   async admin_news({ admin }) { needAdmin(admin); return { items: await listNews() }; },
   async admin_news_save({ admin, b }) {
     needAdmin(admin);
@@ -259,6 +280,11 @@ export default async function handler(req, res) {
     const b = req.body || {};
     const fn = typeof b.action === 'string' && Object.hasOwn(H, b.action) ? H[b.action] : null;
     if (!fn) deny('Неизвестное действие', 400);
+    // закрытые разделы: админам доступны всегда, остальным — ответ 503 с сообщением
+    if (!admins().includes(String(tu.id)) && !['me', 'onboard'].includes(b.action)) {
+      const modes = await getModes(), sec = modes.all && modes.all.off ? 'all' : ACTION_MODE[b.action];
+      if (sec && modes[sec] && modes[sec].off) return res.status(503).json({ error: modes[sec].msg || DEFAULT_MODE_MSG, closed: true, sec, modes: closedOnly(modes) });
+    }
     const host = req.headers['x-forwarded-host'] || req.headers.host;
     // запросы одного пользователя идут по очереди — без потери данных при параллельных вызовах
     const out = await withLock(tu.id, async () => {

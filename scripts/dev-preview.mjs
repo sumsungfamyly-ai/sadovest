@@ -13,7 +13,11 @@ const port = Number(process.env.PORT) || 4173;
 const DAY = 864e5;
 const pdfs = JSON.parse(await readFile(resolve(root, 'lib/pdf/index.json'), 'utf8'));
 const events = new Set();
+const MODE_KEYS = ['all', 'news', 'lessons', 'garden', 'calendar', 'tests', 'enc', 'identify', 'board', 'files', 'support', 'weather', 'moon', 'hacks', 'dict'];
+const ACTION_MODE = { news: 'news', news_badge: 'news', lessons: 'lessons', lesson: 'lessons', done: 'lessons', tests: 'tests', test: 'tests', test_done: 'tests', enc_get: 'enc', files: 'files', pdf: 'files', lb: 'board', tickets: 'support', ticket_new: 'support' };
+const closedModes = () => Object.fromEntries(Object.entries(demo.modes).filter(([, x]) => x.off).map(([k, x]) => [k, { off: true, msg: x.msg || 'Технические работы. Скоро вернёмся!' }]));
 const demo = {
+  modes: {},
   id: 100000001,
   name: 'Демо-садовод',
   profile: { place: ['Дача'], level: 'Любитель', city: 'Москва' },
@@ -28,6 +32,7 @@ const demo = {
   notify: true,
   tickets: [],
   newsSeen: 0,
+  newsImgs: {},
   news: [{ id: 1, title: 'Добро пожаловать в Садовест!', emoji: '🎉', text: 'Это демо-новость локального предпросмотра.\nДобавляйте свои новости в админ-панели.', pin: true, created: Date.now() - DAY }],
   promos: [{ code: 'DEMO10', type: 'discount', value: 10, limit: 0, expires: 0, active: true, used: 0, created: Date.now() }],
   run: null,
@@ -68,6 +73,7 @@ function me(req) {
     admin: req.headers['x-preview-admin'] === '1',
     discount: null,
     cfg: { buy: '' },
+    modes: closedModes(),
   };
 }
 
@@ -84,6 +90,10 @@ async function api(req, body) {
   const user = me(req);
 
   if (body.action.startsWith('admin_')) requireAdmin(admin);
+  if (!admin && !['me', 'onboard'].includes(body.action)) {
+    const sec = demo.modes.all?.off ? 'all' : ACTION_MODE[body.action];
+    if (sec && demo.modes[sec]?.off) throw Object.assign(new Error(demo.modes[sec].msg || 'Технические работы. Скоро вернёмся!'), { status: 503, extra: { closed: true, sec, modes: closedModes() } });
+  }
 
   switch (body.action) {
     case 'me': return user;
@@ -216,8 +226,14 @@ async function api(req, body) {
       if (title.length < 3 || title.length > 100) throw Object.assign(new Error('Заголовок: от 3 до 100 символов'), { status: 400 });
       if (text.length < 3 || text.length > 4000) throw Object.assign(new Error('Текст: от 3 до 4000 символов'), { status: 400 });
       const emoji = String(body.emoji || '').trim().slice(0, 8) || '📰', id = Number(body.id);
-      if (id) { const n = demo.news.find(x => x.id === id); if (!n) throw Object.assign(new Error('Новость не найдена'), { status: 404 }); Object.assign(n, { title, text, emoji, pin: !!body.pin, edited: Date.now() }); }
-      else demo.news.push({ id: Date.now(), title, text, emoji, pin: !!body.pin, created: Date.now() });
+      const style = ['plain', 'emerald', 'gold', 'rainbow', 'sunset', 'ocean', 'night'].includes(body.style) ? body.style : 'plain', layout = body.layout === 'bg' ? 'bg' : 'top', anim = body.anim !== false;
+      let n;
+      if (id) { n = demo.news.find(x => x.id === id); if (!n) throw Object.assign(new Error('Новость не найдена'), { status: 404 }); Object.assign(n, { title, text, emoji, pin: !!body.pin, style, layout, anim, edited: Date.now() }); }
+      else { n = { id: Date.now(), title, text, emoji, pin: !!body.pin, style, layout, anim, img: false, created: Date.now() }; demo.news.push(n); }
+      const m = /^data:image\/jpeg;base64,([A-Za-z0-9+/=]+)$/.exec(String(body.img || ''));
+      if (body.img && (!m || m[1].length > 600000)) throw Object.assign(new Error('Фото не подходит'), { status: 400 });
+      if (m) { demo.newsImgs[n.id] = m[1]; n.img = true; n.imgv = Date.now(); }
+      else if (body.delimg && n.img) { delete demo.newsImgs[n.id]; n.img = false; }
       return { items: demo.news };
     }
     case 'admin_news_pin': { const n = demo.news.find(x => x.id === Number(body.id)); if (n) n.pin = !n.pin; return { items: demo.news }; }
@@ -251,6 +267,16 @@ async function api(req, body) {
     case 'admin_lb_del':
     case 'admin_broadcast':
       return body.action === 'admin_broadcast' ? { sent: 1, failed: 0, total: 1, next: null } : { ok: 1 };
+    case 'admin_modes_get':
+    case 'admin_modes_set':
+    case 'admin_modes_open_all': {
+      if (body.action === 'admin_modes_open_all') demo.modes = {};
+      if (body.action === 'admin_modes_set') {
+        if (!MODE_KEYS.includes(body.key)) throw Object.assign(new Error('Неизвестный раздел'), { status: 400 });
+        demo.modes[body.key] = { off: !!body.off, msg: String(body.msg || '').trim().slice(0, 300) };
+      }
+      return { modes: Object.fromEntries(MODE_KEYS.map(k => [k, { off: !!demo.modes[k]?.off, msg: demo.modes[k]?.msg || '' }])), def: 'Технические работы. Скоро вернёмся!' };
+    }
     case 'admin_bot_get': return { greeting: 'Привет, {name}! 🌿 Это локальный предпросмотр.', button: '🌱 Открыть Садовест' };
     case 'admin_bot_set':
     case 'admin_bot_reset':
@@ -332,8 +358,14 @@ const server = createServer(async (req, res) => {
     try {
       return json(res, 200, await api(req, await readBody(req)));
     } catch (error) {
-      return json(res, error.status || 400, { error: error.message || 'Ошибка предпросмотра' });
+      return json(res, error.status || 400, { error: error.message || 'Ошибка предпросмотра', ...(error.extra || {}) });
     }
+  }
+  if (url.pathname === '/api/newsimg') {
+    const b64 = demo.newsImgs[url.searchParams.get('id')];
+    if (!b64) { res.writeHead(404); return res.end(); }
+    res.writeHead(200, { 'content-type': 'image/jpeg' });
+    return res.end(Buffer.from(b64, 'base64'));
   }
   if (!['GET', 'HEAD'].includes(req.method)) return json(res, 405, { error: 'Method not allowed' });
 
